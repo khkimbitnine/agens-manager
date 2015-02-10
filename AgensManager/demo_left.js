@@ -20,7 +20,7 @@
 var http = require('http');
 var pg = require('pg');
 
-var conString = "postgres://postgres:1111@localhost/postgres";
+var conString = "postgres://postgres:5432@localhost/procarrie";
 
 var server = http.createServer(function(req, res) {
 
