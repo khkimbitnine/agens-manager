@@ -1,63 +1,196 @@
 <!doctype html>
-<html>
+<html ng-app="tree">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Sidebar</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Sidebar Test</title>
+    <style type="text/css">
+        body{
+            font-family:Arial, Helvetica, sans-serif;
+            margin:10px;
+        }
+        .wrapper{
+            position:relative;
+            font-family:Arial, Helvetica, sans-serif;
+            padding-top:90px;
+            padding-left:50px;
+            width:80%;
+            margin:auto
+        }
+        span.btn{
+            padding:10px;
+            display:inline-block;
+            cursor:pointer;
+            font:12px/14px Arial, Helvetica, sans-serif;
+            color:#aaa;
+            background-color:#eee;
+            -moz-border-radius:10px;
+            -webkit-border-radius:10px;
+            -moz-box-shadow:#999 2px 0px 3px;
+            -webkit-box-shadow:#999 2px 0px 3px;
+        }
+        span.btn:hover{
+            background-color:#000;
+        }
+        .extruder.left.a .flap{
+            font-size:18px;
+            color:white;
+            top:0;
+            padding:10px 0 10px 10px;
+            background:#772B14;
+            width:30px;
+            position:absolute;
+            right:0;
+            -moz-border-radius:0 10px 10px 0;
+            -webkit-border-top-right-radius:10px;
+            -webkit-border-bottom-right-radius:10px;
+            -moz-box-shadow:#666 2px 0px 3px;
+            -webkit-box-shadow:#666 2px 0px 3px;
+        }
+        .extruder.left.a .content{
+            border-right:3px solid #772B14;
+        }
+        .extruder.top .optionsPanel .panelVoice a:hover{
+            color:#fff;
+            background: url("public/css/images/black_op_30.png");
+            border-bottom:1px solid #000;
+        }
+        .extruder.top .optionsPanel .panelVoice a{
+            border-bottom:1px solid #000;
+        }
+        .extruder.left.a .flap .flapLabel{
+            background:#772B14;
+        }
+        
+    </style>
 
-<link href="public/css/mbExtruder.css" media="all" rel="stylesheet"	type="text/css">
-<link rel="stylesheet" href="public/css/jquery.treeview.css" />
-<link rel="stylesheet" href="public/css/style.css" />
-
-<script type="text/javascript" 	src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
-<script type="text/javascript" src="public/js/jquery.hoverIntent.min.js"></script>
-<script type="text/javascript" src="public/js/jquery.mb.flipText.js"></script>
-<script type="text/javascript" src="public/js/mbExtruder.js"></script>
-<script src="public/js/jquery.treeview.js"></script>
-
-<script type="text/javascript">
-$(function(){
-	$("#extruderLeft").buildMbExtruder({
-		position:"left",
-		width:230,
-		extruderOpacity:.8,
-		hidePanelsOnClose:true,
-		accordionPanels:true,
-	});
-
-	$("#extruderLeft1").buildMbExtruder({
-		position:"left",
-		width:230,
-		extruderOpacity:.8,
-	});
-    
-	var s = $("#browser").treeview({
-		collapsed: true
-	});
-});
-    </script>
+    <link href="public/css/mbExtruder.css" media="all" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="public/css/jquery.treeview.css" />
 </head>
 <body>
 <div class="wrapper">
-	<div class="longText" style="position: relative; padding-left: 50px">
-		<div id="extruderLeft" class="{title:'Functions', url:''}">
-			<div id="tw" class="voice {panel:''}">
-				<a class="label" href="" target="_blank">Create</a>
-			</div>
-		</div>
-		<div id="extruderLeft1" class="a {title:'Object Browser', url:''}">
-			<div id="tw" class="voice {panel:''}">Create</div>
-			<div id="main">
-				<ul id="browser" class="filetree">
-					<li><span class="folder">폴더</span>
-						<ul>
-							<li><span class="file">폴더 - 파일</span></li>
-						</ul></li>
-					<li><span class="file">파일</span></li>
-				</ul>
-			</div>
-			<!-- main end -->
-		</div>
-	</div>
+    <div class="longText" style="position:relative;padding-left:50px">
+        <div id="extruderLeft" class="{title:'Functions', url:''}">
+            <div id="tw" class="voice {panel:''}"><a class="label" href="" target="_blank">Create</a></div>
+        </div>
+        <div id="extruderLeft1" class="a {title:'Object Browser', url:''}">
+            <div id="tw" class="voice {panel:''}">Create</div>
+            <div id="main">
+            <div id="date"></div>
+			    <ul id="browser" class="filetree">
+			            <li>
+            <span class="folder">폴더</span>
+            <ul>
+                <li>
+                    <span class="file">폴더 - 파일</span>
+			            <ul>
+			                <li>
+			                    <span class="file">폴더 - 파일</span>
+			                </li>
+			            </ul>
+                </li>
+            </ul>
+        </li>
+			    </ul>
+			</div><!-- main end -->
+        </div>
+    </div>
 </div>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+    <script type="text/javascript" src="public/js/jquery.hoverIntent.min.js"></script>
+    <script type="text/javascript" src="public/js/jquery.mb.flipText.js"></script>
+    <script type="text/javascript" src="public/js/mbExtruder.js"></script>
+    <script type="text/javascript" src="public/js/jquery.treeview.js"></script>
+	<script src="https://cdn.socket.io/socket.io-1.3.3.js"></script>
+    <script type="text/javascript">
+
+        $(function(){
+            $("#extruderLeft").buildMbExtruder({
+                position:"left",
+                width:230,
+                extruderOpacity:.8,
+                hidePanelsOnClose:true,
+                accordionPanels:true,
+            });
+
+            $("#extruderLeft1").buildMbExtruder({
+                position:"left",
+                width:230,
+                extruderOpacity:.8,
+            });
+            
+            var s = $("#browser").treeview({
+            	 collapsed: true
+            });
+//======================= 트리 생성 ===============================            
+	//========= 소켓 연결
+            var socket = io.connect();
+    //========= 트리전체를 감싸는 #browser 선언
+            var $browser = $("#browser");
+    //========= db 트리 생성
+             socket.on('db', function(data){
+             	for(var i = 0 ; i < data.db.length; i++){
+            	 //alert(data.db[i]);
+				$("<li class='expandable lastExpandable'><div class='hitarea expandable-hitarea lastExpandable-hitarea'></div><span class='folder'>"+data.db[i]+"</span></li>").appendTo($browser);
+             	}
+             });
+	//========= db 클릭하면 스키마 생성             
+             var flag = true;
+             var f_flag = true;
+             var $sctree = $("<ul style='display: block;'>");
+             var $tabtree = $("<ul style='display: block;'>");
+             
+             $browser.on("click", ".folder", function(){
+            	 var $this = $(this);//folder
+            	 var dbname = $this.text();
+               	$sctree.insertAfter($this);
+                	if($sctree.is(':visible')){
+                		$sctree.hide();
+                		$this.prev().removeClass().addClass("expandable-hitarea lastExpandable-hitarea");
+                		$this.parent().removeClass().addClass("expandable lastExpandable");
+                	}else{
+                		$sctree.show();
+                		$this.prev().removeClass().addClass("collapsable-hitarea lastCollapsable-hitarea");
+                		$this.parent().removeClass().addClass("collapsable lastCollapsable");
+                	
+            	 socket.emit('set_dbname', dbname);
+                 socket.on('scname', function(data){
+                	if(flag){
+                  	for(var i = 0 ; i < data.schema.length; i++){
+						$("<li class='last'><span class='file'>"+data.schema[i]+"</span></li>").appendTo($sctree);
+                  				}
+                		}
+                 	flag = false;
+             	  });
+             }
+             });
+             
+	//========= schema 클릭하면 테이블 생성             
+             $browser.on("click", ".file", function(){
+            	 var $this = $(this);//file
+            	 var scname = $this.text();
+            	 $tabtree.insertAfter($this);
+             	if($tabtree.is(':visible')){
+            		$tabtree.hide();
+            		$this.prev().removeClass().addClass("expandable-hitarea lastExpandable-hitarea");
+            		$this.parent().removeClass().addClass("expandable lastExpandable");
+            	}else{
+            		$tabtree.show();
+            		$this.prev().removeClass().addClass("collapsable-hitarea lastCollapsable-hitarea");
+            		$this.parent().removeClass().addClass("collapsable lastCollapsable");
+            	
+        	 socket.emit('set_scname', scname);
+             socket.on('tabname', function(data){
+            	if(f_flag){
+            		alert(data.table.rows[0]);
+              	for(var i = 0 ; i < data.table.length; i++){
+					$("<li class='last'><span class='file'>"+data.table[i]+"</span></li>").appendTo($tabtree);
+              				}
+            		}
+             	f_flag = false;
+         	  });
+         }
+             });
+         });
+    </script> 
 </body>
 </html>
