@@ -21,7 +21,7 @@ var arrCol = [];
 var sc = null;
 
 //app.use('/public', express.static("C:/Users/Johnahkim/workspace/test/public"));
-app.use('/public', express.static("C:/Users/procarrie/workspace/AgensManager/public"));
+app.use('/public', express.static("C:/Users/procarrie/git/agensmanager/AgensManager/public"));
 
 app.set('port', 3000);
 var server = http.createServer(app).listen(app.get('port'), function(){
@@ -126,7 +126,7 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 
 //========= app.html읽기
 app.get('/', function (req, res){
-	fs.readFile('/Users/Johnahkim/workspace/test/app.html', function(error, data){
+	fs.readFile('/Users/procarrie/git/agensmanager/AgensManager/app.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			//ja021017
 	});
