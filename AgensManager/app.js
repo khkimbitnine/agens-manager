@@ -1,5 +1,5 @@
 
-//=================================================  1) connectedDb 2) constring 3) app.use 경로 4) readFile 경로 바꾸기  ==========//
+//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ 실행 전 주의사항:  1) connectedDb 2) constring 3) app.use 경로 4) readFile 경로 바꾸기!!!!!!! ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
 //-------------------- app.html 불러오는 app모듈
 var express = require('express');
@@ -7,24 +7,28 @@ var fs = require('fs');
 var app = express();
 var http = require('http');
 var pg = require('pg');
-//==================================================================================================================== 1) connectedDb
+//=========================================================================================================================================== 1) connectedDb
 var connectedDb = "agens";
 //var connectedDb = "procarrie";
 
-//======================================================================================================================2) constring
+//=========================================================================================================================================== 2) constring
 var conString = "postgres://postgres:1111@localhost/"+connectedDb;
 //var conString = "postgres://postgres:pro1459@localhost/"+connectedDb;
 
-//======== db, schema, table, column 배열 선언
+//======== db, schema, table, view, function, column, constraint, index 배열 선언
 var arrDB = [];
 var arrSch = [];
 var arrTab = [];
+var arrView = [];
+var arrFunc = [];
 var arrCol = [];
+var arrCons = [];
+var arrInd = [];
 
-//======== 클라이언트에서 받은 db, schema, table, column 이름 담을 변수 선언
-var result, rs, trs, tsrs, crs  = null;
+//======== 클라이언트에서 받은 db, schema, table, view, function, column, constraint, index 이름 담을 변수 선언
+var result, rs, trs, vrs, frs, crs, consrs, irs  = null;
 
-//=====================================================================================================================3) 소스 경로
+//=========================================================================================================================================== 3) 소스 경로
 app.use('/public', express.static("C:/Users/Johnahkim/workspace/test/public"));
 //app.use('/public', express.static("C:/Users/procarrie/workspace/AgensManager/public"));
 
@@ -60,6 +64,45 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 		console.log("arrTab: "+arrTab.length);
 	}
 
+	//selectVw function
+	function selectVw(err, vrs){
+		for(var k=0; k < vrs.rows.length; k++){
+			arrView.push(vrs.rows[k].table_name);
+		}
+		console.log("arrView: "+arrView.length);
+	}
+
+	//selectFc function
+	function selectFc(err, frs){
+		for(var k=0; k < frs.rows.length; k++){
+			arrFunc.push(frs.rows[k].proname);
+		}
+		console.log("arrFunc: "+arrFunc.length);
+	}
+	
+	//selectCol function
+	function selectCol(err, crs){
+		for(var l=0; l < crs.rows.length; l++){
+			arrCol.push(crs.rows[l].column_name);
+		}
+		console.log("arrCol: "+arrCol.length);
+	}
+	
+	//selectCons function
+	function selectCons(err, consrs){
+		for(var l=0; l < consrs.rows.length; l++){
+			arrCons.push(consrs.rows[l].constraint_name);
+		}
+		console.log("arrCons: "+arrCons.length);
+	}
+	//selectInd function
+	function selectInd(err, irs){
+		for(var l=0; l < irs.rows.length; l++){
+			arrInd.push(irs.rows[l].relname);
+		}
+		console.log("arrInd: "+arrInd.length);
+	}
+	
 	//========= socket.io 선언
 	var io = require('socket.io').listen(server);
 
@@ -104,14 +147,14 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 					socket.emit('scname', {schema: 0});
 				}
 			});
-
-			//스키마 클릭, 테이블 전송
-			socket.on('set_scname', function (scname){
+ 
+			//스키마 테이블 클릭, 테이블 전송
+			socket.on('set_scname_table', function (scname){
 				for(var i = 0 ; i < arrSch.length ; i++){
 					if(arrSch[i] === scname){
 						arrTab = [];
 						//get table list
-						client.query('SELECT DISTINCT(table_name) FROM information_schema.tables WHERE table_schema = \''+scname+'\' ORDER BY table_name ASC;', function(err, trs){
+						client.query('SELECT DISTINCT(table_name) FROM information_schema.tables WHERE table_schema = \''+scname+'\' AND table_type = \'BASE TABLE\' ORDER BY table_name ASC;', function(err, trs){
 							selectTb(err, trs);
 							socket.emit('tabname', {table: arrTab});
 							console.log(arrTab);
@@ -119,56 +162,89 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 					}
 				}
 			});
-
-			//테이블 클릭, 컬럼 전송
-			socket.on('set_tabname', function (data){
-				console.log(data.table_scname+","+data.tabname);
+			
+			//스키마 뷰 클릭, 뷰 전송
+			socket.on('set_scname_view', function (scname){
 				for(var i = 0 ; i < arrSch.length ; i++){
-					if(arrSch[i] === data.table_scname){
-						arrTab = [];
-						//get table list
-						client.query('SELECT DISTINCT(table_name) FROM information_schema.tables WHERE table_schema = \''+data.table_scname+'\' ORDER BY table_name ASC;', function(err, tsrs){
-							console.log(err+', '+tsrs+', '+data.tabname);
-							selectTbSc(err, tsrs, data.tabname, data.table_scname);
+					if(arrSch[i] === scname){
+						arrView = [];
+						//get view list
+						client.query('SELECT DISTINCT(table_name) FROM information_schema.views WHERE table_schema = \''+scname+'\' ORDER BY table_name ASC;', function(err, vrs){
+							selectVw(err, vrs);
+							socket.emit('viewname', {view: arrView});
+							console.log(arrView);
 						});
 					}
 				}
 			});
+			//스키마 함수 클릭, 함수 전송
+			socket.on('set_scname_func', function (scname){
+//				for(var i = 0 ; i < arrSch.length ; i++){
+//					if(arrSch[i] === scname){
+						arrFunc = [];
+						//get function list
+						client.query('select proname from pg_proc inner join pg_namespace ns on (pg_proc.pronamespace = ns.oid) where ns.nspname = \''+scname+'\' order by proname;', function(err, frs){
+							selectFc(err, frs);
+							socket.emit('funcname', {func: arrFunc});
+							console.log(arrFunc);
+						});
+//					}
+//				}
+			});
 			
-		//컬럼 배열 만드는 함수
-			
-			//selectTbSc function
-			function selectTbSc(err, tsrs, tabname, table_scname){
-				console.log("tsrs: "+tsrs);
-				for(var k=0; k < tsrs.rows.length; k++){
-					console.log("tablename : "+tsrs.rows[k].table_name+" : "+tabname);
-					if(tsrs.rows[k].table_name === tabname){
+
+			//테이블 컬럼 클릭, 컬럼 전송
+			socket.on('set_tabname_col', function (data){
+//				for(var i = 0 ; i < arrTab.length ; i++){
+//					if(arrTab[i] === data.tabname){
 						arrCol = [];
 						//get column list
-						client.query('SELECT column_name FROM information_schema.columns where table_schema=\''+table_scname+'\' and table_name=\''+tabname+'\'', function(err, crs){
+						client.query('SELECT column_name FROM information_schema.columns WHERE table_schema=\''+data.scname+'\' and table_name =\''+data.tabname+'\' order by column_name;', function(err, crs){
 							selectCol(err, crs);
-							console.log("column: "+arrCol);
 							socket.emit('colname', {column: arrCol});
+							console.log(arrCol);
 						});
-					}
-				}
-			}
-
-			//selectCol function
-			function selectCol(err, crs){
-				for(var l=0; l < crs.rows.length; l++){
-					arrCol.push(crs.rows[l].column_name);
-				}
-				console.log("arrCol: "+arrCol.length);
-			}
+//					}
+//				}
+			});
+			
+			//테이블 제약키 클릭, 제약키 전송
+			socket.on('set_tabname_cons', function (data){
+//				for(var i = 0 ; i < arrTab.length ; i++){
+//					if(arrTab[i] === data.tabname){
+						arrCons = [];
+						//get constraint list
+						client.query('select constraint_name from information_schema.constraint_column_usage where table_schema=\''+data.scname+'\' and table_name=\''+data.tabname+'\' order by constraint_name;', function(err, consrs){
+							selectCons(err, consrs);
+							socket.emit('consname', {constraint: arrCons});
+							console.log(arrCons);
+						});
+//					}
+//				}
+			});
+			
+			//테이블 인덱스 클릭, 인덱스 전송
+			socket.on('set_tabname_ind', function (data){
+//				for(var i = 0 ; i < arrTab.length ; i++){
+//					if(arrTab[i] === data.tabname){
+						arrInd = [];
+						//get index list
+						client.query('select relname from pg_class c, pg_index i, (select distinct(relfilenode) from pg_index, pg_class, (select oid from pg_namespace where nspname = \''+data.scname+'\') s where relname = \''+data.tabname+'\' and relnamespace=s.oid) t where c.relkind = \'i\' AND c.relname NOT LIKE \'pg%\' and i.indexrelid = c.oid and i.indrelid = t.relfilenode and c.oid NOT IN (select conindid from pg_constraint);', function(err, irs){
+							selectInd(err, irs);
+							socket.emit('indname', {index: arrInd});
+							console.log(arrInd);
+						});
+//					}
+//				}
+			});
+			
 		});
 
 	});//pgconnect end
 });
-
-//======================================================================================================================================= 4) readFile 경로
+//======================================================================================================================================================= 4) readFile 경로
 app.get('/', function (req, res){
-	fs.readFile('/Users/Johnahkim/git/agensmanager/AgensManager/app.html', function(error, data){
+	fs.readFile('/Users/Johnahkim/workspace/test/app.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			//ja021017
 	});
