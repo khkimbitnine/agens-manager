@@ -7,20 +7,51 @@
 	type="text/css">
 <link rel="stylesheet" href="public/css/jquery.treeview.css" />
 <link rel="stylesheet" href="public/css/style.css" />
+<style>
+	.object {
+		color:#fff;
+	}
+	.treeview span:hover{
+		color:red;
+		cursor:pointer;
+	}
+	.last span:hover {
+		font: 14px/16px Arial,Helvetica,sans-serif;
+		color: gray;
+		text-shadow: 2px 2px 2px #333;
+		cursor: text;
+	}
+	.extruder.left .flap:hover{
+		cursor:pointer;
+	}
+</style>
 </head>
 <body>
 	<div class="wrapper">
 		<div class="longText" style="position: relative; padding-left: 50px">
 			<div id="extruderLeft" class="{title:'Functions', url:''}">
-				<div id="tw" class="voice {panel:''}">
-					<a class="label" href="" target="_blank">Create</a>
-				</div>
+				<ul>
+					<li>
+						<div id="tw" class="voice {panel:''}">
+							<a class="label" href="" target="_blank">Create</a>
+						</div>
+						<ul>
+							<li><a href="" class="object">table</a></li>
+							<li><a href="" class="object">schema</a></li>
+							<li><a href="" class="object">column</a></li>
+							<li><a href="" class="object">index</a></li>
+							<li><a href="" class="object">view</a></li>
+							<li><a href="" class="object">constraint</a></li>
+							<li><a href="" class="object">trigger</a></li>
+						</ul>
+					</li>
+				</ul>
 			</div>
 			<div id="extruderLeft1" class="a {title:'Object Browser', url:''}">
 				<div id="tw" class="voice {panel:''}">Object Browser</div>
 				<div id="main">
 					<div id="date"></div>
-					<ul id="browser" class="filetree">
+					<ul id="browser" class="filetree treeview">
 					</ul>
 				</div>
 				<!-- main end -->
@@ -37,6 +68,7 @@
 	<script type="text/javascript" src="public/js/jquery.treeview.js"></script>
 	<script src="https://cdn.socket.io/socket.io-1.3.3.js"></script>
 	<script type="text/javascript">
+	
 		$("#extruderLeft").buildMbExtruder({
 			position : "left",
 			width : 230,
@@ -67,7 +99,7 @@
 						function(data) {
 							for (var i = 0; i < data.db.length; i++) {
 								$(
-										"<li class='expandable lastExpandable'><div class='hitarea expandable-hitarea lastExpandable-hitarea'></div><span class='folder db'>"
+										"<li class='expandable lastExpandable'><div class='hitarea expandable-hitarea lastExpandable-hitarea'></div><span class='db'>"
 												+ data.db[i] + "</span></li>")
 										.appendTo($browser);
 							}
@@ -81,12 +113,12 @@
 			if ($this.parent().hasClass("collapsable")) {
 				$this.next().remove();
 				$this.prev().removeClass().addClass(
-						"expandable-hitarea lastExpandable-hitarea");
+						"hitarea expandable-hitarea lastExpandable-hitarea");
 				$this.parent().removeClass().addClass(
 						"expandable lastExpandable");
 			} else {
 				$this.prev().removeClass().addClass(
-						"collapsable-hitarea lastCollapsable-hitarea");
+						"hitarea collapsable-hitarea lastCollapsable-hitarea");
 				$this.parent().removeClass().addClass(
 						"collapsable lastCollapsable");
 
@@ -125,7 +157,7 @@
 				console.log(clickedDb.text());
 				for (var i = 0; i < data.schema.length; i++) {
 					$(
-							"<li class='expandable lastExpandable'><div class='hitarea expandable-hitarea lastExpandable-hitarea'></div><span class='folder schema'>"
+							"<li class='expandable lastExpandable'><div class='hitarea expandable-hitarea lastExpandable-hitarea'></div><span class='schema'>"
 									+ data.schema[i] + "</span></li>")
 							.appendTo(clickedDb.next());
 				}
@@ -147,7 +179,7 @@
 										.prev()
 										.removeClass()
 										.addClass(
-												"expandable-hitarea lastExpandable-hitarea");
+												"hitarea expandable-hitarea lastExpandable-hitarea");
 								$this.parent().removeClass().addClass(
 										"expandable lastExpandable");
 							} else {
@@ -155,7 +187,7 @@
 										.prev()
 										.removeClass()
 										.addClass(
-												"collapsable-hitarea lastCollapsable-hitarea");
+												"hitarea collapsable-hitarea lastCollapsable-hitarea");
 								$this.parent().removeClass().addClass(
 										"collapsable lastCollapsable");
 
@@ -184,12 +216,12 @@
 			if ($parent.children().hasClass("tab")) {
 				$parent.children(".tab").remove();
 				$this.prev().removeClass().addClass(
-						"expandable-hitarea lastExpandable-hitarea");
+						"hitarea expandable-hitarea lastExpandable-hitarea");
 				$parent.removeClass().addClass("expandable lastExpandable");
 			} else {
 
 				$this.prev().removeClass().addClass(
-						"collapsable-hitarea lastCollapsable-hitarea");
+						"hitarea collapsable-hitarea lastCollapsable-hitarea");
 				$parent.removeClass().addClass("collapsable lastCollapsable");
 
 				//테이블 출력 함수 호출
@@ -223,7 +255,7 @@
 				for (var i = 0; i < data.table.length; i++) {
 					console.log(data.table[i]);
 					$(
-							"<li class='expandable lastExpandable'><div class='hitarea expandable-hitarea lastExpandable-hitarea'></div><span class='file table'>"
+							"<li class='expandable lastExpandable'><div class='hitarea expandable-hitarea lastExpandable-hitarea'></div><span class='table'>"
 									+ data.table[i] + "</span></li>").appendTo(
 							$parent.children(".tab"));
 				}
@@ -238,15 +270,15 @@
 			var $this = $(this);
 			var $parent = $this.parent();
 			var scname = $parent.parent().prev().text();
-			if ($parent.children().hasClass("view")) {
-				$parent.children(".view").remove();
+			if ($parent.children().hasClass("vw")) {
+				$parent.children(".vw").remove();
 				$this.prev().removeClass().addClass(
-						"expandable-hitarea lastExpandable-hitarea");
+						"hitarea expandable-hitarea lastExpandable-hitarea");
 				$parent.removeClass().addClass("expandable lastExpandable");
 			} else {
 
 				$this.prev().removeClass().addClass(
-						"collapsable-hitarea lastCollapsable-hitarea");
+						"hitarea collapsable-hitarea lastCollapsable-hitarea");
 				$parent.removeClass().addClass("collapsable lastCollapsable");
 
 				//뷰 출력 함수 호출
@@ -279,7 +311,7 @@
 				for (var i = 0; i < data.view.length; i++) {
 					console.log(data.view[i]);
 					$(
-							"<li class='expandable lastExpandable'><div class='hitarea expandable-hitarea lastExpandable-hitarea'></div><span class='file view'>"
+							"<li class='expandable lastExpandable'><div class='hitarea expandable-hitarea lastExpandable-hitarea'></div><span class='view'>"
 									+ data.view[i] + "</span></li>").appendTo(
 							$parent.children(".vw"));
 				}
@@ -298,12 +330,12 @@
 			if ($parent.children().hasClass("func")) {
 				$parent.children(".func").remove();
 				$this.prev().removeClass().addClass(
-						"expandable-hitarea lastExpandable-hitarea");
+						"hitarea expandable-hitarea lastExpandable-hitarea");
 				$parent.removeClass().addClass("expandable lastExpandable");
 			} else {
 
 				$this.prev().removeClass().addClass(
-						"collapsable-hitarea lastCollapsable-hitarea");
+						"hitarea collapsable-hitarea lastCollapsable-hitarea");
 				$parent.removeClass().addClass("collapsable lastCollapsable");
 
 				//함수 출력 함수 호출
@@ -337,7 +369,7 @@
 				for (var i = 0; i < data.func.length; i++) {
 					console.log(data.func[i]);
 					$(
-							"<li class='last'><span class='file func'>"
+							"<li class='last'><span class='func'>"
 									+ data.func[i] + "</span></li>").appendTo(
 							$parent.children(".func"));
 				}
@@ -353,10 +385,10 @@
 
 							if ($this.parent().hasClass("collapsable")) {
 								$this.next().remove();
-								$this.prev().removeClass().addClass("expandable-hitarea lastExpandable-hitarea");
+								$this.prev().removeClass().addClass("hitarea expandable-hitarea lastExpandable-hitarea");
 								$this.parent().removeClass().addClass("expandable lastExpandable");
 							} else {
-								$this.prev().removeClass().addClass("collapsable-hitarea lastCollapsable-hitarea");
+								$this.prev().removeClass().addClass("hitarea collapsable-hitarea lastCollapsable-hitarea");
 								$this.parent().removeClass().addClass("collapsable lastCollapsable");
 
 								$("<ul>").insertAfter($this).append("<li class='expandable lastExpandable'><div class='hitarea expandable-hitarea lastExpandable-hitarea'></div><span class='tableColumn'>"
@@ -372,10 +404,10 @@
 
 							if ($this.parent().hasClass("collapsable")) {
 								$this.next().remove();
-								$this.prev().removeClass().addClass("expandable-hitarea lastExpandable-hitarea");
+								$this.prev().removeClass().addClass("hitarea expandable-hitarea lastExpandable-hitarea");
 								$this.parent().removeClass().addClass("expandable lastExpandable");
 							} else {
-								$this.prev().removeClass().addClass("collapsable-hitarea lastCollapsable-hitarea");
+								$this.prev().removeClass().addClass("hitarea collapsable-hitarea lastCollapsable-hitarea");
 								$this.parent().removeClass().addClass("collapsable lastCollapsable");
 
 								$("<ul>").insertAfter($this).append("<li class='expandable lastExpandable'><div class='hitarea expandable-hitarea lastExpandable-hitarea'></div><span class='viewColumn'>"
@@ -394,12 +426,12 @@
 			if ($parent.children().hasClass("col")) {
 				$parent.children(".col").remove();
 				$this.prev().removeClass().addClass(
-						"expandable-hitarea lastExpandable-hitarea");
+						"hitarea expandable-hitarea lastExpandable-hitarea");
 				$parent.removeClass().addClass("expandable lastExpandable");
 			} else {
 
 				$this.prev().removeClass().addClass(
-						"collapsable-hitarea lastCollapsable-hitarea");
+						"hitarea collapsable-hitarea lastCollapsable-hitarea");
 				$parent.removeClass().addClass("collapsable lastCollapsable");
 				// 컬럼 출력 함수 호출
 				colname_emit(tabname, scname, $parent);
@@ -434,7 +466,7 @@
 				for (var i = 0; i < data.column.length; i++) {
 					console.log(data.column[i]);
 					$(
-							"<li class='last'><span class='file column'>"
+							"<li class='last'><span class='column'>"
 									+ data.column[i] + "</span></li>")
 							.appendTo($parent.children(".col"));
 				}
@@ -453,12 +485,12 @@
 			if ($parent.children().hasClass("cons")) {
 				$parent.children(".cons").remove();
 				$this.prev().removeClass().addClass(
-						"expandable-hitarea lastExpandable-hitarea");
+						"hitarea expandable-hitarea lastExpandable-hitarea");
 				$parent.removeClass().addClass("expandable lastExpandable");
 			} else {
 
 				$this.prev().removeClass().addClass(
-						"collapsable-hitarea lastCollapsable-hitarea");
+						"hitarea collapsable-hitarea lastCollapsable-hitarea");
 				$parent.removeClass().addClass("collapsable lastCollapsable");
 				// 제약키 출력 함수 호출
 				consname_emit(tabname, scname, $parent);
@@ -493,7 +525,7 @@
 				for (var i = 0; i < data.constraint.length; i++) {
 					console.log(data.constraint[i]);
 					$(
-							"<li class='last'><span class='file cons'>"
+							"<li class='last'><span class='cons'>"
 									+ data.constraint[i] + "</span></li>")
 							.appendTo($parent.children(".cons"));
 				}
@@ -512,12 +544,12 @@
 			if ($parent.children().hasClass("ind")) {
 				$parent.children(".ind").remove();
 				$this.prev().removeClass().addClass(
-						"expandable-hitarea lastExpandable-hitarea");
+						"hitarea expandable-hitarea lastExpandable-hitarea");
 				$parent.removeClass().addClass("expandable lastExpandable");
 			} else {
 
 				$this.prev().removeClass().addClass(
-						"collapsable-hitarea lastCollapsable-hitarea");
+						"hitarea collapsable-hitarea lastCollapsable-hitarea");
 				$parent.removeClass().addClass("collapsable lastCollapsable");
 				// 인덱스 출력 함수 호출
 				indname_emit(tabname, scname, $parent);
@@ -552,7 +584,7 @@
 				for (var i = 0; i < data.index.length; i++) {
 					console.log(data.index[i]);
 					$(
-							"<li class='last'><span class='file ind'>"
+							"<li class='last'><span class='ind'>"
 									+ data.index[i] + "</span></li>").appendTo(
 							$parent.children(".ind"));
 				}
