@@ -1,4 +1,3 @@
-
 //★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ 실행 전 주의사항:  1) connectedDb 2) constring 3) app.use 경로 4) readFile 경로 바꾸기!!!!!!! ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
 //-------------------- app.html 불러오는 app모듈
@@ -7,6 +6,7 @@ var fs = require('fs');
 var app = express();
 var http = require('http');
 var pg = require('pg');
+var jade = require('jade');
 //=========================================================================================================================================== 1) connectedDb
 var connectedDb = "agens";
 //var connectedDb = "procarrie";
@@ -34,6 +34,8 @@ app.use('/public', express.static("C:/Users/Johnahkim/workspace/test/public"));
 
 //포트 연결
 app.set('port', 3000);
+
+
 
 //서버 연결
 var server = http.createServer(app).listen(app.get('port'), function(){
@@ -232,4 +234,11 @@ app.get('/', function (req, res){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			//ja021017
 	});
+//	var fn = jade.compile(fs.readFileSync('app.jade', 'utf-8'), {
+//		  basedir: '/Users/Johnahkim/workspace/test'
+//		});
+//	
+//        var html = fn({});
+//		res.write(html);
+//		res.end();
 });

@@ -517,5 +517,8 @@ jQuery.browser.mobile = jQuery.browser.android || jQuery.browser.blackberry || j
 	$.fn.closeMbExtruder=$.mbExtruder.closeMbExtruder;
 	$.fn.openMbExtruder=$.mbExtruder.openMbExtruder;
 	$.fn.adjustSize=$.mbExtruder.adjustSize;
-
+	
+	$("document").ready(function() { //돔 로딩 되자마자 클릭 - ja 2015-03-02
+	    $("#extruderLeft1 .flap").trigger('click'); 
+	});
 })(jQuery);

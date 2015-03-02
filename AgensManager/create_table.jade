@@ -1,0 +1,57 @@
+body
+  form(action='')
+    ul
+      li
+        .field
+          label(for='name') Name
+          input#name(type='text', name='')
+      li
+        .field
+          table#column
+            tr
+              th Column
+              th Type
+              th Length
+              th Not Null
+              th Unique key
+              th Primary key
+              th Default
+              th Comment
+              th
+                button.add.button add
+            tr
+              td.column
+                label.col_no(for='column') 1. 
+                input(type='text', name='')
+              td
+                select.type(name='')
+                  option(value='SERIAL') SERIAL
+                select.array(name='')
+                  option(value='')
+                  option(value='[]') []
+              td
+                input.length(type='text', name='')
+              td
+                input.not_null.checkbox(type='checkbox', name='')
+              td
+                input.u_key.checkbox(type='checkbox', name='')
+              td
+                input.p_key.checkbox(type='checkbox', name='')
+              td
+                input.default(type='text', name='')
+              td
+                input.comment(type='text', name='')
+              td
+      li
+        .field
+          input#options.checkbox(type='checkbox', name='')
+          span WITHOUT OIDS
+      li
+        .field
+          span Comment: 
+          textarea#comment(name='')
+      li
+        button#hi Create
+        button Cancel
+  script(src='http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js')
+  script(type='text/javascript' src='public/js/create_table_js.js')

@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app="myApp">
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Sidebar Test</title>
@@ -23,12 +23,6 @@
 	}
 	.extruder.left .flap:hover{
 		cursor:pointer;
-	}
-	
-	.object{
-		background:yellow;
-		display:block;
-		width:100%;		
 	}
 </style>
 </head>
@@ -60,12 +54,14 @@
 					<ul id="browser" class="filetree treeview">
 					</ul>
 				</div>
+				<!-- main end -->
 			</div>
-		</div><!-- sidebar end -->
+		</div>
 	</div>
 	<script type="text/javascript"
 		src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
-	<script type="text/javascript" src="public/js/jquery.hoverIntent.min.js"></script>
+	<script type="text/javascript"
+		src="public/js/jquery.hoverIntent.min.js"></script>
 	<script type="text/javascript" src="public/js/jquery.mb.flipText.js"></script>
 	<script type="text/javascript" src="public/js/mbExtruder.js"></script>
 	<!--===================================== "extruder-content"의 overflow를 "hidden"에서 "auto"로 바꿈 / 이유: 컨텐츠가 늘어날 때 height가 늘어나지 않아서. (mbExtruder.js에 주석 표시해놓음) ======================-->

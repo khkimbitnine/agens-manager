@@ -1,0 +1,48 @@
+doctype html
+html(ng-app='myApp')
+  head
+    meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
+    title Sidebar Test
+    link(href='public/css/mbExtruder.css', media='all', rel='stylesheet', type='text/css')
+    link(rel='stylesheet', href='public/css/jquery.treeview.css')
+    link(rel='stylesheet', href='public/css/style.css')
+    link(rel='stylesheet', href='public/css/create_table.css')
+  body
+    .wrapper
+      .longText(style='position: relative; padding-left: 50px')
+        #extruderLeft.temp
+          ul
+            li
+              #tw.voice.(class="{panel:''}")
+                a.label(href='', target='_blank') Create
+              ul
+                li
+                  a.object(href='') table
+                li
+                  a.object(href='') schema
+                li
+                  a.object(href='') column
+                li
+                  a.object(href='') index
+                li
+                  a.object(href='') view
+                li
+                  a.object(href='') constraint
+                li
+                  a.object(href='') trigger
+        #extruderLeft1.a.(class="{title:'Object Browser', url:''}")
+          #tw.voice.(class="{panel:''}") Object Browser
+          #main
+            #date
+            ul#browser.filetree.treeview
+      include /create_table.jade
+    script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js')
+    script(type='text/javascript', src='public/js/jquery.hoverIntent.min.js')
+    script(type='text/javascript', src='public/js/jquery.mb.flipText.js')
+    script(type='text/javascript', src='public/js/mbExtruder.js')
+    // ===================================== "extruder-content"의 overflow를 "hidden"에서 "auto"로 바꿈 / 이유: 컨텐츠가 늘어날 때 height가 늘어나지 않아서. (mbExtruder.js에 주석 표시해놓음) ======================
+    script(type='text/javascript', src='public/js/jquery.treeview.js')
+    script(src='https://cdn.socket.io/socket.io-1.3.3.js')
+    script(type='text/javascript' src='public/js/javascript.js')
+    script(type='text/javascript')
+    temp = {title:'Functions', url:''}
