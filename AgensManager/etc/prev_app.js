@@ -8,7 +8,7 @@ var http = require('http');
 var pg = require('pg');
 var jade = require('jade');
 //=========================================================================================================================================== 1) connectedDb
-var connectedDb = "bitnine";
+var connectedDb = "agens";
 //var connectedDb = "procarrie";
 
 //=========================================================================================================================================== 2) constring
@@ -108,7 +108,7 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 	//========= socket.io 선언
 	var io = require('socket.io').listen(server);
 
-	console.log('server listening on 3000dddd');
+	console.log('server listening on 3000');
 
 	//데이터베이스 연결
 	pg.connect(conString, function(err, client, done) {
@@ -242,5 +242,3 @@ app.get('/', function (req, res){
 //		res.write(html);
 //		res.end();
 });
-
-

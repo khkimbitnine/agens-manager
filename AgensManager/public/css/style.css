@@ -1,57 +1,179 @@
-@CHARSET "EUC-KR";
-body{
-    font-family:Arial, Helvetica, sans-serif;
-    margin:10px;
+@CHARSET "UTF-8";
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	margin: 0;
+	padding: 0;
+	border: none;
+	width: 1920px;
+	height: 979px;
+	color: #fff;
 }
-.wrapper{
-    position:relative;
-    font-family:Arial, Helvetica, sans-serif;
-    padding-top:90px;
-    padding-left:50px;
-    width:80%;
-    margin:auto
+
+.wrapper {
+	position: relative;
+	font-family: Arial, Helvetica, sans-serif;
+	width: 100%;
+	height: 879px;
 }
-span.btn{
-    padding:10px;
-    display:inline-block;
-    cursor:pointer;
-    font:12px/14px Arial, Helvetica, sans-serif;
-    color:#aaa;
-    background-color:#eee;
-    -moz-border-radius:10px;
-    -webkit-border-radius:10px;
-    -moz-box-shadow:#999 2px 0px 3px;
-    -webkit-box-shadow:#999 2px 0px 3px;
+
+.header {
+	width: 100%;
+	height: 100px;
+	background: url("../css/images/agens.PNG") no-repeat;
+	background-size: 100px;
+	background-position-y: -8px;
+	background-color: rgb(149, 193, 218);
 }
-span.btn:hover{
-    background-color:#000;
+.header #loginHeader{
+	display: inline-block;
+	line-height: 100px;
+	width: 200px;
+	float: right;
+	text-align: center;
 }
-.extruder.left.a .flap{
-    font-size:18px;
-    color:white;
-    top:0;
-    padding:10px 0 10px 10px;
-    background:#772B14;
-    width:30px;
-    position:absolute;
-    right:0;
-    -moz-border-radius:0 10px 10px 0;
-    -webkit-border-top-right-radius:10px;
-    -webkit-border-bottom-right-radius:10px;
-    -moz-box-shadow:#666 2px 0px 3px;
-    -webkit-box-shadow:#666 2px 0px 3px;
+.header #loginHeader a, .header #loginHeader span{
+	text-decoration: none;
+	color: #000;
 }
-.extruder.left.a .content{
-    border-right:3px solid #772B14;
+.header #loginHeader a:hover {
+	color: #fff;
+	text-decoration: underline;
 }
-.extruder.top .optionsPanel .panelVoice a:hover{
-    color:#fff;
-    background: url("public/css/images/black_op_30.png");
-    border-bottom:1px solid #000;
+
+.sidebar {
+	width: 230px;
+	height: 879px;
+	float: left;
 }
-.extruder.top .optionsPanel .panelVoice a{
-    border-bottom:1px solid #000;
+
+.content {
+	width: 1687px;
+	height: 879px;
+	float: left;
 }
-.extruder.left.a .flap .flapLabel{
-    background:#772B14;
+
+.object {
+	color: #fff;
+}
+
+.treeview span:hover, .text span:hover {
+	color: #000;
+	cursor: pointer;
+}
+
+.last span:hover {
+	cursor: text;
+	color: #fff;
+}
+
+.object {
+	display: block;
+	width: 100%;
+}
+
+#objectBrowser, #toolMenu {
+	border: 1px solid #666;
+	width: 228px;
+	height: 817px;
+}
+
+.extruder {
+	height: 100%; cursor : default;
+	background: url("images/extruder_blank.png");
+	cursor: default;
+}
+
+.extruder .ext_wrapper {
+	height: 817px;
+	width: 228px;
+}
+
+.extruder .extruder-content {
+	height: 100%;
+	background-color: rgb(149, 193, 218);
+	width: 228px;
+}
+
+.extruder .text {
+	width: 190px;
+	font: 14px/16px Arial, Helvetica, sans-serif;
+	min-height: 797px;
+	padding: 20px 0 0 20px;
+	overflow: auto;
+}
+
+.text>ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+.text>ul>li>ul {
+	list-style-type: none;
+	padding-left: 10px;
+	margin: 0;
+}
+
+.text .tw, .label {
+	font: 18px/24px Arial, Helvetica, sans-serif;
+}
+
+.etabs {
+	margin: 0;
+	padding: 0;
+}
+
+.etabs {
+	position: relative;
+	width: 230px;
+	height: 40px;
+}
+
+.tab {
+	position: absolute;
+	z-index: 1;
+	width: 110px;
+	height: 39px;
+	background: #eee; overflow : hidden;
+	border: solid 1px #999;
+	border-bottom: none;
+	-moz-border-radius: 10px 10px 0 0;
+	-webkit-border-radius: 10px 10px 0 0;
+	overflow: hidden;
+}
+
+.tab:nth-of-type(1) {
+	left: 0;
+}
+
+.tab:nth-of-type(2) {
+	right: 0;
+}
+
+.tab a {
+	width: 113px;
+	height: 40px;
+	line-height:40px;
+	font-size: 14px;
+	color: #000;
+	display: block;
+	outline: none;
+	text-decoration: none;
+	text-align: center;
+	
+}
+
+.tab.active {
+	background-color: rgb(149, 193, 218);
+	border-color: #666;
+	height: 40px;
+}
+
+.tab a.active {
+	font-weight: bold;
+}
+
+.tab-container {
+	margin-top: 20px;
 }
