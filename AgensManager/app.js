@@ -29,13 +29,11 @@ var arrInd = [];
 var result, rs, trs, vrs, frs, crs, consrs, irs  = null;
 
 //=========================================================================================================================================== 3) 소스 경로
-app.use('/public', express.static("C:/Users/Johnahkim/workspace/test/public"));
+app.use('/public', express.static("C:/Users/Johnahkim/git/agensmanager/AgensManager/public"));
 //app.use('/public', express.static("C:/Users/procarrie/workspace/AgensManager/public"));
 
 //포트 연결
 app.set('port', 3000);
-
-
 
 //서버 연결
 var server = http.createServer(app).listen(app.get('port'), function(){
@@ -108,7 +106,7 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 	//========= socket.io 선언
 	var io = require('socket.io').listen(server);
 
-	console.log('server listening on 3000dddd');
+	console.log('server listening on 3000');
 
 	//데이터베이스 연결
 	pg.connect(conString, function(err, client, done) {
@@ -230,10 +228,11 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 });
 //======================================================================================================================================================= 4) readFile 경로
 app.get('/', function (req, res){
-	fs.readFile('/Users/Johnahkim/workspace/test/app.html', function(error, data){
+	fs.readFile('/Users/Johnahkim/git/agensmanager/AgensManager/app.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			//ja021017
 	});
+	
 //	var fn = jade.compile(fs.readFileSync('app.jade', 'utf-8'), {
 //		  basedir: '/Users/Johnahkim/workspace/test'
 //		});
@@ -241,6 +240,7 @@ app.get('/', function (req, res){
 //        var html = fn({});
 //		res.write(html);
 //		res.end();
+	
 });
 
 

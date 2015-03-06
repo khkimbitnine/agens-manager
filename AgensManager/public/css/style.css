@@ -57,7 +57,7 @@ body {
 	color: #fff;
 }
 
-.treeview span:hover, .text span:hover {
+.treeview span:hover, .bar_content span:hover {
 	color: #000;
 	cursor: pointer;
 }
@@ -78,24 +78,25 @@ body {
 	height: 817px;
 }
 
-.extruder {
+.bar {
 	height: 100%; cursor : default;
-	background: url("images/extruder_blank.png");
 	cursor: default;
 }
 
-.extruder .ext_wrapper {
+.bar .bar_wrapper {
 	height: 817px;
 	width: 228px;
+	background-color: rgb(149, 193, 218);
 }
-
-.extruder .extruder-content {
+/*
+.bar .bar-content {
 	height: 100%;
 	background-color: rgb(149, 193, 218);
 	width: 228px;
 }
+*/
 
-.extruder .text {
+.bar .bar_content {
 	width: 190px;
 	font: 14px/16px Arial, Helvetica, sans-serif;
 	min-height: 797px;
@@ -103,19 +104,19 @@ body {
 	overflow: auto;
 }
 
-.text>ul {
+.bar_content>ul {
 	list-style-type: none;
 	padding: 0;
 	margin: 0;
 }
 
-.text>ul>li>ul {
+.bar_content>ul>li>ul {
 	list-style-type: none;
 	padding-left: 10px;
 	margin: 0;
 }
 
-.text .tw, .label {
+.bar_content .title, .label {
 	font: 18px/24px Arial, Helvetica, sans-serif;
 }
 
