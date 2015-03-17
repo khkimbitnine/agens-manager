@@ -1,62 +1,80 @@
-	.content ul{
-		list-style-type: none;
-		color:#000;
-	}
-	.content select, .checkbox, button {
-		cursor:pointer;
-	}
-	.content #name{
-		margin-left:3px;
-	}
-	.content li:nth-of-type(4)>.field>span{
-		display:block;
-	}
-	.content #column th{
-		background: rgb(230, 230, 204);
-	}
-	.content #column th:last-child{
-		background:none;
-	}
-	.content #column td{
-		text-align:center;
-	}
-	.content #comment {
-		width:1050px;
-		height:100px;
-		resize:none;
-	}
-	.content .column{
-		width: 200px;
-	}
-	.content .column input{
-		width: 80%;
-	}
-	.content .type{
-		width:200px;
-	}
-	.content .array{
-		width: 50px;
-	}
-	.content .length{
-		width:100px;
-	}
-	.content .default{
-		width:200px;
-	}
-	.content .comment{
-		width:300px;
-	}
-	.content .button{
-		box-shadow:1px 1px 1px #000;
-		border:none;
-		width:16px;
-		height:16px;
-		text-indent:-9999px;
-		background-size:100%;
-	}
-	.content .add{
-		background:url("images/plus.png") no-repeat;
-	}
-	.content .remove{
-		background:url("images/minus.png") no-repeat;
-	}
+ul {
+	list-style-type: none;
+	color: #000;
+	padding: 0;
+}
+
+select, .checkbox, button {
+	cursor: pointer;
+}
+
+#name {
+	margin-left: 3px;
+}
+
+li:nth-of-type(4)>.field>span {
+	display: block;
+}
+
+#column th {
+	background: rgb(230, 230, 204);
+}
+
+#column th:last-child {
+	background: none;
+}
+
+#column td {
+	text-align: center;
+}
+
+#comment {
+	width: 1050px;
+	height: 100px;
+	resize: none;
+}
+
+.column {
+	width: 200px;
+}
+
+.column input {
+	width: 80%;
+}
+
+.type {
+	width: 80%;
+}
+
+.array {
+	width: 20%;
+}
+
+.length {
+	width: 100px;
+}
+
+.default {
+	width: 200px;
+}
+
+.comment {
+	width: 300px;
+}
+
+.button {
+	box-shadow: 1px 1px 1px #000;
+	border: none;
+	width: 16px;
+	height: 16px;
+	text-indent: -9999px;
+	background-size: 100%;
+}
+
+.add {
+	background: url("images/plus.png") no-repeat;
+}
+
+.remove {
+	background: url("images/minus.png") no-repeat;
+}
