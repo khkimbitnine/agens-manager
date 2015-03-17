@@ -1,78 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>create_table</title>
-</head>
-<style>
-	ul{
-		list-style-type: none;
-	}
-	select, .checkbox, button {
-		cursor:pointer;
-	}
-	#name{
-		margin-left:3px;
-	}
-	li:nth-of-type(4)>.field>span{
-		display:block;
-	}
-	#column th{
-		background: rgb(230, 230, 204);
-	}
-	#column th:last-child{
-		background:none;
-	}
-	#column td{
-		text-align:center;
-	}
-	#comment {
-		width:1050px;
-		height:100px;
-		resize:none;
-	}
-	.column{
-		width: 200px;
-	}
-	.column input{
-		width: 80%;
-	}
-	.type{
-		width:200px;
-	}
-	.array{
-		width: 50px;
-	}
-	.length{
-		width:100px;
-	}
-	.default{
-		width:200px;
-	}
-	.comment{
-		width:300px;
-	}
-	.button{
-		box-shadow:1px 1px 1px #000;
-		border:none;
-		width:16px;
-		height:16px;
-		text-indent:-9999px;
-		background-size:100%;
-	}
-	.add{
-		background:url("public/css/images/plus.png") no-repeat;
-	}
-	.remove{
-		background:url("public/css/images/minus.png") no-repeat;
-	}
-</style>
-<body>
-	<form action="">
+<div class="content_wrapper">
+	<form id="tableForm">
 		<ul>
 			<li>
 				<div class="field">
-					<label for="name">Name</label><input type="text" name="" id="name" />
+					<label for="name">Name</label><input type="text" name="name"
+						id="name" />
 				</div>
 			</li>
 			<li>
@@ -89,63 +21,414 @@
 							<th>Comment</th>
 							<th><button class="add button">add</button></th>
 						</tr>
-						<tr>
-							<td class= "column" ><label for="column" class="col_no">1. </label><input type=
-								"text" name= "" /></td>
-							<td><select name="" class="type"><option
-										value="SERIAL">SERIAL</option></select><select name= "" class="array"><option value=""></option><option
-										value="[]">[]</option></select></td>
-							<td><input type= "text" name= "" class= "length"/></td>
-							<td><input type= "checkbox" name= "" class= "not_null checkbox"/></td>
-							<td><input type= "checkbox" name= "" class= "u_key checkbox"/></td>
-							<td><input type= "checkbox" name= "" class= "p_key checkbox"/></td>
-							<td><input type= "text" name= "" class= "default"/></td>
-							<td><input type= "text" name= "" class= "comment"/></td>
-							<td></td>
+						<tr class="column_row">
+							<td class="column"><label for="column" class="col_no">1.
+							</label><input type="text" name="column" class="column_input" /></td>
+							<td><select name="type" class="type"><option
+										value=""></option>
+							</select><select name="array" class="array">
+									<option value=""></option>
+									<option value="[]">[]</option>
+							</select></td>
+							<td><input type="text" name="length" class="length" disabled />
+								<input type="hidden" name="length2" class="length" /></td>
+							<td><input type="checkbox" class="not_null checkbox" /><input
+								type="hidden" name="not_null" value="0" /></td>
+							<td><input type="checkbox" class="u_key checkbox" /><input
+								type="hidden" name="u_key" value="0" /></td>
+							<td><input type="checkbox" class="p_key checkbox" /><input
+								type="hidden" name="p_key" value="0" /></td>
+							<td><input type="text" name="de_fault" class="default" /></td>
+							<td><input type="text" name="col_comment" class="comment" /></td>
 						</tr>
 					</table>
 				</div>
 			</li>
-			<li>
+			<!--
+	 		<li>
 				<div class="field">
 					<input type="checkbox" name="" id="options" class="checkbox"/><span>WITHOUT OIDS</span>
 				</div>
 			</li>
+-->
 			<li>
 				<div class="field">
 					<span>Comment: </span>
-					<textarea name="" id="comment"></textarea>
+					<textarea name="comment" id="comment"></textarea>
 				</div>
 			</li>
 			<li>
-				<button id="hi">Create</button><button>Cancel</button>
+				<button type="submit" id="submitBtn">Create</button>
+				<button>Cancel</button>
 			</li>
 		</ul>
 	</form>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
-	<script type="text/javascript">
-	
-		var colNo = $(".col_no");
-		var trLth;
-		$(".add").click(function(e){
-			trLth = $("#column tr").length;
-		console.log(trLth);
-			e.preventDefault();
-			$("#column").append("<tr><td class=\"column\"><label for=\"column\" class=\"col_no\">"+trLth+". "+"</label><input type=\"text\" name=\"\" /></td><td><select name=\"\" class=\"type\"><option value=\"SERIAL\">SERIAL</option></select><select name=\"\" class=\"array\"><option value=\"\"></option><option value=\"[]\">[]</option></select></td><td><input type=\"text\" name=\"\" class=\"length\"/></td><td><input type=\"checkbox\" name=\"\" class=\"not_null\"/></td><td><input type=\"checkbox\" name=\"\" class=\"u_key\"/></td><td><input type=\"checkbox\" name=\"\" class=\"p_key\"/></td><td><input type=\"text\" name=\"\" class=\"default\"/></td><td><input type=\"text\" name=\"\" class=\"comment\"/></td><td><button class=\"remove button\">remove</button></td></tr>");
-		});
-		$("#column").on("click", ".remove", function(e){
-			e.preventDefault();
-			$(this).parent().parent().remove();
-			trLth = $("#column tr").length-1;
-			
-			for(var i = 1 ; i <= trLth ; i++){
-				
-				$(".col_no").eq(i-1).text(i+". ");
-				
+</div>
+<script>
+	//.column_input, .length, .default, .comment, #comment
+	//validate
+
+	var pattern = /^[a-zA-Z0-9_]+$/;
+	var namePattern = /^[a-zA-Z][a-zA-Z0-9_]+$/;
+	var lengthPattern = /^[0-9]+$/;
+	$(document).on("change", ".checkbox", function() {
+		if ($(this).is(':checked')) {
+			$(this).next().val(1);
+		} else {
+			$(this).next().val(0);
+		}
+	});
+
+	$("#tableForm").on("click", ".p_key.checkbox", function() {
+		$(".p_key").not($(this)).prop('checked', false).next().val(0);
+	});
+	var trLth;
+	var pattern = /^[a-zA-Z0-9_]+$/;
+	var lengthPattern = /^[0-9]+$/;
+
+	$("#submitBtn").click(function(e) {
+		validCheck('create');
+	});
+	$(".add").click(function(e) {
+		e.preventDefault();
+		validCheck('add');
+	});
+
+	function validCheck(use) {
+		var formdata = $("#tableForm").serializeArray();
+		trLth = $("#column tr").length;
+		var colRowNum = trLth - 2;
+
+		if ((formdata.length - 2) % 9 !== 0) {
+			var length2_no = 9 * colRowNum + 5;
+			var length2 = formdata[length2_no].value;
+			formdata.splice(length2_no, 1);
+
+			socket.emit('array', {
+				array : formdata,
+				colRowNum : colRowNum,
+				submit : true,
+				length2 : length2
+			});
+		} else {
+			socket.emit('array', {
+				array : formdata,
+				colRowNum : colRowNum,
+				submit : true
+			});
+		}
+
+		socket
+				.on(
+						'validCheck',
+						function(data) {
+							var col = data.col;
+							var length = data.length;
+							var lengthValid;
+							var precision;
+							var scale;
+							var numeric = false;//precision,scale의 값이 각각 존재할 때. (length=='numeric'은 precision, scale 값이 존재하지 않을 때.)
+							if (length.split(",").length > 0) {
+								precision = length.split(",")[0];
+								scale = length.split(",")[1];
+								numeric = true;
+							}
+							if (precision > 0 && lengthPattern.test(precision)
+									&& precision >= scale && scale >= 0
+									&& lengthPattern.test(scale)) {
+								lengthValid = true;
+								var numericLengthNo = 9 * colRowNum + 4;
+
+							} else if (lengthPattern.test(length)) {
+								lengthValid = true;
+							} else {
+								lengthValid = false;
+							}
+							var def = data.def;
+							var colcomment = data.colcomment;
+
+							if (use == 'create') {
+								var name = data.name;
+								var comment = data.comment;
+								createTable();
+							} else {
+								addColumn();
+							}
+
+							function createTable() {
+								if (namePattern.test(name)
+										&& (comment == '' || pattern
+												.test(comment))
+										&& (length == "disabled"
+												|| length == 'numeric' || lengthValid)
+										&& pattern.test(col)
+										&& (def == '' || pattern.test(def))
+										&& (colcomment == '' || pattern
+												.test(colcomment))) {
+									socket.emit('form', formdata);
+									alert("submitted");
+								} else if (!namePattern.test(name)) {
+									alert("Name should be started with a-z or A-Z and the rest filled with a-z or A-Z or number.");
+								} else if (length !== "disabled"
+										&& !lengthValid && !numeric) {
+									alert("The last column's length(optional) should be filled with number.");
+								} else if (numeric && precision < scale) {
+									alert("scale should be less than or equal to precision.");
+								} else {
+									alert("The last column(required), default/columnComment(optional) should be a-z or A-Z or number.");
+								}
+							}
+
+							function addColumn() {
+								if ((length == "disabled"
+										|| length == 'numeric' || lengthValid)
+										&& pattern.test(col)
+										&& (def == '' || pattern.test(def))
+										&& (colcomment == '' || pattern
+												.test(colcomment))) {
+									appendColumns();
+								} else if (length !== "disabled"
+										&& !lengthValid && !numeric) {
+									alert("length(optional) should be filled with number.");
+								} else if (numeric && precision < scale) {
+									alert("scale should be less than or equal to precision.");
+								} else {
+									alert("column(required), default/columnComment(optional) should be a-z or A-Z or number.");
+								}
+							}
+							socket.removeListener('validCheck');
+						});
+	}
+
+	function appendColumns() {
+		var $column_row = $("<tr class=\"column_row\">").appendTo("#column");
+		for (var i = 0; i < 9; i++) {
+			$column_row.append("<td>");
+		}
+		$column_row
+				.children("td:eq(0)")
+				.addClass("column")
+				.append(
+						"<label for=\"column\" class=\"col_no\">1. </label><input type=\"text\" name= \"column\" />");
+		$column_row.children("td:eq(1)").append(
+				"<select name=\"type\" class=\"type\">").append(
+				"<select name= \"array\" class=\"array\">").children(".type")
+				.append("<option value=''>").next().append("<option value=''>")
+				.append("<option value=\"[]\">[]</option>");
+		$column_row
+				.children("td:eq(2)")
+				.append(
+						"<input type= \"text\" name= \"length\" class= \"length\" disabled/>")
+				.append(
+						"<input type= \"hidden\" name= \"length2\" class= \"length\" />");
+		$column_row
+				.children("td:eq(3)")
+				.append(
+						"<input type= \"checkbox\" class= \"not_null checkbox\" /><input type= \"hidden\" name=\"not_null\" value=\"0\"/>");
+		$column_row
+				.children("td:eq(4)")
+				.append(
+						"<input type= \"checkbox\" class= \"u_key checkbox\" /><input type= \"hidden\" name=\"p_key\" value=\"0\"/>");
+		$column_row
+				.children("td:eq(5)")
+				.append(
+						"<input type= \"checkbox\" class= \"p_key checkbox\" /><input type= \"hidden\" name=\"p_key\" value=\"0\"/>");
+		$column_row
+				.children("td:eq(6)")
+				.append(
+						"<input type= \"text\" name= \"de_fault\" class= \"default\"/>");
+		$column_row
+				.children("td:eq(7)")
+				.append(
+						"<input type= \"text\" name= \"col_comment\" class= \"comment\"/>");
+		$column_row.children("td:eq(8)").append(
+				"<button class=\"remove button\">remove</button>");
+
+		for (var i = 1; i <= trLth; i++) {
+
+			$(".col_no").eq(i - 1).text(i + ". ");
+
+		}
+		appendOptions();
+
+	}
+	$("#column").on("click", ".remove", function(e) {
+		e.preventDefault();
+		$(this).parent().parent().remove();
+		trLth = $("#column tr").length - 1;
+
+		for (var i = 1; i <= trLth; i++) {
+
+			$(".col_no").eq(i - 1).text(i + ". ");
+
+		}
+		//console.log(trLth);
+	});
+
+	var type = [ "bigint", "bigserial", "boolean", "box", "bytea", "cidr",
+			"circle", "date", "double precision", "inet", "integer", "json",
+			"line", "lseg", "macaddr", "money", "path", "point", "polygon",
+			"real", "smallint", "smallserial", "serial", "text", "tsquery",
+			"tsvector", "txid_snapshot", "uuid", "xml", "bit", "bit varying",
+			"character", "character varying", "interval", "time",
+			"time with time zone", "timestamp", "timestamp with time zone",
+			"numeric" ];
+	appendOptions();
+
+	function appendOptions() {
+		for (var i = 0; i < type.length; i++) {
+			$(".type").append(
+					"<option class='typeOption' data-num='"+i+"' value='"+type[i]+"'>"
+							+ type[i] + "</option>");
+		}
+	}
+
+	$("#tableForm").on("click", "select.type", function() {
+
+		var lengthParent = $(this).parent().next();
+		var length = lengthParent.children(".length");
+		var typeInd = $(this).children("option:selected").index();
+		console.log(typeInd);
+		if (typeInd >= 30 && typeInd < type.length) {//length로 전송(numeric 외 length가 필요한 경우.)
+			length.eq(0).prop("disabled", false).css("width", 100);
+			length.eq(1).prop({
+				"type" : "hidden",
+				"disabled" : true
+			});
+
+		} else if (typeInd == type.length) {//numeric
+			lengthParent.width(104);
+			length.prop({
+				"type" : "text",
+				"disabled" : false
+			}).css("width", "48px");
+			length.eq(0).css("float", "left");
+			length.eq(1).css("float", "right");
+
+		} else {//length 필요 없는 경우 - length2전송
+			length.eq(0).prop({
+				"disabled" : true,
+				"value" : ""
+			}).css("width", 100);
+			length.eq(1).prop({
+				"type" : "hidden",
+				"disabled" : false
+			});
+			if (typeInd == 1 && typeInd == 23) {
+				lengthParent.prev().find(".array").prop("disabled", true);
 			}
-			console.log(trLth);
-		});
-		
-	</script>
-</body>
-</html>
+		}
+
+		$(this).next().children('option:first').prop('selected', true);
+	});
+
+	$("#tableForm").on(
+			"click",
+			"select.array",
+			function() {
+				var length = $(this).parent().next().children(".length");
+				var typeInd = $(this).prev().children("option:selected")
+						.index();
+				if ($(this).children('option:selected').val() == '[]') {
+					length.eq(0).prop("disabled", true).css("width", 100);
+					length.eq(1).prop("type", "hidden");
+				} else if (typeInd >= 30 && typeInd < type.length
+						&& $(this).children('option:selected').val() == '') {
+					length.eq(0).prop("disabled", false).css("width", 100);
+					length.eq(1).prop("type", "hidden");
+				} else if (typeInd == type.length
+						&& $(this).children('option:selected').val() == '') {
+					length.parent().width(104);
+					length.prop({
+						"type" : "text",
+						"disabled" : false
+					}).css("width", "48px");
+					length.eq(0).css("float", "left");
+					length.eq(1).css("float", "right");
+				}
+			});
+</script>
+<style>
+ul {
+	list-style-type: none;
+	color: #000;
+	padding: 0;
+}
+
+select, .checkbox, button {
+	cursor: pointer;
+}
+
+#name {
+	margin-left: 3px;
+}
+
+li:nth-of-type(4)>.field>span {
+	display: block;
+}
+
+#column th {
+	background: rgb(230, 230, 204);
+}
+
+#column th:last-child {
+	background: none;
+}
+
+#column td {
+	text-align: center;
+}
+
+#comment {
+	width: 1050px;
+	height: 100px;
+	resize: none;
+}
+
+.column {
+	width: 200px;
+}
+
+.column input {
+	width: 80%;
+}
+
+.type {
+	width: 80%;
+}
+
+.array {
+	width: 20%;
+}
+
+.length {
+	width: 100px;
+}
+
+.default {
+	width: 200px;
+}
+
+.comment {
+	width: 300px;
+}
+
+.button {
+	box-shadow: 1px 1px 1px #000;
+	border: none;
+	width: 16px;
+	height: 16px;
+	text-indent: -9999px;
+	background-size: 100%;
+}
+
+.add {
+	background: url("public/css/images/plus.png") no-repeat;
+}
+
+.remove {
+	background: url("public/css/images/minus.png") no-repeat;
+}
+</style>
+
+

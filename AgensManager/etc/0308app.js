@@ -7,16 +7,14 @@ var app = express();
 var http = require('http');
 var pg = require('pg');
 var jade = require('jade');
-var bodyParser = require('body-parser');//새로운 npm
 //=========================================================================================================================================== 1) connectedDb
-//var connectedDb = "demo";
-//var connectedDb = "procarrie";
 var connectedDb = "bitnine";
+//var connectedDb = "procarrie";
 
 //=========================================================================================================================================== 2) constring
-//var conString = "postgres://postgres:bit9@localhost/"+connectedDb;
-//var conString = "postgres://postgres:pro1459@localhost/"+connectedDb;
 var conString = "postgres://postgres:1111@localhost/"+connectedDb;
+//var conString = "postgres://postgres:pro1459@localhost/"+connectedDb;
+
 //======== db, schema, table, view, function, column, constraint, index 배열 선언
 var arrDB = [];
 var arrSch = [];
@@ -26,17 +24,15 @@ var arrFunc = [];
 var arrCol = [];
 var arrCons = [];
 var arrInd = [];
-var createTable;
+
 //======== 클라이언트에서 받은 db, schema, table, view, function, column, constraint, index 이름 담을 변수 선언
 var result, rs, trs, vrs, frs, crs, consrs, irs  = null;
 
 //=========================================================================================================================================== 3) 소스 경로
-//app.use('/public', express.static("/home/bitnine/source_code_dir/agens-manager/public"));
+app.use('/public', express.static("C:/Users/Johnahkim/git/agensmanager/AgensManager/public"));
 //app.use('/public', express.static("C:/Users/procarrie/workspace/AgensManager/public"));
-app.use('/public', express.static("C:/Users/Johnahkim/workspace/test/public"));
 
 //포트 연결
-//app.set('port', 7474);
 app.set('port', 3000);
 
 //서버 연결
@@ -107,85 +103,6 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 		console.log("arrInd: "+arrInd.length);
 	}
 	
-	//createTable function
-	function createTable(name, column, comment){
-		var eachColumn = [];
-		createTable = "CREATE TABLE "+name+"(";
-		var comments = '';
-		for(var i = 0 ; i < (column.length)/9 ; i++){
-			var columnProp;
-			var columnName;
-			var typeName;
-			var array;
-			var typeLength;
-			var def;
-			var nn;
-			var uk;
-			var pk;
-			var cc;
-			var c;
-			
-			eachColumn[i] = "";//(eachColumn[i] = []를 썼었는데, 2차원 배열 앞에서부터 9개씩 공백이 누적되는데 뭔지 모르겠음)
-			
-			for(var j = (9*i) ; j < 9*(i+1) ; j++){
-				if(j+1 < 9*(i+1)){
-					eachColumn[i] += column[j]+";";//token: ';'
-				}else{
-					eachColumn[i] += column[j];
-				}
-			}
-			columnProp = eachColumn[i].split(";");
-			
-			columnName = columnProp[0];
-			typeName = columnProp[1];
-			array = columnProp[2];
-			typeLength = columnProp[3];
-			nn = columnProp[4];
-			uk = columnProp[5];
-			pk = columnProp[6];
-			def = columnProp[7];
-			columnComment = columnProp[8];
-			if(typeLength!=='') typeLength = "("+typeLength+")"; 
-			typeTokens = typeName.split(" ");
-			if(typeTokens.length>0){
-				typeName = typeTokens[0];
-				for(var k = 1 ; k < typeTokens.length ; k++){
-					typeLength += " "+typeTokens[k];
-				}
-			}
-			
-			if(def!=='') def = " DEFAULT '"+def+"'";
-			if(nn == 1) {
-				nn = " NOT NULL";
-			}else{
-				nn = '';
-			}
-			if(uk == 1) {
-				uk = " UNIQUE";
-			}else{
-				uk = '';
-			}
-			if(pk == 1) {
-				pk = " PRIMARY KEY";
-			}else{
-				pk = '';
-			}
-			createTable += columnName+" "+typeName+typeLength+array+nn+def+uk+pk;
-			//console.log(createTable);
-			if(i == ((column.length)/9)-1){
-				createTable += ");" 
-			}else{
-				createTable += ", " 
-			}
-			
-			if(columnComment !=='') comments += "COMMENT ON COLUMN "+name+"."+columnName+" IS '"+columnComment+"';"
-				
-		}
-		
-		if(comment!=='') comments += "COMMENT ON TABLE "+name+" IS '"+comment+"';"
-		createTable += comments;
-		console.log(createTable);
-	}
 	//========= socket.io 선언
 	var io = require('socket.io').listen(server);
 
@@ -303,65 +220,6 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 							console.log(arrInd);
 						});
 			});
-			var type = [ "bigint", "bigserial", "boolean", "box", "bytea", "cidr",
-							"circle", "date", "double precision", "inet", "integer",
-							"json", "line", "lseg", "macaddr", "money", "path", "point",
-							"polygon", "real", "smallint", "smallserial", "serial", "text",
-							"tsquery", "tsvector", "txid_snapshot", "uuid", "xml", "bit",
-							"bit varying", "character", "character varying", "interval",
-							"time", "time with time zone", "timestamp",
-							"timestamp with time zone", "numeric" ];
-			
-			//add, submit누를때 보낸다.
-			socket.on('array', function(data){
-
-				var array = data.array;
-				var colRowNum = data.colRowNum;
-
-				var col_no = 9*colRowNum+1;
-				var type_no = 9*colRowNum+2;
-				var length_no = 9*colRowNum+4;
-				var def_no = 9*colRowNum+8;
-				var colcomment_no = 9*colRowNum+9;
-				
-				if(array[length_no].name=="length2") array[length_no].value = 'disabled';
-				if(array[length_no].name=="length" && array[length_no].value=='') array[length_no].value = 'numeric';
-				if(data.length2 && data.length2!=='') {
-					array[length_no].value += ",";
-					array[length_no].value += data.length2;
-				}
-				
-				if(data.submit){
-					var name_no = 0;
-					var comment_no = array.length-1;
-					socket.emit('validCheck', {name: array[name_no].value, col: array[col_no].value, length: array[length_no].value, def: array[def_no].value, colcomment: array[colcomment_no].value, comment: array[comment_no].value});
-				}else{
-					socket.emit('validCheck', {col: array[col_no].value, length: array[length_no].value, def: array[def_no].value, colcomment: array[colcomment_no].value});
-				}
-				
-			});
-			
-			socket.on('form', function(formdata){
-				var name = formdata[0].value;
-				var comment = formdata[formdata.length-1].value;
-				var column = [];
-				for(var i = 1 ; i < formdata.length-1; i++){
-					column[i-1] = formdata[i].value;
-				}
-				
-				createTable(name, column, comment);
-				client.query(createTable, function(err, rs){
-					if(err){
-						console.log(err);
-					}else{
-						console.log("Table created.");
-						//socket.removeListener('form')이 안됨.(client에선 되는데)
-						//events.js:215
-					    //	throw TypeError('listener must be a function');
-					}
-				});
-
-			});
 			
 		});
 
@@ -369,8 +227,7 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 });
 //======================================================================================================================================================= 4) readFile 경로
 app.get('/', function (req, res){
-	//fs.readFile('/home/bitnine/source_code_dir/agens-manager/app.html', function(error, data){
-		fs.readFile('/Users/Johnahkim/workspace/test/app.html', function(error, data){
+	fs.readFile('/Users/Johnahkim/git/agensmanager/AgensManager/app.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			//ja021017
 	});
@@ -380,18 +237,26 @@ app.get('/', function (req, res){
 //		  basedir: '/Users/Johnahkim/workspace/test'
 //		});
 //	
-//      var html = fn({});
+//        var html = fn({});
 //		res.write(html);
 //		res.end();
 	
 });
 app.get('/create_table.html', function (req, res){
-//	fs.readFile('/home/bitnine/source_code_dir/agens-manager/create_table.html', function(error, data){
-		fs.readFile('/Users/Johnahkim/workspace/test/create_table.html', function(error, data){
+	fs.readFile('/Users/Johnahkim/git/agensmanager/AgensManager/create_table.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			//ja021017
 	});
+	
+	
+//	var fn = jade.compile(fs.readFileSync('app.jade', 'utf-8'), {
+//		  basedir: '/Users/Johnahkim/workspace/test'
+//		});
+//	
+//        var html = fn({});
+//		res.write(html);
+//		res.end();
+	
 });
-
 
 

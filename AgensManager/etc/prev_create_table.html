@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>create_table</title>
+<link rel="stylesheet" href="public/css/create_table.css" />
+</head>
+<style>
+
+</style>
+<body>
+	<form action="">
+		<ul>
+			<li>
+				<div class="field">
+					<label for="name">Name</label><input type="text" name="" id="name" />
+				</div>
+			</li>
+			<li>
+				<div class="field">
+					<table id="column">
+						<tr>
+							<th>Column</th>
+							<th>Type</th>
+							<th>Length</th>
+							<th>Not Null</th>
+							<th>Unique key</th>
+							<th>Primary key</th>
+							<th>Default</th>
+							<th>Comment</th>
+							<th><button class="add button">add</button></th>
+						</tr>
+						<tr>
+							<td class= "column" ><label for="column" class="col_no">1. </label><input type=
+								"text" name= "" /></td>
+							<td><select name="" class="type"><option
+										value="SERIAL">SERIAL</option></select><select name= "" class="array"><option value=""></option><option
+										value="[]">[]</option></select></td>
+							<td><input type= "text" name= "" class= "length"/></td>
+							<td><input type= "checkbox" name= "" class= "not_null checkbox"/></td>
+							<td><input type= "checkbox" name= "" class= "u_key checkbox"/></td>
+							<td><input type= "checkbox" name= "" class= "p_key checkbox"/></td>
+							<td><input type= "text" name= "" class= "default"/></td>
+							<td><input type= "text" name= "" class= "comment"/></td>
+							<td></td>
+						</tr>
+					</table>
+				</div>
+			</li>
+			<li>
+				<div class="field">
+					<input type="checkbox" name="" id="options" class="checkbox"/><span>WITHOUT OIDS</span>
+				</div>
+			</li>
+			<li>
+				<div class="field">
+					<span>Comment: </span>
+					<textarea name="" id="comment"></textarea>
+				</div>
+			</li>
+			<li>
+				<button id="hi">Create</button><button>Cancel</button>
+			</li>
+		</ul>
+	</form>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+	<script type="text/javascript">
+	
+		var colNo = $(".col_no");
+		var trLth;
+		$(".add").click(function(e){
+			trLth = $("#column tr").length;
+		console.log(trLth);
+			e.preventDefault();
+			$("#column").append("<tr><td class=\"column\"><label for=\"column\" class=\"col_no\">"+trLth+". "+"</label><input type=\"text\" name=\"\" /></td><td><select name=\"\" class=\"type\"><option value=\"SERIAL\">SERIAL</option></select><select name=\"\" class=\"array\"><option value=\"\"></option><option value=\"[]\">[]</option></select></td><td><input type=\"text\" name=\"\" class=\"length\"/></td><td><input type=\"checkbox\" name=\"\" class=\"not_null\"/></td><td><input type=\"checkbox\" name=\"\" class=\"u_key\"/></td><td><input type=\"checkbox\" name=\"\" class=\"p_key\"/></td><td><input type=\"text\" name=\"\" class=\"default\"/></td><td><input type=\"text\" name=\"\" class=\"comment\"/></td><td><button class=\"remove button\">remove</button></td></tr>");
+		});
+		$("#column").on("click", ".remove", function(e){
+			e.preventDefault();
+			$(this).parent().parent().remove();
+			trLth = $("#column tr").length-1;
+			
+			for(var i = 1 ; i <= trLth ; i++){
+				
+				$(".col_no").eq(i-1).text(i+". ");
+				
+			}
+			console.log(trLth);
+		});
+		
+	</script>
+</body>
+</html>

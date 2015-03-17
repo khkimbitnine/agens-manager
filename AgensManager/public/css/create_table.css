@@ -1,52 +1,52 @@
-@CHARSET "EUC-KR";
-	ul{
+	.content ul{
 		list-style-type: none;
+		color:#000;
 	}
-	select, .checkbox, button {
+	.content select, .checkbox, button {
 		cursor:pointer;
 	}
-	#name{
+	.content #name{
 		margin-left:3px;
 	}
-	li:nth-of-type(4)>.field>span{
+	.content li:nth-of-type(4)>.field>span{
 		display:block;
 	}
-	#column th{
+	.content #column th{
 		background: rgb(230, 230, 204);
 	}
-	#column th:last-child{
+	.content #column th:last-child{
 		background:none;
 	}
-	#column td{
+	.content #column td{
 		text-align:center;
 	}
-	#comment {
+	.content #comment {
 		width:1050px;
 		height:100px;
 		resize:none;
 	}
-	.column{
+	.content .column{
 		width: 200px;
 	}
-	.column input{
+	.content .column input{
 		width: 80%;
 	}
-	.type{
+	.content .type{
 		width:200px;
 	}
-	.array{
+	.content .array{
 		width: 50px;
 	}
-	.length{
+	.content .length{
 		width:100px;
 	}
-	.default{
+	.content .default{
 		width:200px;
 	}
-	.comment{
+	.content .comment{
 		width:300px;
 	}
-	.button{
+	.content .button{
 		box-shadow:1px 1px 1px #000;
 		border:none;
 		width:16px;
@@ -54,9 +54,9 @@
 		text-indent:-9999px;
 		background-size:100%;
 	}
-	.add{
-		background:url("public/css/images/plus.png") no-repeat;
+	.content .add{
+		background:url("images/plus.png") no-repeat;
 	}
-	.remove{
-		background:url("public/css/images/minus.png") no-repeat;
+	.content .remove{
+		background:url("images/minus.png") no-repeat;
 	}
