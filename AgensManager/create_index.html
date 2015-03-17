@@ -1,0 +1,89 @@
+<div class="content_wrapper">
+	<form id="indexForm">
+		<table>
+			<tbody>
+				<tr>
+					<th colspan='4'>Index name</th>
+				</tr>
+				<tr>
+					<td>
+						<input type="text" />
+					</td>
+				</tr>
+				<tr>
+					<th>Tables</th>
+					<th>Columns</th>
+					<th></th>
+					<th>Index</th>
+				</tr>
+				<tr>
+					<td>
+						<select multiple="multiple">
+							<option>table1</option><!-- 여기서 Index로 옮김. -->
+							<option>table2</option>
+						</select>
+					</td>
+					<td>
+						<select multiple="multiple">
+							<option>column1</option><!-- 여기서 Index로 옮김. -->
+							<option>column2</option>
+						</select>
+					</td>
+					<td>
+						<button>remove</button>
+						<button>add</button>
+					</td>
+					<td>
+						<select multiple="multiple"></select>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<table>
+			<tbody>
+				<tr>
+					<th>Access method</th>
+					<td>
+						<select>
+							<option></option>
+							<option>btree</option>
+							<option>hash</option>
+							<option>gist</option>
+							<option>gin</option>
+							<option>spgist</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th>Unique</th>
+					<td>
+						<input type="checkbox" />
+					</td>
+				</tr>
+				<tr>
+					<th>Operator class</th>
+					<td>
+						<select>
+							<option></option>
+							<option>bpchar_pattern_ops</option>
+							<option>cidr_ops</option>
+							<option>text_pattern_ops</option>
+							<option>varchar_ops</option>
+							<option>varchar_pattern_ops</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th>Concurrently</th>
+					<td>
+						<input type="checkbox"/>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<div>
+			<button>Create</button>
+			<button>Cancel</button>
+		</div>
+	</form>
+</div>
