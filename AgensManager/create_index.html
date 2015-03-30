@@ -6,84 +6,173 @@
 					<th colspan='4'>Index name</th>
 				</tr>
 				<tr>
-					<td>
-						<input type="text" />
-					</td>
+					<td><input name="index_name" id="indexName" type="text" /></td>
 				</tr>
 				<tr>
+					<th></th>
+					<th>Databases</th>
+					<th>Schemas</th>
 					<th>Tables</th>
 					<th>Columns</th>
+					<th></th>
 					<th></th>
 					<th>Index</th>
 				</tr>
 				<tr>
 					<td>
-						<select multiple="multiple">
-							<option>table1</option><!-- 여기서 Index로 옮김. -->
-							<option>table2</option>
-						</select>
+						<ul id="options">
+							<li><label for = "access">Access method</label>
+							<select name="access_method" id="access">
+									<option></option>
+									<option value="btree">btree</option>
+									<option value="hash">hash</option>
+									<option value="gist">gist</option>
+									<option value="gin">gin</option>
+									<option value="spgist">spgist</option>
+							</select>
+							</li>
+							<li><label for="unique">Unique</label>
+							<input id="unique" type="checkbox" class="checkbox" /> <input
+								name="unique" value="0" type="hidden" /></li>
+							<li><label for="concurrently">Concurrently</label>
+							<input id="concurrently" type="checkbox" class="checkbox" /> <input
+								name="concurrently" value="0" type="hidden" /></li>
+						</ul>
+					</td>
+					<td><select name="database" class="database" multiple="multiple">
+					</select></td>
+					<td><select name="schema" class="schema" multiple="multiple">
+					</select></td>
+					<td><select name="table" class="table" multiple="multiple">
+					</select></td>
+					<td><select name="column" class="column" multiple="multiple">
+					</select></td>
+					<td>
+						<ul>
+							<li><label for ="desc">DESC</label>
+							<input id="desc" type="checkbox" class="checkbox" /><input
+								type="hidden" name="desc" value="0" /><label for="first">FIRST</label><input type="radio"
+						class="checkbox order" name="order"/><input type="hidden" name="first"
+						value="0" /> <label for="last">LAST</label><input type="radio"
+						class="checkbox order" name="order" checked/><input type="hidden" name="last"
+						value="1" /></li>
+							<li><label for="operator">Operator Class</label>
+							<select id="operator" name="operator_class">
+									<option></option>
+									<option value="bpchar_pattern_ops">bpchar_pattern_ops</option>
+									<option value="cidr_ops">cidr_ops</option>
+									<option value="text_pattern_ops">text_pattern_ops</option>
+									<option value="varchar_ops">varchar_ops</option>
+									<option value="varchar_pattern_ops">varchar_pattern_ops</option>
+							</select></li>
+						</ul>
 					</td>
 					<td>
-						<select multiple="multiple">
-							<option>column1</option><!-- 여기서 Index로 옮김. -->
-							<option>column2</option>
-						</select>
+						<div id="btnBox">
+							<button>add</button>
+							<button>remove</button>
+						</div>
 					</td>
-					<td>
-						<button>remove</button>
-						<button>add</button>
-					</td>
-					<td>
-						<select multiple="multiple"></select>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<table>
-			<tbody>
-				<tr>
-					<th>Access method</th>
-					<td>
-						<select>
-							<option></option>
-							<option>btree</option>
-							<option>hash</option>
-							<option>gist</option>
-							<option>gin</option>
-							<option>spgist</option>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<th>Unique</th>
-					<td>
-						<input type="checkbox" />
-					</td>
-				</tr>
-				<tr>
-					<th>Operator class</th>
-					<td>
-						<select>
-							<option></option>
-							<option>bpchar_pattern_ops</option>
-							<option>cidr_ops</option>
-							<option>text_pattern_ops</option>
-							<option>varchar_ops</option>
-							<option>varchar_pattern_ops</option>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<th>Concurrently</th>
-					<td>
-						<input type="checkbox"/>
+					<td><select name="index" class="index" multiple="multiple"></select>
 					</td>
 				</tr>
 			</tbody>
 		</table>
 		<div>
-			<button>Create</button>
+			<button id="createBtn">Create</button>
 			<button>Cancel</button>
 		</div>
 	</form>
 </div>
+<style>
+#indexForm {
+	color: #000;
+}
+</style>
+<script>
+ 	var scname;
+ 	var pattern = /^[a-zA-Z0-9_]+$/;
+
+ 	$(document).on("change", ".checkbox", function() {
+ 		var $this = $(this);
+		if ($this.is(':checked')) {
+			$this.next().val(1);
+		} else {
+			$this.next().val(0);
+		}
+		
+		if($this.hasClass("order") && $this.is(':checked')){
+			$(".order").not($this).next().val(0);
+		}
+	});
+ 	
+ 	$("#last").prop('checked', true).next().val(1);
+ 	
+ 	$.each(db, function(i){
+ 	$(".database").append("<option value='"+db[i]+"'>"+db[i]+"</option>");
+ 	});
+ 	
+ 	
+ 	$("#indexForm").on("click", "option", function(){
+ 		var parent = $(this).parent();
+ 		var name = $(this).text();
+ 		if(parent.hasClass("database")){
+	 		$(".schema, .table, .column, .index").empty();
+ 	 		socket.emit('set_dbname', name);
+ 	 		socket.once('scname', function(data){
+ 	 			$.each(data.schema, function(i){
+ 	 				$(".schema").append("<option value='"+data.schema[i]+"'>"+data.schema[i]+"</option>");
+ 	 			});
+ 	 			socket.removeListener('scname');
+ 	 		});
+ 		}
+ 		if(parent.hasClass("schema")){
+ 			scname = name;
+ 			$(".table, .column, .index").empty();
+ 			socket.emit('set_scname_table', name);
+ 			socket.on('tabname', function(data){
+ 				$.each(data.table, function(i){
+ 					$(".table").append("<option value='"+data.table[i]+"'>"+data.table[i]+"</option>");
+ 				});
+ 				socket.removeListener('tabname');
+ 			});
+ 		}
+ 		if(parent.hasClass("table")){
+ 			$(".column, .index").empty();
+ 			socket.emit('set_tabname_col', {tabname: name, scname:scname});
+ 			socket.on('colname', function(data){
+ 				$.each(data.column, function(i){
+ 					$(".column").append("<option value='"+data.column[i]+"'>"+data.column[i]+"</option>");
+ 				});
+ 				socket.removeListener('colname');
+ 			});
+ 		}
+ 	});
+ 	
+ 	$("#btnBox>button").click(function(e){
+ 		e.preventDefault();
+ 		if($(this).index()==0){
+	 		$(".column>option:selected").remove().appendTo(".index").prop('selected', false);
+ 		}else{
+	 		$(".index>option:selected").remove().appendTo(".column").prop('selected', false);
+ 		}
+ 	});
+ 	$("#createBtn").click(function(e){
+ 		e.preventDefault();
+ 		var test = pattern.test($("#indexName").val());
+ 		var indexes = [];
+ 		if(test && $(".index").has('option').length!==0){
+ 			for(var i = 0 ; i < $(".index>option").length ; i++){
+ 				indexes[i] = $(".index>option").eq(i).val();
+ 			}
+ 			
+ 		var formdata = $("#indexForm").serializeArray();
+ 		socket.emit('index_form', {form: formdata, index: indexes});
+ 			
+ 		}else if(!test){
+ 			alert("Index name should be a-z or A-Z or number.");
+ 		}else{
+ 			alert("Index should be selected.")
+ 		}
+ 	});
+</script>

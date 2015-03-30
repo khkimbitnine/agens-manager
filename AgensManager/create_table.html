@@ -1,9 +1,10 @@
+<link rel="stylesheet" href="public/css/create_table.css" />
 <div class="content_wrapper">
 	<form id="tableForm">
 		<ul>
 			<li>
 				<div class="field">
-					<label for="name">Name</label><input type="text" name="name"
+					<label for="name">Table Name</label><input type="text" name="name"
 						id="name" />
 				</div>
 			</li>
@@ -87,6 +88,7 @@
 	var lengthPattern = /^[0-9]+$/;
 
 	$("#submitBtn").click(function(e) {
+		e.preventDefault();
 		validCheck('create');
 	});
 	$(".add").click(function(e) {
@@ -107,14 +109,12 @@
 			socket.emit('array', {
 				array : formdata,
 				colRowNum : colRowNum,
-				submit : true,
 				length2 : length2
 			});
 		} else {
 			socket.emit('array', {
 				array : formdata,
-				colRowNum : colRowNum,
-				submit : true
+				colRowNum : colRowNum
 			});
 		}
 
@@ -165,8 +165,7 @@
 										&& (def == '' || pattern.test(def))
 										&& (colcomment == '' || pattern
 												.test(colcomment))) {
-									socket.emit('form', formdata);
-									alert("submitted");
+									socket.emit('table_form', formdata);
 								} else if (!namePattern.test(name)) {
 									alert("Name should be started with a-z or A-Z and the rest filled with a-z or A-Z or number.");
 								} else if (length !== "disabled"
@@ -348,87 +347,5 @@
 				}
 			});
 </script>
-<style>
-ul {
-	list-style-type: none;
-	color: #000;
-	padding: 0;
-}
-
-select, .checkbox, button {
-	cursor: pointer;
-}
-
-#name {
-	margin-left: 3px;
-}
-
-li:nth-of-type(4)>.field>span {
-	display: block;
-}
-
-#column th {
-	background: rgb(230, 230, 204);
-}
-
-#column th:last-child {
-	background: none;
-}
-
-#column td {
-	text-align: center;
-}
-
-#comment {
-	width: 1050px;
-	height: 100px;
-	resize: none;
-}
-
-.column {
-	width: 200px;
-}
-
-.column input {
-	width: 80%;
-}
-
-.type {
-	width: 80%;
-}
-
-.array {
-	width: 20%;
-}
-
-.length {
-	width: 100px;
-}
-
-.default {
-	width: 200px;
-}
-
-.comment {
-	width: 300px;
-}
-
-.button {
-	box-shadow: 1px 1px 1px #000;
-	border: none;
-	width: 16px;
-	height: 16px;
-	text-indent: -9999px;
-	background-size: 100%;
-}
-
-.add {
-	background: url("public/css/images/plus.png") no-repeat;
-}
-
-.remove {
-	background: url("public/css/images/minus.png") no-repeat;
-}
-</style>
 
 

@@ -115,26 +115,28 @@
 		});
 
 		//create table click event: content에 create_table.html 로드 
-		toolMenuSubUl.on("click", ".object_li:eq(0)>.object", function() {
+		toolMenuSubUl.on("click", ".object_li>.object", function() {
 			
-			// html IMPORT 코드
-			//$(".content").load("/home/bitnine/source_code_dir/agens-manager/create_table.html").dialog({modal:true});
-
-			// $.get("/home/bitnine/source_code_dir/agens-manager/create_table.html").dialog({modal:true}, pars, function(data) {
-			// 			$(".content").html( data );
-			// 	});
-			//============>> error msg:  XMLHttpRequest cannot load file:///C:/Users/Johnahkim/workspace/test/create_table.html. 
-			//Cross origin requests are only supported for protocol schemes: http, data, chrome, chrome-extension, https, chrome-extension-resource.
+			var objectIndex = $(this).parent().index();
+			$(".content").empty();	
 			
-			//팝업
-			//$(window).open("/home/bitnine/source_code_dir/agens-manager/create_table.html",'name','height=200,width=150');
+			if(objectIndex == 0 ){
+		 		$.ajax({
+	             	url:"create_table.html",
+	             	success:function(data){
+	              	$(".content").html(data);
+	              } 
+	        	}); 
+			}
+			if(objectIndex == 3){//index
+		 		$.ajax({
+	             	url:"create_index.html",
+	             	success:function(data){
+	              	$(".content").html(data);
+	              } 
+	        	}); 
+			}
 
- 		$.ajax({
-             	url:"create_table.html",
-             	success:function(data){
-              	$(".content").html(data);
-              } 
-        	}); 
 		});
 		
 		toolMenuSubUl.on("click", ".object_li>.object", function(){
@@ -167,13 +169,14 @@
 		var exp = "expandable lastExpandable";
 		var collHit = "hitarea collapsable-hitarea lastCollapsable-hitarea";
 		var coll = "collapsable lastCollapsable";
-
+		var db;
 		//========= db 트리 생성
 		socket.on('db', function(data) {
-			for (var i = 0; i < data.db.length; i++) {
+			db = data.db;
+			for (var i = 0; i < db.length; i++) {
 				$(
 						"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='db'>"
-								+ data.db[i] + "</span></li>").appendTo(
+								+ db[i] + "</span></li>").appendTo(
 						$browser);
 			}
 			socket.removeListener('db');
