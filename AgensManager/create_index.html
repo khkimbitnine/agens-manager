@@ -6,7 +6,7 @@
 					<th colspan='4'>Index name</th>
 				</tr>
 				<tr>
-					<td><input name="index_name" id="indexName" type="text" /></td>
+					<td><input name="index_name" id="indexName" type="text" placeholder="optional"/></td>
 				</tr>
 				<tr>
 					<th></th>
@@ -23,7 +23,7 @@
 						<ul id="options">
 							<li><label for = "access">Access method</label>
 							<select name="access_method" id="access">
-									<option></option>
+									<option value="">(default)</option>
 									<option value="btree">btree</option>
 									<option value="hash">hash</option>
 									<option value="gist">gist</option>
@@ -39,32 +39,22 @@
 								name="concurrently" value="0" type="hidden" /></li>
 						</ul>
 					</td>
-					<td><select name="database" class="database" multiple="multiple">
+					<td><select name="database" class="database" size="6">
 					</select></td>
-					<td><select name="schema" class="schema" multiple="multiple">
+					<td><select name="schema" class="schema" size="6">
 					</select></td>
-					<td><select name="table" class="table" multiple="multiple">
+					<td><select name="table" class="table" size="6">
 					</select></td>
-					<td><select name="column" class="column" multiple="multiple">
+					<td><select name="column" class="column" size="6">
 					</select></td>
 					<td>
 						<ul>
-							<li><label for ="desc">DESC</label>
-							<input id="desc" type="checkbox" class="checkbox" /><input
-								type="hidden" name="desc" value="0" /><label for="first">FIRST</label><input type="radio"
-						class="checkbox order" name="order"/><input type="hidden" name="first"
-						value="0" /> <label for="last">LAST</label><input type="radio"
-						class="checkbox order" name="order" checked/><input type="hidden" name="last"
-						value="1" /></li>
-							<li><label for="operator">Operator Class</label>
-							<select id="operator" name="operator_class">
-									<option></option>
-									<option value="bpchar_pattern_ops">bpchar_pattern_ops</option>
-									<option value="cidr_ops">cidr_ops</option>
-									<option value="text_pattern_ops">text_pattern_ops</option>
-									<option value="varchar_ops">varchar_ops</option>
-									<option value="varchar_pattern_ops">varchar_pattern_ops</option>
-							</select></li>
+							<li>
+							<label for ="desc">DESC</label><input id="desc" type="checkbox" class="checkbox" />
+							<label for="first">FIRST</label><input type="radio"
+						class="order"/>
+						<label for="last">LAST</label><input type="radio"
+						class="order" checked/></li>
 						</ul>
 					</td>
 					<td>
@@ -91,21 +81,18 @@
 </style>
 <script>
  	var scname;
- 	var pattern = /^[a-zA-Z0-9_]+$/;
+ 	var pattern = /^[a-zA-Z_\d]+$/;
 
- 	$(document).on("change", ".checkbox", function() {
- 		var $this = $(this);
-		if ($this.is(':checked')) {
-			$this.next().val(1);
-		} else {
-			$this.next().val(0);
-		}
-		
-		if($this.hasClass("order") && $this.is(':checked')){
-			$(".order").not($this).next().val(0);
-		}
+ 	$(".checkbox").click(function(){
+ 		if($(this).is(':checked')){
+	 		$(this).next().val(1);
+ 		}else{
+	 		$(this).next().val(0);
+ 		}
+ 	});
+	$(".order").click(function(){
+		$(".order").not($(this)).prop('checked', false);
 	});
- 	
  	$("#last").prop('checked', true).next().val(1);
  	
  	$.each(db, function(i){
@@ -151,28 +138,46 @@
  	
  	$("#btnBox>button").click(function(e){
  		e.preventDefault();
- 		if($(this).index()==0){
-	 		$(".column>option:selected").remove().appendTo(".index").prop('selected', false);
+ 		var column = $(".column>option:selected");
+ 		if($(this).index()==0){//add
+ 			
+	 		var col = column.remove().appendTo(".index").prop('selected', false).text();
+	 		
+	 		if($("#desc").is(":checked")){
+	 			col+=" DESC";
+	 		}else{
+	 			col+=" ASC";
+	 		}
+	 		if($(".order:eq(0)").is(":checked")) col+=" NULLS FIRST";
+	 		if($(".order:eq(1)").is(":checked")) col+=" NULLS LAST";
+	 		
+	 		column.text(col).val(col);
+	 		
  		}else{
-	 		$(".index>option:selected").remove().appendTo(".column").prop('selected', false);
+ 			var index = $(".index>option:selected");
+ 			var res = index.text().split(" ");
+ 			
+	 		index.remove().appendTo(".column").prop('selected', false).text(res[0]).val(res[0]);
  		}
  	});
  	$("#createBtn").click(function(e){
  		e.preventDefault();
- 		var test = pattern.test($("#indexName").val());
- 		var indexes = [];
- 		if(test && $(".index").has('option').length!==0){
+ 		var idxVal = $("#indexName").val();
+ 		var test = pattern.test(idxVal);
+ 		var columns = [];
+ 		if(( test || idxVal === '' )&& $(".index").has('option').length!==0){
  			for(var i = 0 ; i < $(".index>option").length ; i++){
- 				indexes[i] = $(".index>option").eq(i).val();
+ 				columns[i] = $(".index>option").eq(i).val();
  			}
  			
  		var formdata = $("#indexForm").serializeArray();
- 		socket.emit('index_form', {form: formdata, index: indexes});
+ 		socket.emit('index_form', {form: formdata, column: columns});
  			
- 		}else if(!test){
+ 		}else if(!test && idxVal !== ''){
  			alert("Index name should be a-z or A-Z or number.");
  		}else{
  			alert("Index should be selected.")
  		}
  	});
+ 	
 </script>

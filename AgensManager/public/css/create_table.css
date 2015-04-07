@@ -3,7 +3,10 @@ ul {
 	color: #000;
 	padding: 0;
 }
-
+#column{
+	width:1400px;
+	
+}
 select, .checkbox, button {
 	cursor: pointer;
 }
@@ -42,6 +45,9 @@ li:nth-of-type(4)>.field>span {
 	width: 80%;
 }
 
+.type_box{
+	width:200px;	
+}
 .type {
 	width: 80%;
 }
@@ -53,13 +59,25 @@ li:nth-of-type(4)>.field>span {
 .length {
 	width: 100px;
 }
+.constraint_box, .constraint_box>.c{
+	width: 100px;
+}
+.f_key_box{
+	width:100px;
+}
+.f{
+	width:70px;
+}
 
 .default {
-	width: 200px;
+	width: 150px;
 }
 
 .comment {
-	width: 300px;
+	width: 200px;
+}
+.check{
+	width:200px;
 }
 
 .button {

@@ -77,8 +77,7 @@
 		//toolMenu text
 		var toolMenuLabelText = [ "Create", "SQL", "History", "Model",
 				"Server config", "Analyze", "Privilege" ];
-		var create = [ "table", "schema", "column", "index", "view",
-				"constraint", "trigger" ];
+		var create = [ "table", "schema", "index", "view", "function", "trigger"];
 		var toolMenuSubUl = $("<ul>").appendTo($("#toolMenu .bar_content"));
 
 		//toolMenu's sub <ul>
@@ -99,7 +98,7 @@
 			"height" : 120,
 		});
 
-		for (var i = 0; i < 7; i++) {
+		for (var i = 0; i < create.length; i++) {
 
 			$createSubUl.append("<li class='object_li'><span class='object'>"
 					+ create[i] + "</span></li>");
@@ -120,7 +119,7 @@
 			var objectIndex = $(this).parent().index();
 			$(".content").empty();	
 			
-			if(objectIndex == 0 ){
+			if(objectIndex == 0 ){//table
 		 		$.ajax({
 	             	url:"create_table.html",
 	             	success:function(data){
@@ -128,9 +127,25 @@
 	              } 
 	        	}); 
 			}
-			if(objectIndex == 3){//index
+			if(objectIndex == 2){//index
 		 		$.ajax({
 	             	url:"create_index.html",
+	             	success:function(data){
+	              	$(".content").html(data);
+	              } 
+	        	}); 
+			}
+			if(objectIndex == 1){//schema
+		 		$.ajax({
+	             	url:"create_schema.html",
+	             	success:function(data){
+	              	$(".content").html(data);
+	              } 
+	        	}); 
+			}
+			if(objectIndex == 3){//view
+		 		$.ajax({
+	             	url:"create_view.html",
 	             	success:function(data){
 	              	$(".content").html(data);
 	              } 

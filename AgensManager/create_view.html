@@ -1,0 +1,57 @@
+<div class="content_wrapper">
+	<form id="viewForm">
+		<h2>Create view</h2>
+		<ul id = "view">
+			<li><span>Name</span><input type='text' name='name' id="name"/></li>
+			<li><span>Query</span><textarea name='query' id='query'></textarea></li>
+			<li><span>Comment</span><textarea name='comment' id='comment'></textarea></li>
+		</ul>
+	</form>
+	<button id="createBtn">Create</button>
+	<button id="Cancel">Cancel</button>
+</div>
+<script>
+	$("#createBtn").click(function(e){
+		e.preventDefault();
+		validCheck();
+		
+	});
+	var $name = $("#name");
+	var $query = $("#query");
+	var $comment = $("#comment");
+	
+	
+	var pattern = /^[a-zA-Z_\d\s\''\.\*]+$/;//	숫자 = \d 홑따옴표 = \'' 공백= \s 마침표 = \.
+	
+	var namePattern = /^[a-zA-Z_][a-zA-Z_\d]+$/;
+	var onePattern = /^[a-zA-Z_]+$/;//한글자일 경우
+	
+	
+	function notValid(notValid){
+		notValid.css("border", "2px solid red").addClass("notValid");
+	}
+
+	
+	function validCheck(){
+		
+		$(".notValid").removeClass("notValid").css({"border": "1px solid #aaa"});//default border
+		
+		if(!namePattern.test($name.val()) && !onePattern.test($name.val())){
+			notValid($name);
+		}
+		if(!pattern.test($query.val()) || $query.val()==''){
+			notValid($query);
+		}
+		
+		if(!pattern.test($comment.val()) && $comment.val()!==''){
+			notValid($comment);
+		}
+		
+		if($(".notValid").size()==0) {
+			socket.emit('view_form', $("#viewForm").serializeArray());
+			console.log($("#tableForm").serializeArray());
+		}
+		
+	}
+
+</script>
