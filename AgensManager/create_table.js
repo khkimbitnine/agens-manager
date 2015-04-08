@@ -1,6 +1,6 @@
 exports.create_table = function(socket, client){
-
 	socket.once('table_form', function(formdata){//once
+		var error;
 		
 		var interval = formdata.length -1 -1	//except name, comment
 		
@@ -127,12 +127,14 @@ exports.create_table = function(socket, client){
 
 		client.query(createTable, function(err, rs){
 			if(err){
-				console.log(err);
+				error = err.toString();
+				console.log(error);
+				socket.emit('table_success', error);
 			}else{
 				console.log("Table created.");
+				socket.emit('table_success', error);
 			}
 		});
-
 	});
 	
 	var search_type =
@@ -145,11 +147,10 @@ exports.create_table = function(socket, client){
 		"timetz", "timestamp", "timestamptz",
 		"numeric"];
 	
-	var isunique=false;
-	var sameType = false;
-	
-	socket.once('f_check', function(data){
-		
+
+	socket.on('f_check', function(data){
+		var isunique=false;
+		var sameType = false;
 		var schema = data.schema;
 		var table = data.table;
 		var column = data.column;
@@ -159,8 +160,6 @@ exports.create_table = function(socket, client){
 		console.log("column: "+column)
 		console.log("typeInd: "+typeInd)
 		var atttypid;
-
-		
 		var unique_query = "select attname, atttypid from (select indexrelid from (select rtrim(substr(relname, 10), ' index') id from (select reltoastrelid from pg_class, (select oid from pg_namespace where nspname='"+schema+"') n	where relname = '"+table+"' and relnamespace = n.oid) r, pg_class c where c.relfilenode = r.reltoastrelid) p, (select cast(indrelid as text) id, indexrelid, indisunique from pg_index) i where i.id=p.id and indisunique = true) pp, pg_attribute a where a.attrelid = pp.indexrelid";
 		var type_query = "select oid from pg_type where typname like '%"+search_type[typeInd-1]+"%'";
 		
@@ -169,13 +168,18 @@ exports.create_table = function(socket, client){
 				console.log(err);
 			}else{
 				for(var i=0; i < rs.rows.length; i++){
+					console.log("column:"+column +", rs.rows[i].attname: " +rs.rows[i].attname)
 					if(column == rs.rows[i].attname) {
 						isunique = true;
-						socket.emit('f_check_unique', true);
 						atttypid = rs.rows[i].atttypid;
-						dataCheck(atttypid);
-						break;
 					}
+				}
+				console.log("isunique "+isunique)
+				
+				if(isunique){
+					dataCheck(atttypid);	
+				}else{
+					socket.emit('f_checked', {isunique:false, sameType:false});	
 				}
 			}
 		});
@@ -189,13 +193,12 @@ exports.create_table = function(socket, client){
 						for(var i = 0 ; i < rs.rows.length ; i++){
 							if(atttypid == rs.rows[i].oid){
 								sameType = true;
-								socket.emit('f_check_type', true);
-								break;
 							}
 						}
+						console.log("sameType "+sameType)
+						socket.emit('f_checked', {isunique:true, sameType:sameType});
 					}
 				});
 		}
-		
 	});
 }

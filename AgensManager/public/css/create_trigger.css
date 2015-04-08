@@ -1,0 +1,18 @@
+@CHARSET "UTF-8";
+#triggerForm ul{
+	padding:0;
+	list-style:none;
+	width: 800px;
+}
+#triggerForm ul>li{
+	padding:0;
+	width:399px;
+	display:inline-block;
+	margin-right:1px;
+}
+#triggerForm ul>li>label{
+	display:block;
+	width:100%;
+	background:skyblue;
+	text-align:center;
+}

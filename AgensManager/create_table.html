@@ -128,7 +128,6 @@
 	$(".p_key.checkbox").click(function() {
 		$(".p_key").not($(this)).prop('checked', false).next().val(0);
 	});
-
 	$("#column")
 			.on(
 					"click",
@@ -235,60 +234,60 @@
 				}
 
 			});
-	var prevInd = 0;
-
 	$("#column")
 			.on(
 					"click",
 					".f_column",
 					function() {
-
-						var typeInd = $(this).parent().parent().find(".type")
-								.find("option:selected").index(); //to match & compare datatype
-						var i = $(this).find("option:selected").index();
-						var $f_key = $(this).parent().find(".f_key").next(); //f_key input value to change
-
-						if (typeInd == 0)
-							alert("Please select type");
-
-						var isunique;
-						var sameType;
-
-						if (typeInd > 0 && i !== prevInd) {
-							prevInd = i;
-
-							refcolumn = $(this).find("option:selected").val();
-
-							socket.emit('f_check', {
-								schema : refschema,
-								table : reftable,
-								column : refcolumn,
-								typeInd : typeInd
-							});
-							socket.on('f_check_unique', function(data) {
-								isunique = data;
-							});
-							socket
-									.on(
-											'f_check_type',
-											function(data) {
-												sameType = data;
-
-												if (isunique && sameType) {
-													$f_key.val(reftable + " ("
-															+ refcolumn + ")");
-													console.log($f_key.val());
-												} else if (isunique
-														&& !sameType) {
-													alert(refcolumn
-															+ " is incompatible type.");
-												} else {
-													alert("There is no unique constraint matching given keys for referenced table '"
-															+ reftable + "'");
-												}
-											});
+						var $this = $(this);
+						if($this.find("option:selected").index()>0){
+								var tr = $this.parent().parent().index();
+								
+								var dataType = $this.parent().parent().find(".type")
+										.find("option:selected"); //to match & compare datatype
+								var i = $this.find("option:selected").index();
+								var $f_key = $this.parent().find(".f_key").next(); //f_key input value to change
+		
+								if (dataType.index() == 0){
+									alert("Please select type");
+									$this.find("option:eq(0)").prop('selected', true);	
+								}
+		
+								if (dataType.index() > 0 && i > 0) {
+									reftable = $this.parent().find(".f_table").find('option:selected').val();
+									refcolumn = $this.find("option:selected").val();
+		
+									var emit = socket.emit('f_check', {
+										schema : refschema,
+										table : reftable,
+										column : refcolumn,
+										typeInd : dataType.index()
+									});
+									
+									console.log(emit);
+									
+									socket.once('f_checked', function(data) {
+										var isunique = data.isunique;
+										var sameType = data.sameType;
+										if(!isunique){
+											alert("There is no unique constraint matching given keys for referenced table '"
+													+ reftable + "'");
+											$this.find("option:eq(0)").prop('selected', true);
+										}else if(isunique && !sameType){
+											alert(refcolumn
+													+ " and "+dataType.val()+" are incompatible types.");
+											$this.find("option:eq(0)").prop('selected', true);	
+										}else{
+											$f_key.val(reftable + " ("
+													+ refcolumn + ")");
+											console.log("foreign key added");
+										}
+									});
+								}
 						}
 					});
+	
+
 
 	var trLth;
 
@@ -330,6 +329,7 @@
 			var type = $columnTr.eq(i).find(".type")
 			var length = $columnTr.eq(i).find(".length")
 			var constraint = $columnTr.eq(i).find(".constraint.checkbox")
+			var fkey = $columnTr.eq(i).find(".f_key.checkbox")
 			var def = $columnTr.eq(i).find(".default")
 			var columnComment = $columnTr.eq(i).find(".comment")
 			var check = $columnTr.eq(i).find(".check")
@@ -343,6 +343,7 @@
 			if (constraint.is(':checked')
 					&& !colPattern.test(constraint.next().next().val()))
 				notValid(constraint.next().next()) //constraint_name
+			if (fkey.is(':checked') && fkey.siblings(".f.f_column").find('option:selected').index()==0) notValid(fkey.siblings('.f.f_column'))
 			if (!commentPattern.test(def.val()) && !def.val() == '')
 				notValid(def);
 			if (!commentPattern.test(columnComment.val())
@@ -359,7 +360,13 @@
 
 		if ($(".notValid").size() == 0) {
 			socket.emit('table_form', $("#tableForm").serializeArray());
-			console.log($("#tableForm").serializeArray());
+			socket.on('table_success', function(error){
+				if(error==null){
+					alert("Table created.");
+				}else{
+					alert(error);
+				}
+			})
 		}
 
 		//유효성 검사 - 통과하는 걸 어떻게 검사?1) notValid 클래스가 있는지 확인(실패)
@@ -380,7 +387,7 @@
 	});
 
 	$("#column").on("click", "select.type", function() {
-
+		
 		var lengthParent = $(this).parent().next();
 		var length = lengthParent.children(".length");
 		var typeInd = $(this).children("option:selected").index();

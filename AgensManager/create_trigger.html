@@ -1,0 +1,42 @@
+<link rel="stylesheet" href="public/css/create_trigger.css" />
+<div class="content_wrapper">
+<form id="triggerForm">
+	<ul>
+		<li><label for="name">Name</label><input type="text" name="name" id="name"/></li><!-- 
+	 --><li><label for="when">When</label><select name="when" id="when">
+			<option value="BEFORE">BEFORE</option>
+			<option value="AFTER">AFTER</option>
+		</select></li><!-- 
+	 --><li><label for="event">Event</label><select name="event" id="event">
+		<option value="INSERT">INSERT</option>
+		<option value="UPDATE">UPDATE</option>
+		<option value="DELETE">DELETE</option>
+		<option value="INSERT OR UPDATE">INSERT OR UPDATE</option>
+		<option value="INSERT OR DELETE">INSERT OR DELETE</option>
+		<option value="DELETE OR UPDATE">DELETE OR UPDATE</option>
+		<option value="INSERT OR DELETE OR UPDATE">INSERT OR DELETE OR UPDATE</option>
+		</select>
+		</li><!-- 
+	 --><li><label for="for_each">For each</label><select name="for_each" id="for_each">
+		<option value="ROW">ROW</option>
+		<option value="STATEMENT">STATEMENT</option>
+		</select></li><!-- 
+	 --><li><label for="function">Function</label><select name="function" id="function"></select>
+		</li><!-- 
+	 --><li><label for="arguments">Arguments</label>(<input type="text" name="arguments" id="arguments"/>)</li>
+	</ul>
+	<button id="createBtn">Create</button>
+	<button id="cancelBtn">Cancel</button>
+</form>
+</div>
+<script>
+	socket.disconnect();//소켓 연결이 안돼서 재연결
+	socket.connect();
+	var username = 'jakim'; //임의 유저
+	socket.emit('username', username);
+	socket.on('trigger_function', function(data){
+		for(var i = 0 ; i < data.length ; i ++){
+			$("#function").append('<option value="'+data[i]+'">'+data[i]+'</option>');
+		}
+	});
+</script>

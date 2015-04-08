@@ -127,14 +127,6 @@
 	              } 
 	        	}); 
 			}
-			if(objectIndex == 2){//index
-		 		$.ajax({
-	             	url:"create_index.html",
-	             	success:function(data){
-	              	$(".content").html(data);
-	              } 
-	        	}); 
-			}
 			if(objectIndex == 1){//schema
 		 		$.ajax({
 	             	url:"create_schema.html",
@@ -143,9 +135,35 @@
 	              } 
 	        	}); 
 			}
+			if(objectIndex == 2){//index
+		 		$.ajax({
+	             	url:"create_index.html",
+	             	success:function(data){
+	              	$(".content").html(data);
+	              } 
+	        	}); 
+			}
 			if(objectIndex == 3){//view
 		 		$.ajax({
 	             	url:"create_view.html",
+	             	success:function(data){
+	              	$(".content").html(data);
+	              } 
+	        	}); 
+			}
+			if(objectIndex == 4){//function
+				
+		 		$.ajax({
+	             	url:"create_function.html",
+	             	success:function(data){
+	              	$(".content").html(data);
+	              } 
+	        	}); 
+			}
+			if(objectIndex == 5){//trigger
+				
+		 		$.ajax({
+	             	url:"create_trigger.html",
 	             	success:function(data){
 	              	$(".content").html(data);
 	              } 

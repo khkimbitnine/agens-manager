@@ -13,6 +13,8 @@ var object_tree = require('./object_tree');
 var create_index = require('./create_index');
 var create_schema = require('./create_schema');
 var create_view = require('./create_view');
+var create_function = require('./create_function');
+var create_trigger = require('./create_trigger');
 //1) connectedDb
 var connectedDb = "bitnine";
 
@@ -56,6 +58,8 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 			create_index.create_index(socket, client);
 			create_schema.create_schema(socket, client);
 			create_view.create_view(socket, client);
+			create_function.create_function(socket, client);
+			create_trigger.create_trigger(socket, client);
 		});
 
 	});//pgconnect end
@@ -88,6 +92,18 @@ app.get('/create_schema.html', function (req, res){
 });
 app.get('/create_view.html', function (req, res){
 	fs.readFile('/Users/Johnahkim/workspace/test/create_view.html', function(error, data){
+		res.writeHead(200, {'Content-Type': 'text/html'});
+		res.end(data);			
+	});
+});
+app.get('/create_function.html', function (req, res){
+	fs.readFile('/Users/Johnahkim/workspace/test/create_function.html', function(error, data){
+		res.writeHead(200, {'Content-Type': 'text/html'});
+		res.end(data);			
+	});
+});
+app.get('/create_trigger.html', function (req, res){
+	fs.readFile('/Users/Johnahkim/workspace/test/create_trigger.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			
 	});
