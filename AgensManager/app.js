@@ -66,7 +66,7 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 });
 //4) readFile 경로
 app.get('/', function (req, res){
-	fs.readFile('/Users/Johnahkim/workspace/test/app.html', function(error, data){
+	fs.readFile('/Users/procarrie/git/agensmanager/AgensManager/app.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			//ja021017
 	});
