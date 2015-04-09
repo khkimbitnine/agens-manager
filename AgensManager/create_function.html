@@ -4,11 +4,8 @@
 		<ul>
 			<li class='grp1'><label for='name'>Name</label><input type='text' name='name'
 				id='name' /></li><!-- 
-		 --><li class='grp1'><label for='setof'>Returns</label><select name='setof'
-				id='setof'>
-					<option></option>
-					<option value="SET OF">SET OF</option>
-			</select> <select name='rettype' id='rettype'>
+		 --><li class='grp1'><label for='setof'>Returns</label><select name="schema" class="schema"><option></option></select><select name="argtype" id="argtype"></select><label for="array">Array</label><input type="checkbox" name="array" id="array"/>
+		 <select name='rettype' id='rettype'>
 			</select> <select name='array' id='array'>
 					<option></option>
 					<option value="[]">[]</option>
@@ -28,7 +25,7 @@
 					</select></li><!-- 
 				 --><li><label for="argname">Name</label><input type="text"
 						name="argname" id="argname" /></li><!-- 
-				 --><li><label for="argtype">Type</label> <select name="argtype"
+				 --><li><label for="argtype">Type</label><select name="schema" class="schema"><option></option></select><select name="argtype"
 						id="argtype">
 					</select> <select name="argarray" id="argarray">
 							<option></option>
@@ -76,9 +73,36 @@
 <script>
 	socket.disconnect();//소켓 연결이 안돼서 재연결
 	socket.connect();
-	socket.on('returns', function(returns){
-		for(var i = 0 ; i < returns.length ; i ++){
-			$("#rettype, #argtype").append('<option value = "'+returns[i]+'">'+returns[i]+'</option>');	
+	var $rettype = $("#rettype");
+	var $argtype = $("#argtype");
+	var $schema = $(".schema");
+	if($schema.length==2 ){
+		socket.once('schemas', function(schemas){
+			for(var i = 0 ; i < schemas.length ; i++){
+				$schema.append('<option value = "'+schemas[i]+'">'+schemas[i]+'</option>');
+			}
+		});		
+	}
+	var preInd = 0;
+	$schema.click(function(){
+		var $this = $(this);
+		var $schema = $this.find("option:selected");
+		var index = $schema.index();
+		var $type = $this.next();
+		
+		if(index > 0 && preInd !== index){
+			$type.empty();
+			preInd = index;
+			socket.disconnect();//소켓 연결이 안돼서 재연결
+			socket.connect();
+				socket.emit('schema', $schema.text());
+				socket.once('types', function(types){
+					for(var i = 0 ; i < types.length ; i++){
+						$type.append('<option value = "'+types[i]+'">'+types[i]+'</option>');
+					}
+				});
 		}
+
 	});
+
 </script>

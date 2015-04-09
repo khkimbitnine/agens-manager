@@ -360,7 +360,7 @@
 
 		if ($(".notValid").size() == 0) {
 			socket.emit('table_form', $("#tableForm").serializeArray());
-			socket.on('table_success', function(error){
+			socket.once('table_success', function(error){
 				if(error==null){
 					alert("Table created.");
 				}else{
