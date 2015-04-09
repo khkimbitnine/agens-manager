@@ -30,13 +30,16 @@
 </form>
 </div>
 <script>
-	socket.disconnect();//소켓 연결이 안돼서 재연결
-	socket.connect();
 	var username = 'jakim'; //임의 유저
 	socket.emit('username', username);
-	socket.on('trigger_function', function(data){
-		for(var i = 0 ; i < data.length ; i ++){
-			$("#function").append('<option value="'+data[i]+'">'+data[i]+'</option>');
-		}
-	});
+	var $function = $('#function');
+	if($function.length ==1){
+		socket.once('trigger_function', function(data){
+			for(var i = 0 ; i < data.length ; i ++){
+				$("#function").append('<option value="'+data[i]+'">'+data[i]+'</option>');
+			}
+		});		
+	}
+	
+
 </script>
