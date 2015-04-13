@@ -156,23 +156,20 @@ socket.connect();
 		var schInd = $(".schema").index($this);
 		var $option = $this.find("option:selected");
 		var optionInd = $option.index();
-		var $type = $this.next().empty().append("<option>");
+		var $type = $this.next();
 		
-		if(schInd !== prevSch || optionInd !== prevOpt){
-			prevSch = schInd;
+		prevSch = schInd;
+		
+		if(prevOpt !== optionInd || schInd !== prevSch){
 			prevOpt = optionInd;
-			socket.disconnect();
-			socket.connect();
+			$type.empty();
 			socket.emit('schema', $option.text());
 			socket.once('types', function(type){
-				console.log($option.text());
-				for(var i = 0 ; i < type.length ; i++){
-					$type.append('<option value = "'+type[i]+'">'+type[i]+'</option>');
-				}
-			});				
+					for(var i = 0 ; i < type.length ; i++){
+						$type.append('<option value = "'+type[i]+'">'+type[i]+'</option>');
+					}					
+			});					
 		}
-		
-			
 	});
 	
 	var $row4 = $functionForm.find("#row4");
@@ -208,11 +205,36 @@ socket.connect();
 	
 	$functionForm.on("click", ".up", function(e){// above index exchange
 		e.preventDefault();
-		var argInd = $(".argmode").length;	//Arguments row index
-		if(argInd == 1){
+		var argInd = $(".up").index($(this));	//Arguments row index
+		var $li = $row2Ul.find('li');
+		
+		if(argInd == 0){
 			alert("It is is the 1st row.");
 		}else{
-			
+			$li.eq(argInd - 1).insertAfter($li.eq(argInd));
+		}
+	});
+	$functionForm.on("click", ".down", function(e){// below index exchange
+		e.preventDefault();
+		var argInd = $(".down").index($(this));	//Arguments row index
+		var lastInd = $(".down").length - 1;
+		
+		var $li = $row2Ul.find('li');
+		
+		if(argInd == lastInd){
+			alert("It is is the last row.");
+		}else{
+			$li.eq(argInd + 1).after($li.eq(argInd));
+		}
+	});
+	$functionForm.on("click", ".remove", function(e){
+		e.preventDefault();
+		var argInd = $(".remove").index($(this));
+
+		if(argInd == 0){
+			alert("It is the 1st row.")
+		}else{
+			$row2Ul.find('li').eq(argInd).remove();
 		}
 	});
 	

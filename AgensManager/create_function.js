@@ -12,7 +12,8 @@ exports.create_function = function(socket, client){
 		socket.emit('schemas', schemas);
 	});
 	
-	socket.once('schema', function(schema){
+	socket.on('schema', function(schema){
+		types = [];
 		var query;
 		if(schema =='pg_toast'){
 			query = "select typname from pg_type where typname like '%pg_toast%'"

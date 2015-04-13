@@ -7,7 +7,6 @@ var app = express();
 var http = require('http');
 var pg = require('pg');
 var jade = require('jade');
-var bodyParser = require('body-parser');
 var create_table = require('./create_table');
 var object_tree = require('./object_tree');
 var create_index = require('./create_index');
@@ -17,13 +16,14 @@ var create_function = require('./create_function');
 var create_trigger = require('./create_trigger');
 //1) connectedDb
 var connectedDb = "bitnine";
-
+var sourcePath = "C:/Users/user/git/agensmanager/AgensManager/public";
+var fpath = "C:/Users/user/git/agensmanager/AgensManager/";
 //2) constring (postgres://username:password@localhost/database)
 var conString = "postgres://postgres:1111@localhost/"+connectedDb;
 
 var createTable;
 //3) 소스 경로
-app.use('/public', express.static("C:/Users/Johnahkim/workspace/test/public"));
+app.use('/public', express.static(sourcePath));
 
 //포트 연결
 //app.set('port', 7474);
@@ -66,44 +66,44 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 });
 //4) readFile 경로
 app.get('/', function (req, res){
-	fs.readFile('/Users/Johnahkim/workspace/test/app.html', function(error, data){
+	fs.readFile(fpath+'app.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			//ja021017
 	});
 });
 
 app.get('/create_table.html', function (req, res){
-	fs.readFile('/Users/Johnahkim/workspace/test/create_table.html', function(error, data){
+	fs.readFile(fpath+'create_table.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			//ja021017
 	});
 });
 app.get('/create_index.html', function (req, res){
-	fs.readFile('/Users/Johnahkim/workspace/test/create_index.html', function(error, data){
+	fs.readFile(fpath+'create_index.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			
 	});
 });
 app.get('/create_schema.html', function (req, res){
-	fs.readFile('/Users/Johnahkim/workspace/test/create_schema.html', function(error, data){
+	fs.readFile(fpath+'create_schema.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			
 	});
 });
 app.get('/create_view.html', function (req, res){
-	fs.readFile('/Users/Johnahkim/workspace/test/create_view.html', function(error, data){
+	fs.readFile(fpath+'create_view.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			
 	});
 });
 app.get('/create_function.html', function (req, res){
-	fs.readFile('/Users/Johnahkim/workspace/test/create_function.html', function(error, data){
+	fs.readFile(fpath+'create_function.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			
 	});
 });
 app.get('/create_trigger.html', function (req, res){
-	fs.readFile('/Users/Johnahkim/workspace/test/create_trigger.html', function(error, data){
+	fs.readFile(fpath+'create_trigger.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			
 	});
