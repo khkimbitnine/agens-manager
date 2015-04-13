@@ -1,108 +1,221 @@
 <link rel="stylesheet" href="public/css/create_function.css" />
 <div class="content_wrapper">
 	<form id="functionForm">
-		<ul>
-			<li class='grp1'><label for='name'>Name</label><input type='text' name='name'
-				id='name' /></li><!-- 
-		 --><li class='grp1'><label for='setof'>Returns</label><select name="schema" class="schema"><option></option></select><select name="argtype" id="argtype"></select><label for="array">Array</label><input type="checkbox" name="array" id="array"/>
-		 <select name='rettype' id='rettype'>
-			</select> <select name='array' id='array'>
-					<option></option>
-					<option value="[]">[]</option>
-			</select></li><!-- 
-		 --><li class='grp1'><label for="language">Programming language</label><select
-				name="language" id="language">
-					<option value="sql">sql</option>
-					<option value="plpgsql">plpgsql</option>
-			</select></li><!-- 
-		 --><li class='grp2'><span>Arguments</span>
-				<ul>
-					<li><label for="argmode">Mode</label><select name="argmode"
-						id="argmode">
-							<option value="IN">IN</option>
-							<option value="OUT">OUT</option>
-							<option value="INOUT">INOUT</option>
-					</select></li><!-- 
-				 --><li><label for="argname">Name</label><input type="text"
-						name="argname" id="argname" /></li><!-- 
-				 --><li><label for="argtype">Type</label><select name="schema" class="schema"><option></option></select><select name="argtype"
-						id="argtype">
-					</select> <select name="argarray" id="argarray">
-							<option></option>
-							<option value="[]"></option>
-					</select>
-						<button id="top">top</button>
-						<button id="bottom">bottom</button>
-						<button id="remove">remove</button>
-						<button id="refresh">refresh</button></li>
-				</ul>
-			</li>
-			<li class='grp3'><button>Add another argument</button></li>
-			<li class='grp4'><label for="definition">Definition</label> <textarea
-					name="definition" id="definition" cols="30" rows="10"></textarea></li>
-			<li class='grp5'><label for="comment">Comment</label> <textarea
-					name="comment" id="comment" cols="30" rows="10"></textarea></li>
-			<li class='grp6'><span>Function Costing</span>
-				<ul>
-					<li><label for="execution_cost">Execution Cost: </label><input
-						type="text" name="execution_cost" id="execution_cost" /></li>
-					<li><label for="result_rows">Result Rows: </label><input
-						type="text" name="result_rows" id="result_rows" /></li>
-				</ul></li>
-			<li class='grp7'><span>Properties</span> <select name="behavior"
-				id="behavior">
-					<option></option>
-					<option value="IMMUTABLE">IMMUTABLE</option>
-					<option value="STABLE">STABLE</option>
-					<option value="VOLATILE">VOLATILE</option>
-			</select> <select name="strict" id="strict">
-					<option></option>
-					<option value="CALLED ON NULL INPUT">CALLED ON NULL INPUT</option>
-					<option value="RETURNS NULL ON NULL INPUT">RETURNS NULL ON
-						NULL INPUT</option>
-			</select> <select name="security" id="security">
-					<option></option>
-					<option value="SECURITY INVOKER">SECURITY INVOKER</option>
-					<option value="SECURITY DEFINER">SECURITY DEFINER</option>
-			</select></li>
-		</ul>
-		<button id="createBtn">Create</button>
-		<button id="cancelBtn">Cancel</button>
+		<div id="langBox">
+			<label for="language">sql/plpgsql</label><input type="radio" name="language" class="language" value="sql"/>
+			<label for="language">internal</label><input type="radio" name="language" class="language" value="internal"/>
+			<label for="language">c</label><input type="radio" name="language" class="language" value="c"/>
+		</div>
 	</form>
+	<button id="createBtn">Create</button>
+	<button id="cancelBtn">Cancel</button>
 </div>
 <script>
-	socket.disconnect();//소켓 연결이 안돼서 재연결
-	socket.connect();
-	var $rettype = $("#rettype");
-	var $argtype = $("#argtype");
-	var $schema = $(".schema");
-	if($schema.length==2 ){
-		socket.once('schemas', function(schemas){
-			for(var i = 0 ; i < schemas.length ; i++){
-				$schema.append('<option value = "'+schemas[i]+'">'+schemas[i]+'</option>');
-			}
-		});		
-	}
-	var preInd = 0;
-	$schema.click(function(){
-		var $this = $(this);
-		var $schema = $this.find("option:selected");
-		var index = $schema.index();
-		var $type = $this.next();
+
+socket.disconnect();//소켓 연결이 안돼서 재연결
+socket.connect();
+	var sql_template = '<ul class="temp">'
+	+ '<li id="row1">'
+	+ '<span>Name</span>'
+	+ '<span>Returns</span>'
+	+ '<span>Programming language</span>'
+	+ '<div id="name">'
+	+ '<input type="text" name="name" />'
+	+ '</div>'
+	+ '<div id="returns">'
+	+ '<label for="name">SET OF</label>'
+	+ '<input type="checkbox" id="setof" name="setof" value="SET"/>'
+	+ '<div id="argtype">'
+	+ '<select name="schema" class="schema"><option></option></select>'
+	+ '<select name="argtype" id="argtype"><option></option></select>'
+	+ '<span>Array</span>'
+	+ '<input type="checkbox" name="array" id="array"/>'
+	+ '</div>'
+	+ '</div>'
+	+ '</li><!--'
+	+ '--><li id="row2"><span>Arguments</span>'
+	+ '<ul>'
+	+ '<span>Mode</span>'
+	+ '<span>Name</span>'
+	+ '<span>Type</span>'
+	+ '</ul>'
+	+ '</li>'
+	+ '<li id="row3" >'
+	+ '<button id="add">Add another argument</button>'
+	+ '</li>'
+	+ '<li id="row4" class="def">'
+	+ '</li>'
+	+ '<li id="row5" >'
+	+ '<label for="comment">Comment</label>'
+	+ '<textarea name="comment" id="comment" cols="30" rows="10"></textarea>'
+	+ '</li>'
+	+ '<li id="row6" >'
+	+ '<span>Function Costing</span>'
+	+ '<ul>'
+	+ '<li>'
+	+ '<label for="execution_cost">Execution Cost: </label>'
+	+ '<input type="text" name="execution_cost" id="execution_cost" />'
+	+ '</li>'
+	+ '<li>'
+	+ '<label for="result_rows">Result Rows: </label>'
+	+ '<input type="text" name="result_rows" id="result_rows" />'
+	+ '</li>'
+	+ '</ul>'
+	+ '</li>'
+	+ '<li id="row7" >'
+	+ '<span>Properties</span>'
+	+ '<select name="behavior" id="behavior">'
+	+ '<option></option>'
+	+ '<option value="IMMUTABLE">IMMUTABLE</option>'
+	+ '<option value="STABLE">STABLE</option>'
+	+ '<option value="VOLATILE">VOLATILE</option>'
+	+ '</select>'
+	+ '<select name="strict" id="strict">'
+	+ '<option></option>'
+	+ '<option value="CALLED ON NULL INPUT">CALLED ON NULL INPUT</option>'
+	+ '<option value="RETURNS NULL ON NULL INPUT">RETURNS NULL ON NULL INPUT</option>'
+	+ '</select>'
+	+ '<select name="security" id="security">'
+	+ '<option></option>'
+	+ '<option value="SECURITY INVOKER">SECURITY INVOKER</option>'
+	+ '<option value="SECURITY DEFINER">SECURITY DEFINER</option>'
+	+ '</select>'
+	+ '</li>'
+	+ '</ul>';
+ 
+	var $functionForm = $("#functionForm");
+	$functionForm.append(sql_template);
+	
+	var def = '<label>Definition</label><textarea name="definition" id="definition" cols="30" rows="10"></textarea>';
+	$(".def").append(def);
+	
+	var $row1_3 = $("#row1");
+	var sql = '<div id="language" class="sql"><select name="language"><option value="sql">sql</option><option value="plpgsql">plpgsql</option></select></div>';
+	$row1_3.append(sql);
+	$row1_3.find("#language").css({"display":"inline-block", "width": "19%"});
+	
+	
+	var $row2Ul = $("#row2>ul")
+	var argmode = '<div class="argmode">'
+		+ '<select name="argmode">'
+		+ '<option value="IN">IN</option>'
+		+ '<option value="OUT">OUT</option>'
+		+ '<option value="INOUT">INOUT</option>'
+		+ '</select>'
+		+ '</div>';
 		
-		if(index > 0 && preInd !== index){
-			$type.empty();
-			preInd = index;
-			socket.disconnect();//소켓 연결이 안돼서 재연결
-			socket.connect();
-				socket.emit('schema', $schema.text());
-				socket.once('types', function(types){
-					for(var i = 0 ; i < types.length ; i++){
-						$type.append('<option value = "'+types[i]+'">'+types[i]+'</option>');
-					}
-				});
+	var argname = '<div class="argname">'
+		+ '<input type="text" name="argname" />'
+		+ '</div>';
+	
+	var argtype = '<div class="argtype">'
+		+ '<select name="schema" class="schema"><option></option></select>'
+		+ '<select name="type" class="type"><option></option></select>'
+		+ '<label for="array">Array</label>'
+		+ '<input type="checkbox" name="array" class="array"/>'
+		+ '<button class="up">up</button>'
+		+ '<button class="down">down</button>'
+		+ '<button class="remove">remove</button>'
+		+ '</div>';
+		
+	var schemas = [];
+	var types = [];
+	function row2append(argInd){
+		var $li = $("<li>").appendTo($row2Ul);
+		
+		$li.append(argmode+argname+argtype);
+		schemaAppend(argInd);
+	}
+	
+	function schemaAppend(argInd){
+		for(var i = 0 ; i < schemas.length ; i++){
+			$(".schema").eq(argInd).append('<option value = "'+schemas[i]+'">'+schemas[i]+'</option>');
+		}	
+	}
+	
+	socket.once('schemas', function(schema){
+		for(var i = 0 ; i < schema.length ; i++){
+			schemas[i] = schema[i];
 		}
-
+		schemaAppend(0);
+		row2append(1);
+	});	
+	
+	var $sqlBtn = $("#langBox").find(".language").eq(0);
+	var $internalBtn = $("#langBox").find(".language").eq(1);
+	var $cBtn = $("#langBox").find(".language").eq(2);
+	
+	$sqlBtn.prop('checked', 'checked');
+	
+	
+	var prevOpt = 0;
+	var prevSch = -1;
+	
+	$functionForm.on("click", ".schema", function(){
+		var $this = $(this);
+		var schInd = $(".schema").index($this);
+		var $option = $this.find("option:selected");
+		var optionInd = $option.index();
+		var $type = $this.next().empty().append("<option>");
+		
+		if(schInd !== prevSch || optionInd !== prevOpt){
+			prevSch = schInd;
+			prevOpt = optionInd;
+			socket.disconnect();
+			socket.connect();
+			socket.emit('schema', $option.text());
+			socket.once('types', function(type){
+				console.log($option.text());
+				for(var i = 0 ; i < type.length ; i++){
+					$type.append('<option value = "'+type[i]+'">'+type[i]+'</option>');
+				}
+			});				
+		}
+		
+			
 	});
-
+	
+	var $row4 = $functionForm.find("#row4");
+	var $lang = $row1_3.find("#language");
+	
+	$sqlBtn.click(function(){
+		if(!$row4.hasClass("def")){
+			$row4.addClass("def").empty().append(def);
+		}
+		if(!$lang.hasClass("sql")){
+			$lang.empty().removeClass("internal c").addClass("sql").append(sql);
+		}
+	});
+	$internalBtn.click(function(){//link symbol
+		$row4.removeClass("def").empty().append('<label>Link Symbol</label><input type="text" name="link_symbol" id="linkSymbol">').find("#linkSymbol").width("100%");//definition
+		$lang.empty().removeClass("sql c").addClass("internal").append('<span>internal</span>');
+	});
+	$cBtn.click(function(){//object file, link symbol
+		$row4.removeClass("def").empty().append('<div id="objectFile"><label>Object File</label><input type="text" name="object_file"></div><div id="objectFile"><label>Link Symbol</label><input type="text" name="link_symbol" id="linkSymbol"></div>').find('div').css({"width": "50%", "display":"inline-block"}).children("input").width("100%");//definition
+		$lang.empty().removeClass("sql internal").addClass("c").append('<span>c</span>');
+	});
+	
+	var $add = $("#add");
+	
+	$add.click(function(e){
+		e.preventDefault();
+		var argInd = $(".argmode").length + 1; //second argument
+		row2append(argInd);
+	});
+	
+	var $down = $(".down");//below index exchange
+	var $remove = $(".remove");
+	
+	$functionForm.on("click", ".up", function(e){// above index exchange
+		e.preventDefault();
+		var argInd = $(".argmode").length;	//Arguments row index
+		if(argInd == 1){
+			alert("It is is the 1st row.");
+		}else{
+			
+		}
+	});
+	
+	
+	
 </script>
