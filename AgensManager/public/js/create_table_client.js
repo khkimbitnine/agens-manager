@@ -1,4 +1,3 @@
-	
 	var col_template = '<tr>'
 			+ '<td class="column">'
 			+ '<input type="text" name="column" class="column_input" value=""/>'
@@ -71,7 +70,6 @@
 							+ type[i] + "</option>");
 	}
 	appendColumn();
-
 	var connectedDb = 'bitnine';
 
 	$(document).on("change", ".checkbox", function() {
@@ -119,7 +117,7 @@
 							schema.append('<option>');
 							schemaList(schema);
 						} else {
-
+							$(".u_key, .p_key, .not_null").prop('disabled', false);
 							$(this).parent().find("select").empty().hide();
 						}
 					});
@@ -140,6 +138,7 @@
 	var refschema;//f_key value
 	var reftable;
 	var refcolumn;
+	var array = false;
 
 	$("#column").on(
 			"click",
@@ -174,7 +173,6 @@
 			function() {
 
 				reftable = $(this).find("option:selected").val();
-				$(this).parent().find(".f_key").next().val(reftable);
 
 				var trInd = $(this).parent().parent().index();
 
@@ -205,7 +203,10 @@
 					function() {
 						var $this = $(this);
 						if($this.find("option:selected").index()>0){
-								var tr = $this.parent().parent().index();
+								var $tr = $this.parent().parent();
+								if($tr.find(".array").val()=='[]'){
+									array = true;
+								}
 								
 								var dataType = $this.parent().parent().find(".type")
 										.find("option:selected"); //to match & compare datatype
@@ -220,12 +221,12 @@
 								if (dataType.index() > 0 && i > 0) {
 									reftable = $this.parent().find(".f_table").find('option:selected').val();
 									refcolumn = $this.find("option:selected").val();
-		
 									var emit = socket.emit('f_check', {
 										schema : refschema,
 										table : reftable,
 										column : refcolumn,
-										typeInd : dataType.index()
+										typeInd : dataType.index(),
+										array: array
 									});
 									
 									//console.log(emit);
@@ -239,7 +240,7 @@
 											$this.find("option:eq(0)").prop('selected', true);
 										}else if(isunique && !sameType){
 											alert(refcolumn
-													+ " and "+dataType.val()+" are incompatible types.");
+													+ " and "+dataType.val()+"'s data type are incompatible.");
 											$this.find("option:eq(0)").prop('selected', true);	
 										}else{
 											$f_key.val(reftable + " ("
@@ -353,7 +354,14 @@
 		}
 		//console.log(trLth);
 	});
-
+	$("#column").on("click", ".type_box>select", function(){
+		var f_col_ind = $(this).parents("tr").find(".f_column").find("option:selected").index();
+		
+		if(f_col_ind > 0){
+			$(this).parents("tr").find(".f_key_box").find(".f_key").prop("checked", false).parent().find("select").empty().hide();
+			$(".u_key, .p_key, .not_null").prop('disabled', false);
+		}
+	});
 	$("#column").on("click", "select.type", function() {
 		
 		var lengthParent = $(this).parent().next();

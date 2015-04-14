@@ -17,8 +17,8 @@ var create_trigger = require('./create_trigger');
 var register_user = require('./register_user');
 //1) connectedDb
 var connectedDb = "bitnine";
-var sourcePath = "C:/Users/Johnahkim/workspace/test/public";
-var fpath = "C:/Users/Johnahkim/workspace/test/";
+var sourcePath = "C:/Users/user/git/agensmanager/AgensManager/public";
+var fpath = "C:/Users/user/git/agensmanager/AgensManager/";
 //2) constring (postgres://username:password@localhost/database)
 var conString = "postgres://postgres:1111@localhost/"+connectedDb;
 

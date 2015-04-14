@@ -9,7 +9,7 @@ exports.create_table = function(socket, client){
 		var schema = formdata[0].value;
 		var name = formdata[1].value;
 		var comment = formdata[formdata.length-1].value;
-		var column = [];
+		var column = [];//all column values
 		for(var i = 2 ; i < formdata.length-1; i++){
 			column[i-2] = formdata[i].value;
 		}
@@ -20,7 +20,6 @@ exports.create_table = function(socket, client){
 		createTable = "CREATE TABLE "+schema+"."+name+"(";
 		var comments = ''; //col_comment, comment
 		for(var i = 0 ; i < (column.length)/interval ; i++){// row index
-			var columnRow = [];
 			var columnName;
 			var typeName;
 			var array;
@@ -34,17 +33,11 @@ exports.create_table = function(socket, client){
 			var cc;
 			var ck;
 
-			eachColumn[i] = "";//eachColumn 2차원 배열 생성 실패로 인한 차선책 
-
+			var columnRow = [];//column values per row
+			var k = 0;
 			for(var j = (interval*i) ; j < interval*(i+1) ; j++){// per row
-				if(j+1 < interval*(i+1)){
-					eachColumn[i] += column[j]+";";//token: ';'
-				}else{
-					eachColumn[i] += column[j];
-				}
+					columnRow[k++] = column[j];
 			}
-			columnRow = eachColumn[i].split(";");
-			
 			columnName = columnRow[0];
 			typeName = columnRow[1];
 			array = columnRow[2];
@@ -106,18 +99,6 @@ exports.create_table = function(socket, client){
 				fk = " REFERENCES "+fk;
 			}
 			
-//			console.log("columnName: "+columnName)
-//			console.log("typeName: "+typeName)
-//			console.log("typeLength: "+typeLength)
-//			console.log("array: "+array)
-//			console.log("cs: "+cs)
-//			console.log("nn: "+nn)
-//			console.log("ck: "+ck)
-//			console.log("def: "+def)
-//			console.log("uk: "+uk)
-//			console.log("pk: "+pk)
-//			console.log("fk: "+fk)
-			
 			createTable += columnName+" "+typeName+typeLength+array+cs+nn+ck+def+uk+pk+fk;
 			if(i == ((column.length)/interval)-1){
 				createTable += ");" 
@@ -162,13 +143,19 @@ exports.create_table = function(socket, client){
 		var table = data.table;
 		var column = data.column;
 		var typeInd = data.typeInd;
-//		console.log("schema: "+schema)
-//		console.log("table: "+table)
-//		console.log("column: "+column)
-//		console.log("typeInd: "+typeInd)
+		var array = data.array;
+		var type_query = "";
 		var atttypid;
-		var unique_query = "select attname, atttypid from (select indexrelid from (select rtrim(substr(relname, 10), ' index') id from (select reltoastrelid from pg_class, (select oid from pg_namespace where nspname='"+schema+"') n	where relname = '"+table+"' and relnamespace = n.oid) r, pg_class c where c.relfilenode = r.reltoastrelid) p, (select cast(indrelid as text) id, indexrelid, indisunique from pg_index) i where i.id=p.id and indisunique = true) pp, pg_attribute a where a.attrelid = pp.indexrelid";
-		var type_query = "select oid from pg_type where typname like '%"+search_type[typeInd-1]+"%'";
+		var attname;
+		var unique_query = "select attname from (select indexrelid from (select rtrim(substr(relname, 10), ' index') id from (select reltoastrelid from pg_class, (select oid from pg_namespace where nspname='"+schema+"') n	where relname = '"+table+"' and relnamespace = n.oid) r, pg_class c where c.relfilenode = r.reltoastrelid) p, (select cast(indrelid as text) id, indexrelid, indisunique from pg_index) i where i.id=p.id and indisunique = true) pp, pg_attribute a where a.attrelid = pp.indexrelid";
+		
+		var equal;
+		if(array){
+			equal = "=";
+		}else{
+			equal = "<>";
+		}
+		type_query = "select column_name from information_schema.columns where table_schema='"+schema+"' and table_name='"+table+"' and data_type"+equal+"'ARRAY' and udt_name like '%"+search_type[typeInd -1]+"%';";
 		
 		client.query(unique_query, function(err, rs){
 			if(err){
@@ -178,13 +165,13 @@ exports.create_table = function(socket, client){
 					//console.log("column:"+column +", rs.rows[i].attname: " +rs.rows[i].attname)
 					if(column == rs.rows[i].attname) {
 						isunique = true;
-						atttypid = rs.rows[i].atttypid;
+						attname = rs.rows[i].attname;
 					}
 				}
 				//console.log("isunique "+isunique)
 				
 				if(isunique){
-					dataCheck(atttypid);	
+					dataCheck(attname);	
 				}else{
 					socket.emit('f_checked', {isunique:false, sameType:false});	
 				}
@@ -192,20 +179,20 @@ exports.create_table = function(socket, client){
 		});
 		
 		
-		function dataCheck(atttypid){
+		function dataCheck(attname){
 				client.query(type_query, function(err, rs){
 					if(err){
 						console.log(err);
 					}else{
-						for(var i = 0 ; i < rs.rows.length ; i++){
-							if(atttypid == rs.rows[i].oid){
-								sameType = true;
+							for(var i = 0 ; i < rs.rows.length ; i++){
+								if(attname == rs.rows[i].column_name){
+									sameType = true;
+								}
 							}
 						}
 						//console.log("sameType "+sameType)
 						socket.emit('f_checked', {isunique:true, sameType:sameType});
-					}
-				});
+					});
 		}
 	});
 }
