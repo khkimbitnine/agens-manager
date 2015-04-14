@@ -2,21 +2,25 @@ exports.create_table = function(socket, client){
 	socket.once('table_form', function(formdata){//once
 		var error;
 		
-		var interval = formdata.length -1 -1	//except name, comment
+		var interval = 12	
+		//columnName, typeName, array, typeLength, constraint, not_null
+		//unique, primary, foreign, default, column_comment, check
 		
-		var name = formdata[0].value;
+		var schema = formdata[0].value;
+		var name = formdata[1].value;
 		var comment = formdata[formdata.length-1].value;
 		var column = [];
-		for(var i = 1 ; i < formdata.length-1; i++){
-			column[i-1] = formdata[i].value;
+		for(var i = 2 ; i < formdata.length-1; i++){
+			column[i-2] = formdata[i].value;
 		}
+		
 		
 		//create Table
 		var eachColumn = [];
-		createTable = "CREATE TABLE "+name+"(";
-		var comments = '';
-		for(var i = 0 ; i < (column.length)/interval ; i++){
-			var columnProp;
+		createTable = "CREATE TABLE "+schema+"."+name+"(";
+		var comments = ''; //col_comment, comment
+		for(var i = 0 ; i < (column.length)/interval ; i++){// row index
+			var columnRow = [];
 			var columnName;
 			var typeName;
 			var array;
@@ -30,46 +34,52 @@ exports.create_table = function(socket, client){
 			var cc;
 			var ck;
 
-			eachColumn[i] = "";//(eachColumn[i] = []를 썼었는데, 2차원 배열 앞에서부터 9개씩 공백이 누적되는데 뭔지 모르겠음)
+			eachColumn[i] = "";//eachColumn 2차원 배열 생성 실패로 인한 차선책 
 
-			for(var j = (interval*i) ; j < interval*(i+1) ; j++){
+			for(var j = (interval*i) ; j < interval*(i+1) ; j++){// per row
 				if(j+1 < interval*(i+1)){
 					eachColumn[i] += column[j]+";";//token: ';'
 				}else{
 					eachColumn[i] += column[j];
 				}
 			}
-			columnProp = eachColumn[i].split(";");
-			console.log(columnProp);
-			columnName = columnProp[0];
-			typeName = columnProp[1];
-			array = columnProp[2];
-			typeLength = columnProp[3];
-			cs = columnProp[4];
-			nn = columnProp[5];
-			uk = columnProp[6];
-			pk = columnProp[7];
-			fk = columnProp[8];
-			def = columnProp[9];
-			cc = columnProp[10];
-			ck = columnProp[11];
-
+			columnRow = eachColumn[i].split(";");
+			
+			columnName = columnRow[0];
+			typeName = columnRow[1];
+			array = columnRow[2];
+			typeLength = columnRow[3];
+			cs = columnRow[4];
+			nn = columnRow[5];
+			uk = columnRow[6];
+			pk = columnRow[7];
+			fk = columnRow[8];
+			def = columnRow[9];
+			cc = columnRow[10];
+			ck = columnRow[11];
+			
+			if(typeLength.length!== 0){
+				typeLength = "("+typeLength+")";
+			}
+			
 			if(ck.length !== 0){
 				ck = " CHECK ("+ck+")";
 			}else{
 				ck = '';
 			}
 			
-			if(def.length !== 0){
+			if(def.length !== 0 && typeName=="character"){
 				def = " DEFAULT '"+def+"'";
-			}else{
-				cef = '';
+			}
+			if(def.length == 0) def = "";
+			if(def.length !== 0 && typeName !== "character"){
+				def = " DEFAULT "+def;
 			}
 			
 			if(cs == 0) {
 				cs = '';
 			}else{
-				cs = " CONSTRAINT "+cs;
+				cs = ' CONSTRAINT "'+cs+'"';
 			}
 			
 			if(nn == 1) {
@@ -96,27 +106,26 @@ exports.create_table = function(socket, client){
 				fk = " REFERENCES "+fk;
 			}
 			
-			console.log("columnName: "+columnName)
-			console.log("typeName: "+typeName)
-			console.log("typeLength: "+typeLength)
-			console.log("array: "+array)
-			console.log("cs: "+cs)
-			console.log("nn: "+nn)
-			console.log("ck: "+ck)
-			console.log("def: "+def)
-			console.log("uk: "+uk)
-			console.log("pk: "+pk)
-			console.log("fk: "+fk)
+//			console.log("columnName: "+columnName)
+//			console.log("typeName: "+typeName)
+//			console.log("typeLength: "+typeLength)
+//			console.log("array: "+array)
+//			console.log("cs: "+cs)
+//			console.log("nn: "+nn)
+//			console.log("ck: "+ck)
+//			console.log("def: "+def)
+//			console.log("uk: "+uk)
+//			console.log("pk: "+pk)
+//			console.log("fk: "+fk)
 			
 			createTable += columnName+" "+typeName+typeLength+array+cs+nn+ck+def+uk+pk+fk;
-			
 			if(i == ((column.length)/interval)-1){
 				createTable += ");" 
 			}else{
 				createTable += ", " 
 			}
 
-			if(cc.length !== 0) comments += "COMMENT ON COLUMN "+name+"."+columnName+" IS '"+cc+"';"
+			//if(cc.length !== 0) comments += "COMMENT ON COLUMN "+name+"."+columnName+" IS '"+cc+"';"
 
 		}
 
@@ -128,12 +137,10 @@ exports.create_table = function(socket, client){
 		client.query(createTable, function(err, rs){
 			if(err){
 				error = err.toString();
-				console.log(error);
-				socket.emit('table_success', error);
 			}else{
 				console.log("Table created.");
-				socket.emit('table_success', error);
 			}
+			socket.emit('table_success', error);
 		});
 	});
 	
@@ -155,10 +162,10 @@ exports.create_table = function(socket, client){
 		var table = data.table;
 		var column = data.column;
 		var typeInd = data.typeInd;
-		console.log("schema: "+schema)
-		console.log("table: "+table)
-		console.log("column: "+column)
-		console.log("typeInd: "+typeInd)
+//		console.log("schema: "+schema)
+//		console.log("table: "+table)
+//		console.log("column: "+column)
+//		console.log("typeInd: "+typeInd)
 		var atttypid;
 		var unique_query = "select attname, atttypid from (select indexrelid from (select rtrim(substr(relname, 10), ' index') id from (select reltoastrelid from pg_class, (select oid from pg_namespace where nspname='"+schema+"') n	where relname = '"+table+"' and relnamespace = n.oid) r, pg_class c where c.relfilenode = r.reltoastrelid) p, (select cast(indrelid as text) id, indexrelid, indisunique from pg_index) i where i.id=p.id and indisunique = true) pp, pg_attribute a where a.attrelid = pp.indexrelid";
 		var type_query = "select oid from pg_type where typname like '%"+search_type[typeInd-1]+"%'";
@@ -168,13 +175,13 @@ exports.create_table = function(socket, client){
 				console.log(err);
 			}else{
 				for(var i=0; i < rs.rows.length; i++){
-					console.log("column:"+column +", rs.rows[i].attname: " +rs.rows[i].attname)
+					//console.log("column:"+column +", rs.rows[i].attname: " +rs.rows[i].attname)
 					if(column == rs.rows[i].attname) {
 						isunique = true;
 						atttypid = rs.rows[i].atttypid;
 					}
 				}
-				console.log("isunique "+isunique)
+				//console.log("isunique "+isunique)
 				
 				if(isunique){
 					dataCheck(atttypid);	
@@ -195,7 +202,7 @@ exports.create_table = function(socket, client){
 								sameType = true;
 							}
 						}
-						console.log("sameType "+sameType)
+						//console.log("sameType "+sameType)
 						socket.emit('f_checked', {isunique:true, sameType:sameType});
 					}
 				});

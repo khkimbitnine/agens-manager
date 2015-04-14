@@ -33,10 +33,11 @@ exports.create_index = function(socket, client){
 		console.log(query);
 		client.query(query, function(err, rs){
 			if(err){
-				console.log(err);
+				error = err.toString();
 			}else{
 				console.log("Index created.");
 			}
+			socket.emit('index_success', error);
 		});
 		
 	});

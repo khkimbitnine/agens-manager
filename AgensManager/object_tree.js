@@ -18,7 +18,7 @@ function selectDb(err, result){
 	for(var i=0; i < result.rows.length; i++){
 		arrDB.push(result.rows[i].datname);
 	}
-	console.log(arrDB);
+	//console.log(arrDB);
 }
 
 //selectSc function
@@ -26,7 +26,7 @@ function selectSc(err, rs){
 	for(var j=0; j < rs.rows.length; j++){
 		arrSch.push(rs.rows[j].schema_name);
 	}
-	console.log("arrSch: "+arrSch.length);
+	//console.log("arrSch: "+arrSch.length);
 }
 
 //selectTb function
@@ -34,7 +34,7 @@ function selectTb(err, trs){
 	for(var k=0; k < trs.rows.length; k++){
 		arrTab.push(trs.rows[k].table_name);
 	}
-	console.log("arrTab: "+arrTab.length);
+	//console.log("arrTab: "+arrTab.length);
 }
 
 //selectVw function
@@ -42,7 +42,7 @@ function selectVw(err, vrs){
 	for(var k=0; k < vrs.rows.length; k++){
 		arrView.push(vrs.rows[k].table_name);
 	}
-	console.log("arrView: "+arrView.length);
+	//console.log("arrView: "+arrView.length);
 }
 
 //selectFc function
@@ -50,7 +50,7 @@ function selectFc(err, frs){
 	for(var k=0; k < frs.rows.length; k++){
 		arrFunc.push(frs.rows[k].proname);
 	}
-	console.log("arrFunc: "+arrFunc.length);
+	//console.log("arrFunc: "+arrFunc.length);
 }
 
 //selectCol function
@@ -58,7 +58,7 @@ function selectCol(err, crs){
 	for(var l=0; l < crs.rows.length; l++){
 		arrCol.push(crs.rows[l].column_name);
 	}
-	console.log("arrCol: "+arrCol.length);
+	//console.log("arrCol: "+arrCol.length);
 }
 
 //selectCons function
@@ -66,14 +66,14 @@ function selectCons(err, consrs){
 	for(var l=0; l < consrs.rows.length; l++){
 		arrCons.push(consrs.rows[l].constraint_name);
 	}
-	console.log("arrCons: "+arrCons.length);
+	//console.log("arrCons: "+arrCons.length);
 }
 //selectInd function
 function selectInd(err, irs){
 	for(var l=0; l < irs.rows.length; l++){
 		arrInd.push(irs.rows[l].relname);
 	}
-	console.log("arrInd: "+arrInd.length);
+	//console.log("arrInd: "+arrInd.length);
 }
 
 exports.db = function(client){
@@ -91,7 +91,7 @@ exports.subtree = function(socket, client, connectedDb){
 	//db 클릭, 스키마 전송
 	socket.on('set_dbname', function (dbname){
 		if(dbname === connectedDb){
-			console.log("dbname: connected =>   "+dbname+" : "+connectedDb);
+			//console.log("dbname: connected =>   "+dbname+" : "+connectedDb);
 			//arrSch 비우기
 			arrSch = [];
 
@@ -114,7 +114,7 @@ exports.subtree = function(socket, client, connectedDb){
 				client.query('SELECT DISTINCT(table_name) FROM information_schema.tables WHERE table_schema = \''+scname+'\' AND table_type = \'BASE TABLE\' ORDER BY table_name ASC;', function(err, trs){
 					selectTb(err, trs);
 					socket.emit('tabname', {table: arrTab});
-					console.log(arrTab);
+					//console.log(arrTab);
 				});
 			}
 		}
@@ -129,7 +129,7 @@ exports.subtree = function(socket, client, connectedDb){
 				client.query('SELECT DISTINCT(table_name) FROM information_schema.views WHERE table_schema = \''+scname+'\' ORDER BY table_name ASC;', function(err, vrs){
 					selectVw(err, vrs);
 					socket.emit('viewname', {view: arrView});
-					console.log(arrView);
+					//console.log(arrView);
 				});
 			}
 		}
@@ -141,7 +141,7 @@ exports.subtree = function(socket, client, connectedDb){
 		client.query('select proname from pg_proc inner join pg_namespace ns on (pg_proc.pronamespace = ns.oid) where ns.nspname = \''+scname+'\' order by proname;', function(err, frs){
 			selectFc(err, frs);
 			socket.emit('funcname', {func: arrFunc});
-			console.log(arrFunc);
+			//console.log(arrFunc);
 		});
 	});
 
@@ -153,7 +153,7 @@ exports.subtree = function(socket, client, connectedDb){
 		client.query('SELECT column_name FROM information_schema.columns WHERE table_schema=\''+data.scname+'\' and table_name =\''+data.tabname+'\' order by column_name;', function(err, crs){
 			selectCol(err, crs);
 			socket.emit('colname', {column: arrCol});
-			console.log(arrCol);
+			//console.log(arrCol);
 		});
 	});
 
@@ -164,7 +164,7 @@ exports.subtree = function(socket, client, connectedDb){
 		client.query('select constraint_name from information_schema.constraint_column_usage where table_schema=\''+data.scname+'\' and table_name=\''+data.tabname+'\' order by constraint_name;', function(err, consrs){
 			selectCons(err, consrs);
 			socket.emit('consname', {constraint: arrCons});
-			console.log(arrCons);
+			//console.log(arrCons);
 		});
 	});
 
@@ -175,7 +175,7 @@ exports.subtree = function(socket, client, connectedDb){
 		client.query('select relname from pg_class c, pg_index i, (select distinct(relfilenode) from pg_class, (select oid from pg_namespace where nspname = \''+data.scname+'\') s where relname = \''+data.tabname+'\' and relnamespace=s.oid) t where c.relkind = \'i\' and i.indexrelid = c.oid and i.indrelid = t.relfilenode and c.oid NOT IN (select conindid from pg_constraint);', function(err, irs){
 			selectInd(err, irs);
 			socket.emit('indname', {index: arrInd});
-			console.log(arrInd);
+			//console.log(arrInd);
 		});
 	});
 

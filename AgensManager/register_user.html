@@ -1,0 +1,30 @@
+<div id="registerForm">
+	<div id="username">
+		<label>username</label> <input type="text" />
+		<button>Check</button>
+	</div>
+	<div id="passwd">
+		<label>passwd</label> <input type="password" />
+	</div>
+	<div id="passwdConfirm">
+		<label>passwd confirm</label> <input type="password" />
+	</div>
+	<div id="createBtnBox">
+		<button>Cancel</button>
+		<button>Create</button>
+	</div>
+</div>
+<script>
+	var $chkBtn = $("#username>button");
+	
+	$chkBtn.click(function(e){
+		e.preventDefault();
+		var username =  $("#username>input").val();
+		socket.emit("check", username);
+		socket.once("dup_user", function(dup){
+			if(dup == 1){
+				alert("You can't user the username");
+			}
+		});
+	});
+</script>

@@ -96,3 +96,10 @@ li:nth-of-type(4)>.field>span {
 .remove {
 	background: url("images/minus.png") no-repeat;
 }
+.field>div {
+	display:inline-block;
+}
+#tableForm{
+	margin:auto;
+	width:1400px;
+}

@@ -8,7 +8,6 @@ exports.create_schema = function(socket, client){
 				for(var i=0; i < rs.rows.length; i++){
 					roles.push(rs.rows[i].rolname);
 				}
-				//console.log("roles: "+roles)
 				socket.emit("get_role", roles);
 			}
 		});

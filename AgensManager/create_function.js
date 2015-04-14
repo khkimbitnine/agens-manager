@@ -33,5 +33,49 @@ exports.create_function = function(socket, client){
 				socket.emit('types', types);
 			}
 		});
-	})
+	});
+	
+	socket.on('function_form', function(formdata){
+		
+		var error;
+		
+		var interval = 4; 
+		//argmode, argname, argschema, argtype
+		var endInd = formdata.length - 1;
+		
+		
+		var language = formdata[0].value;
+		var name = formdata[1].value;
+		var schema = formdata[2].value;
+		var type = formdata[3].value;
+		var lang_kind = formdata[4].value;
+		
+		var definition = formdata[endInd-6].value;
+		var comment = formdata[endInd-5].value;
+		var execution_cost = formdata[endInd-4].value;
+		var result_rows = formdata[endInd-3].value;
+		var behavior = formdata[endInd-2].value;
+		var strict = formdata[endInd-1].value;
+		var security = formdata[endInd].value;
+		
+		var arg = [];
+		
+		for(var i = 5 ; i < endInd-6; i++){
+			arg[i-5] = formdata[i].value;
+		}
+		
+		var eachArg = [];
+		createFunction = "CREATE FUNCTION "+name+"(";
+		
+		for(var i = 0 ; i <(arg.length)/interval ; i++){
+			var argRow;
+			var argMode;
+			var argName;
+			var argSchema;
+			var argType;
+		}
+		
+		
+		
+	});
 }
