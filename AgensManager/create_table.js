@@ -1,5 +1,5 @@
 exports.create_table = function(socket, client){
-	socket.once('table_form', function(formdata){//once
+	socket.on('table_form', function(formdata){
 		var error;
 		
 		var interval = 12	
@@ -16,8 +16,7 @@ exports.create_table = function(socket, client){
 		
 		
 		//create Table
-		var eachColumn = [];
-		createTable = "CREATE TABLE "+schema+"."+name+"(";
+		var createTable = "CREATE TABLE "+schema+"."+name+"(";
 		var comments = ''; //col_comment, comment
 		for(var i = 0 ; i < (column.length)/interval ; i++){// row index
 			var columnName;
@@ -144,6 +143,12 @@ exports.create_table = function(socket, client){
 		var column = data.column;
 		var typeInd = data.typeInd;
 		var array = data.array;
+		
+		console.log("schema: "+schema)
+		console.log("table: "+table)
+		console.log("column: "+column)
+		console.log("typeInd: "+typeInd)
+		console.log("array: "+array)
 		var type_query = "";
 		var atttypid;
 		var attname;

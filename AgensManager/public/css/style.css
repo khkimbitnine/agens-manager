@@ -261,8 +261,8 @@ body {
 }
 
 #registerForm {
-	width: 500px;
-	height: 200px;
+	width: 600px;
+	height: 100px;
 	position: absolute;
 	left: 100px;
 	top: 100px;
@@ -277,11 +277,11 @@ body {
 
 #registerForm>div>input {
 	display: inline-block;
-	width: 200px;
+	width: 230px;
 }
 
 #registerForm #createBtnBox {
-	width: 400px;
+	width: 600px;
 }
 
 #registerForm #createBtnBox>button {

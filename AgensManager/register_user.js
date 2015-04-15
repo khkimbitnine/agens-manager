@@ -1,8 +1,14 @@
 exports.register_user = function(socket, client){
 	
-	socket.once('check', function(username){
+	socket.on('register_form', function(formdata){
 		var error;
-		var dup_user;
+		
+	});
+	
+	socket.on('check', function(username){
+		//console.log("username: "+username)
+		var error;
+		var dup_user = 0;
 		client.query("select usename from pg_user", function(err, rs){
 			if(err){
 				console.log(err);

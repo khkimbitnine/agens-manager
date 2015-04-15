@@ -11,12 +11,14 @@ socket.connect();
 	+ '</div>'
 	+ '<div id="returns">'
 	+ '<label for="name">SET OF</label>'
-	+ '<input type="checkbox" id="setof" name="setof" value="SET"/>'
+	+ '<input type="checkbox" id="setof" />'
+	+ '<input type="hidden" name="setof" value="" />'
 	+ '<div id="typeBox">'
 	+ '<select name="schema" class="schema"><option></option></select>'
 	+ '<select name="type" class="type"><option></option></select>'
 	+ '<span>Array</span>'
-	+ '<input type="checkbox" name="array" id="array"/>'
+	+ '<input type="checkbox" id="array" />'
+	+ '<input type="hidden" name="array" value=""/>'
 	+ '</div>'
 	+ '</div>'
 	+ '</li><!--'
@@ -45,7 +47,7 @@ socket.connect();
 	+ '</li>'
 	+ '<li>'
 	+ '<label for="result_rows">Result Rows: </label>'
-	+ '<input type="text" name="result_rows" id="result_rows" />'
+	+ '<input type="text" name="result_rows" id="result_rows" readonly style="background: #ccc"/>'
 	+ '</li>'
 	+ '</ul>'
 	+ '</li>'
@@ -109,6 +111,27 @@ socket.connect();
 		
 	var schemas = [];
 	var types = [];
+	
+	$("#setof").change(function(){
+		var $this = $(this);
+		var $resRows = $("#result_rows");
+		if($this.is(":checked")){
+			$this.next().val("SETOF");
+			$resRows.prop('readonly', false).css('background', '#fff');
+		}else{
+			$this.next().val("");
+			$resRows.prop('readonly', true).css('background', '#ccc');
+		}
+	});
+	$("#array").change(function(){
+		var $this = $(this);
+		if($this.is(':checked')){
+			$this.next().val("[]");
+		}else{
+			$this.next().val("");
+		}
+	});
+	
 	function row2append(argInd){
 		var $li = $("<li>").appendTo($row2Ul);
 		
@@ -117,8 +140,11 @@ socket.connect();
 	}
 	
 	function schemaAppend(argInd){
+		var $schema = $(".schema").eq(argInd);
+		$schema.append('<option value = "">'+"Basic datatype"+'</option>');
+		
 		for(var i = 0 ; i < schemas.length ; i++){
-			$(".schema").eq(argInd).append('<option value = "'+schemas[i]+'">'+schemas[i]+'</option>');
+			$schema.append('<option value = "'+schemas[i]+'">'+schemas[i]+'</option>');
 		}	
 	}
 	
@@ -147,12 +173,15 @@ socket.connect();
 		var optionInd = $option.index();
 		var $type = $this.next();
 		
+		if(optionInd == 0){
+			$type.empty();
+		}		
 		prevSch = schInd;
-		
-		if(prevOpt !== optionInd || schInd !== prevSch){
+
+		if((prevOpt !== optionInd && optionInd !== 0) || schInd !== prevSch){
 			prevOpt = optionInd;
 			$type.empty();
-			socket.emit('schema', $option.text());
+			socket.emit('schema', $option.val());
 			socket.once('types', function(type){
 					for(var i = 0 ; i < type.length ; i++){
 						$type.append('<option value = "'+type[i]+'">'+type[i]+'</option>');
@@ -174,11 +203,11 @@ socket.connect();
 	});
 	$internalBtn.click(function(){//link symbol
 		$row4.removeClass("def").empty().append('<label>Link Symbol</label><input type="text" name="link_symbol" id="linkSymbol">').find("#linkSymbol").width("100%");//definition
-		$lang.empty().removeClass("sql c").addClass("internal").append('<span>internal</span>');
+		$lang.empty().removeClass("sql c").addClass("internal").append('<div><span>internal</span><input type="hidden" name="language" value="internal"/></div>');
 	});
 	$cBtn.click(function(){//object file, link symbol
 		$row4.removeClass("def").empty().append('<div id="objectFile"><label>Object File</label><input type="text" name="object_file"></div><div id="objectFile"><label>Link Symbol</label><input type="text" name="link_symbol" id="linkSymbol"></div>').find('div').css({"width": "50%", "display":"inline-block"}).children("input").width("100%");//definition
-		$lang.empty().removeClass("sql internal").addClass("c").append('<span>c</span>');
+		$lang.empty().removeClass("sql internal").addClass("c").append('<div><span>c</span><input type ="hidden" name="language" value="c" /></div>');
 	});
 	
 	var $add = $("#add");
@@ -229,6 +258,14 @@ socket.connect();
 	
 	$("#createBtn").click(function(e){
 		e.preventDefault();
-		console.log($("#functionForm").serializeArray());
+		//console.log($("#functionForm").serializeArray());
+		socket.emit("function_form", $("#functionForm").serializeArray());
+		socket.once('function_success', function(error){
+			if(error == null){
+				alert("Function created.");
+			}else{
+				alert(error);
+			}
+		});
 	});
 	

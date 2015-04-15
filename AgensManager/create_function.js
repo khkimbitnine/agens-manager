@@ -1,7 +1,7 @@
 exports.create_function = function(socket, client){
 	var schemas = [];
 	var types = [];
-	client.query("select schema_name from information_schema.schemata", function(err, rs){
+	client.query("select schema_name from information_schema.schemata order by 1", function(err, rs){
 		if(err){
 			console.log(err)
 		}else{
@@ -14,11 +14,11 @@ exports.create_function = function(socket, client){
 	
 	socket.on('schema', function(schema){
 		types = [];
-		var query;
-		if(schema =='pg_toast'){
-			query = "select typname from pg_type where typname like '%pg_toast%'"
+		var query = "";
+		if(schema.length == 0) {
+			query = "select typname as t from pg_type, (select oid from pg_namespace where nspname = 'pg_catalog') n where typnamespace = n.oid and typtype <> 'c'";
 		}else{
-			query = "select typname from (select oid from (select tablename from pg_tables where schemaname = '"+schema+"') tn, pg_class p where p.relname = tn.tablename) c, pg_type where c.oid = typrelid"
+			query = "select table_name as t from information_schema.tables where table_schema = '"+schema+"' order by 1";
 		}
 		
 		client.query(query, function(err, rs){
@@ -26,8 +26,8 @@ exports.create_function = function(socket, client){
 				console.log(err)
 			}else{
 				for(var i = 0 ; i < rs.rows.length ; i++){
-					if(rs.rows[i].typname){
-						types.push(rs.rows[i].typname);
+					if(rs.rows[i].t){
+						types.push(rs.rows[i].t);
 					}
 				}
 				socket.emit('types', types);
@@ -36,19 +36,19 @@ exports.create_function = function(socket, client){
 	});
 	
 	socket.on('function_form', function(formdata){
-		
+		//console.log(formdata);
 		var error;
 		
 		var interval = 4; 
 		//argmode, argname, argschema, argtype
 		var endInd = formdata.length - 1;
 		
-		
-		var language = formdata[0].value;
-		var name = formdata[1].value;
+		var name = formdata[0].value;
+		var setof = formdata[1].value;
 		var schema = formdata[2].value;
 		var type = formdata[3].value;
-		var lang_kind = formdata[4].value;
+		var array = formdata[4].value;
+		var language = formdata[5].value;
 		
 		var definition = formdata[endInd-6].value;
 		var comment = formdata[endInd-5].value;
@@ -60,22 +60,54 @@ exports.create_function = function(socket, client){
 		
 		var arg = [];
 		
-		for(var i = 5 ; i < endInd-6; i++){
-			arg[i-5] = formdata[i].value;
+		for(var i = 6 ; i < endInd-6; i++){
+			arg[i-6] = formdata[i].value;
 		}
 		
-		var eachArg = [];
-		createFunction = "CREATE FUNCTION "+name+"(";
+		var createFunction = "CREATE FUNCTION ";
+		var functionName = name+"(";
 		
 		for(var i = 0 ; i <(arg.length)/interval ; i++){
-			var argRow;
-			var argMode;
-			var argName;
-			var argSchema;
-			var argType;
+			var argMode = "";
+			var argName = "";
+			var argSchema = "";
+			var argType = "";
+			
+			var argRow = [];
+			var k = 0;
+			for(var j = (interval*i) ; j < interval*(i+1) ; j++){
+				argRow[k++] = arg[j];
+			}
+			argMode = argRow[0];
+			argName = argRow[1];
+			argSchema = argRow[2];
+			argType = argRow[3];
+			
+			if(i < (arg.length)/interval - 1){
+				functionName += argMode+" "+argName+" "+argSchema+"."+argType+", "
+			}else{
+				functionName += argMode+" "+argName+" "+argSchema+"."+argType+")"
+			}
+		}
+		//rows not applicable when function doesn't return a set
+		if(result_rows.length !== 0){
+			result_rows = " ROWS "+result_rows;
 		}
 		
+		createFunction += functionName;
+		createFunction += " RETURNS "+setof+" "+schema+"."+type+array
+		+" AS $$"+definition+"$$ LANGUAGE "+language+" "+behavior+" "+strict+" "+security+" COST "+execution_cost+result_rows+";"
+		createFunction += "COMMENT ON FUNCTION "+functionName+" IS '"+comment+"';"
+		console.log("createFunction: "+createFunction);
 		
+		client.query(createFunction, function(err, rs){
+			if(err){
+				error = err.toString();
+			}else{
+				console.log("Function created");
+			}
+			socket.emit('function_success', error);
+		});
 		
 	});
 }
