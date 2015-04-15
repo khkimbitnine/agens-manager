@@ -15,10 +15,12 @@ var create_view = require('./create_view');
 var create_function = require('./create_function');
 var create_trigger = require('./create_trigger');
 var register_user = require('./register_user');
+var login_user = require('./login_user');
+
 //1) connectedDb
 var connectedDb = "bitnine";
-var sourcePath = "C:/Users/Johnahkim/workspace/test/public";
-var fpath = "C:/Users/Johnahkim/workspace/test/";
+var sourcePath = "C:/Users/user/git/agensmanager/AgensManager/public";
+var fpath = "C:/Users/user/git/agensmanager/AgensManager/";
 //2) constring (postgres://username:password@localhost/database)
 var conString = "postgres://postgres:1111@localhost/"+connectedDb;
 
@@ -62,6 +64,7 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 			create_function.create_function(socket, client);
 			create_trigger.create_trigger(socket, client);
 			register_user.register_user(socket, client);
+			login_user.login_user(socket, client);
 		});
 
 	});//pgconnect end
@@ -112,6 +115,12 @@ app.get('/create_trigger.html', function (req, res){
 });
 app.get('/register_user.html', function (req, res){
 	fs.readFile(fpath+'register_user.html', function(error, data){
+		res.writeHead(200, {'Content-Type': 'text/html'});
+		res.end(data);			
+	});
+});
+app.get('/login_user.html', function (req, res){
+	fs.readFile(fpath+'login_user.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			
 	});

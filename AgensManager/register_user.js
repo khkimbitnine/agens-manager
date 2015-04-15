@@ -2,7 +2,16 @@ exports.register_user = function(socket, client){
 	
 	socket.on('register_form', function(formdata){
 		var error;
+		var username = formdata[0].value;
+		var passwd = formdata[1].value;
+		var passwdCfrm = formdata[2].value;
 		
+		client.query("CREATE USER "+username+" PASSWORD '"+passwd+"'", function(err, rs){
+			if(err){
+				error = err.toString();
+			}
+			socket.emit('register_success', error);
+		});
 	});
 	
 	socket.on('check', function(username){

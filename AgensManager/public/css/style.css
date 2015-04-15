@@ -260,7 +260,7 @@ body {
 	resize: none;
 }
 
-#registerForm {
+#registerForm, #loginForm{
 	width: 600px;
 	height: 100px;
 	position: absolute;
@@ -269,21 +269,21 @@ body {
 	background: #fff;
 }
 
-#registerForm>div>label {
+#registerForm>div>label, #loginForm>div>label {
 	display: inline-block;
 	width: 120px;
 	color: #000;
 }
 
-#registerForm>div>input {
+#registerForm>div>input, #loginForm>div>input {
 	display: inline-block;
-	width: 230px;
+	width: 300px;
 }
 
-#registerForm #createBtnBox {
+#registerForm>#createBtnBox, #loginForm>#loginBtnBox{
 	width: 600px;
 }
 
-#registerForm #createBtnBox>button {
+#registerForm>#createBtnBox>button, #loginForm>#loginBtnBox>button {
 	float: right;
 }

@@ -1,29 +1,31 @@
-<div id="registerForm">
+<div>
+<form id="registerForm">
 	<div id="username">
-		<label>username</label> <input type="text" value="" class="notValid" placeholder="a-z,A-Z,_,number(number can't be first)"/>
+		<label>username</label> <input type="text" name="username" value="" class="notValid" placeholder="a-z,A-Z,_,numbers(number can't be first) only."/>
 		<button>Check</button>
 	</div>
 	<div id="passwd" class="passwd">
-		<label>passwd</label> <input type="password" value=""/>
+		<label>passwd</label> <input type="password" name="passwd" value="" placeholder="a-z,A-Z,_,numbers only."/>
 	</div>
 	<div id="passwdConfirm" class="passwd">
-		<label>passwd confirm</label> <input type="password" value=""/><span id="mismatch" style="display:none; color:#aaa">Mismatch with passwd.</span>
+		<label>passwd confirm</label> <input type="password" name="passwdCfrm" value="" placeholder="a-z,A-Z,_,numbers only."/><span id="mismatch" style="display:none; color:#aaa">Mismatch with passwd.</span>
 	</div>
 	<div id="createBtnBox">
 		<button>Cancel</button>
 		<button>Create</button>
 	</div>
+	</form>
 </div>
 <script>
 
 	var $chkBtn = $("#username>button");
 	var $createBtn = $("#createBtnBox").find("button").eq(1);
-	
 	function notValid($notValid){
 		$notValid.css("border", "2px solid red").addClass("notValid");
 	}
 	
 	var pattern = /^[a-zA-Z_][a-zA-Z_\d]+$/;
+	var passwdPattern = /^[a-zA-Z_\d]+$/;
 	
 	function validCheck(){
 
@@ -53,16 +55,16 @@
 			$mismatch.show().css("color", "#aaa");
 		}
 		
-//		if($notValid.size() == 0){
-			//socket.emit('register_form', $("#registerForm").serializeArray())
-			//socket.once('register_success', function(error){
-//				if(error == null){
-					//alert("User created.");
-				//}else{
-//					alert(error);
-				//}
-			//});
-		//}
+ 		if($(".notValid").size() == 0){
+			 socket.emit('register_form', $("#registerForm").serializeArray())
+			 socket.once('register_success', function(error){
+ 				if(error == null){
+					 alert("User created.");
+				 }else{
+ 					alert(error);
+				 }
+			 });
+		 }
 	}	
 	$chkBtn.click(function(e){
 		e.preventDefault();

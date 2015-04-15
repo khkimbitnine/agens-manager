@@ -1,0 +1,97 @@
+<div>
+<form id="loginForm">
+	<div id="username">
+		<label>username</label> <input type="text" name="username" value="" />
+	</div>
+	<div id="passwd" class="passwd">
+		<label>passwd</label> <input type="password" name="passwd" value="" />
+	</div>
+	<div id="loginBtnBox">
+		<button>Cancel</button>
+		<button>Login</button>
+	</div>
+	</form>
+</div>
+<script>
+
+	var $chkBtn = $("#username>button");
+	var $createBtn = $("#createBtnBox").find("button").eq(1);
+	function notValid($notValid){
+		$notValid.css("border", "2px solid red").addClass("notValid");
+	}
+	
+	var pattern = /^[a-zA-Z_][a-zA-Z_\d]+$/;
+	var passwdPattern = /^[a-zA-Z_\d]+$/;
+	
+	function validCheck(){
+
+		var $mismatch = $("#mismatch");
+		$mismatch.hide();
+		
+		$(".passwd>input").removeClass("notValid").css({
+			"border": "1px solid #aaa"
+		});
+		var $username = $("#username").find('input');		
+		var $passwd = $("#passwd").find('input');
+		var $passwdCfrm = $("#passwdConfirm").find('input');
+		
+		if($username.hasClass("notValid")) $username.css("border", "2px solid red");
+		
+		if($passwd.val().length == 0) notValid($passwd);
+		if($passwd.val().length > 0 && !pattern.test($passwd.val())){
+			notValid($passwd);			
+		}
+		
+		if($passwdCfrm.val().length == 0) notValid($passwdCfrm);
+		if($passwdCfrm.val().length > 0 && !pattern.test($passwdCfrm.val())){
+			notValid($passwdCfrm);			
+		}
+		if(pattern.test($passwd.val()) && pattern.test($passwdCfrm.val()) && $passwdCfrm.val() !== $passwd.val()){
+			notValid($passwdCfrm);
+			$mismatch.show().css("color", "#aaa");
+		}
+		
+ 		if($(".notValid").size() == 0){
+			 socket.emit('register_form', $("#registerForm").serializeArray())
+			 socket.once('register_success', function(error){
+ 				if(error == null){
+					 alert("User created.");
+				 }else{
+ 					alert(error);
+				 }
+			 });
+		 }
+	}	
+	$chkBtn.click(function(e){
+		e.preventDefault();
+		var $username =  $("#username").find("input");
+		
+		$username.removeClass("notValid").css({
+			"border": "1px solid #aaa"
+		});
+		
+		if($username.val().length == 0){
+			notValid($username);
+		}
+		if($username.val().length > 0 && !pattern.test($username.val())){
+			notValid($username);
+		}
+		
+		if(!$username.hasClass("notValid")){
+			socket.emit("check", $username.val());
+			socket.once("dup_user", function(dup){
+				if(dup == 1){
+					alert("You can't use the username(duplicate username existing).");
+					notValid($username);
+				}else{
+					alert("You can use the username");
+				}
+			});			
+		}
+	});
+	
+	$createBtn.click(function(e){
+		e.preventDefault();
+		validCheck();
+	});
+</script>

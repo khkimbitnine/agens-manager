@@ -77,11 +77,22 @@
 		
 		var $content = $(".content");
 		
-		$(".reg").click(function(e){
+		$("#reg").click(function(e){
 			e.preventDefault();
 			$content.empty();
 			$.ajax({
 				url:"register_user.html",
+				success:function(data){
+					$content.html(data);
+				}
+			});
+			
+		});
+		$("#login").click(function(e){
+			e.preventDefault();
+			$content.empty();
+			$.ajax({
+				url:"login_user.html",
 				success:function(data){
 					$content.html(data);
 				}
