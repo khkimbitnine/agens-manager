@@ -21,8 +21,8 @@ var login_user = require('./login_user');
 var database = "postgres";
 var username = "postgres";
 var passwd = "1111";
-var sourcePath = "C:/Users/Johnahkim/workspace/test/public";
-var fpath = "C:/Users/Johnahkim/workspace/test/";
+var sourcePath = "C:/Users/user/git/agensmanager/AgensManager/public";
+var fpath = "C:/Users/user/git/agensmanager/AgensManager/";
 //2) constring (postgres://username:password@localhost/database)
 
 var createTable;
@@ -41,41 +41,52 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 
 	console.log('server listening on 3000');
 	
-	io.on('connection', function(socket){
-		socket.on('login', function(user){
-			username = user.username;
-			passwd = user.passwd;
+	function pgConnect(username, passwd, database){
+		//데이터베이스 연결
+		pg.connect("postgres://"+username+":"+passwd+"@localhost/"+database, function(err, client, done) {
+
+			//에러 핸들러
+			var handleError = function(err) {
+				if(!err) {
+					return false;
+				}
+				done(client);
+				return true;
+			};
+			object_tree.db(client);
+
+			//socket 연결
+			io.on('connection', function(socket){
+				object_tree.subtree(socket, client, database);
+				create_table.create_table(socket, client);
+				create_index.create_index(socket, client);
+				create_schema.create_schema(socket, client);
+				create_view.create_view(socket, client);
+				create_function.create_function(socket, client);
+				create_trigger.create_trigger(socket, client);
+			});
+
+		});//pgconnect end
+	}
+	function initConnect(username, passwd, database){
+		pg.connect("postgres://"+username+":"+passwd+"@localhost/"+database, function(er, client, done){
+			
+			io.on('connection', function(socket){
+				register_user.register_user(socket, client);
+				login_user.login_user(socket,client);
+				
+				socket.on('login_success', function(user){
+					username = user.username;
+					passwd = user.passwd;
+					done(client);
+					pgConnect(username, passwd, database);
+				});	
+			});
 		});		
-	})
-
-	//데이터베이스 연결
-	pg.connect("postgres://"+username+":"+passwd+"@localhost/"+database, function(err, client, done) {
-
-		//에러 핸들러
-		var handleError = function(err) {
-			if(!err) {
-				return false;
-			}
-			done(client);
-			return true;
-		};
-		//object_tree.db(client);
-
-		//socket 연결
-		io.on('connection', function(socket){
-
-			object_tree.subtree(socket, client, database);
-			create_table.create_table(socket, client);
-			create_index.create_index(socket, client);
-			create_schema.create_schema(socket, client);
-			create_view.create_view(socket, client);
-			create_function.create_function(socket, client);
-			create_trigger.create_trigger(socket, client);
-			register_user.register_user(socket, client);
-			login_user.login_user(socket, client);
-		});
-
-	});//pgconnect end
+	}
+	
+	initConnect(username, passwd, database);
+	
 });
 //4) readFile 경로
 app.get('/', function (req, res){

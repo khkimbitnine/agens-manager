@@ -39,6 +39,7 @@
 		}
 		
 		if($(".notValid").size() == 0){
+			
 			socket.emit('login_check', $("#loginForm").serializeArray());
 			
 			socket.once('login_success', function(rs){
