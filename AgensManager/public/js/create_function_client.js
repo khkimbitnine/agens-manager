@@ -140,6 +140,7 @@ socket.connect();
 	}
 	
 	function schemaAppend(argInd){
+		
 		var $schema = $(".schema").eq(argInd);
 		$schema.append('<option value = "">'+"Basic datatype"+'</option>');
 		
@@ -189,9 +190,11 @@ socket.connect();
 			});					
 		}
 	});
-	
+
 	var $row4 = $functionForm.find("#row4");
 	var $lang = $row1_3.find("#language");
+	var $row2 = $functionForm.find("#row2");
+	var $row1 = $functionForm.find("#row1");
 	
 	$sqlBtn.click(function(){
 		if(!$row4.hasClass("def")){
@@ -202,12 +205,21 @@ socket.connect();
 		}
 	});
 	$internalBtn.click(function(){//link symbol
+		$row2.children("ul").children("li").remove();
+		row2append(1);
 		$row4.removeClass("def").empty().append('<label>Link Symbol</label><input type="text" name="link_symbol" id="linkSymbol">').find("#linkSymbol").width("100%");//definition
 		$lang.empty().removeClass("sql c").addClass("internal").append('<div><span>internal</span><input type="hidden" name="language" value="internal"/></div>');
+		
 	});
 	$cBtn.click(function(){//object file, link symbol
+		$row2.children("ul").children("li").remove();
+		row2append(1);
 		$row4.removeClass("def").empty().append('<div id="objectFile"><label>Object File</label><input type="text" name="object_file"></div><div id="objectFile"><label>Link Symbol</label><input type="text" name="link_symbol" id="linkSymbol"></div>').find('div').css({"width": "50%", "display":"inline-block"}).children("input").width("100%");//definition
 		$lang.empty().removeClass("sql internal").addClass("c").append('<div><span>c</span><input type ="hidden" name="language" value="c" /></div>');
+	});
+	
+	$(".language").click(function(){
+		$(".language").not($(this)).prop('checked', false);
 	});
 	
 	var $add = $("#add");

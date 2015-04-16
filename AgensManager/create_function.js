@@ -45,8 +45,12 @@ exports.create_function = function(socket, client){
 		
 		var name = formdata[0].value;
 		var setof = formdata[1].value;
-		var schema = formdata[2].value;
-		var type = formdata[3].value;
+		var type;
+		if(formdata[2].value.length == 0){
+			type = formdata[3].value; 
+		}else{
+			type = formdata[2].value+"."+formdata[3].value;
+		}
 		var array = formdata[4].value;
 		var language = formdata[5].value;
 		
@@ -95,7 +99,7 @@ exports.create_function = function(socket, client){
 		}
 		
 		createFunction += functionName;
-		createFunction += " RETURNS "+setof+" "+schema+"."+type+array
+		createFunction += " RETURNS "+setof+" "+type+array
 		+" AS $$"+definition+"$$ LANGUAGE "+language+" "+behavior+" "+strict+" "+security+" COST "+execution_cost+result_rows+";"
 		createFunction += "COMMENT ON FUNCTION "+functionName+" IS '"+comment+"';"
 		console.log("createFunction: "+createFunction);

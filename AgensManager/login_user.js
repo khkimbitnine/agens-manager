@@ -1,24 +1,36 @@
 exports.login_user = function(socket, client){
 	
-	socket.on('login_form', function(username){
-		//console.log("username: "+username)
-		var error;
+	socket.on('login_check', function(formdata){
+		var username = formdata[0].value;
+		var passwd = formdata[1].value;
 		var user_exist = 0;
+		
+		function loginCheck(user){
+			if(user == 0) {
+				socket.emit('login_success', {username: false, passwd:false});
+			}else{
+				client.query("select passwd = '"+passwd+"' as p from pg_user_passwd where usename = '"+username+"'", function(err, rs){
+					console.log(rs);
+					if(rs.rows[0].p){
+						socket.emit('login_success', {username: true, passwd:true});
+						client.query()
+					}else{
+						socket.emit('login_success', {username: true, passwd:false});
+					}
+				});	
+			}
+		}
+		
 		client.query("select usename from pg_user", function(err, rs){
 			if(err){
 				console.log(err);
 			}else{
-				
 				for(var i = 0 ; i < rs.rows.length ; i++){
 					if(rs.rows[i].usename == username){
 						user_exist = 1;
 					}
 				}
-				if(user_exist == 0) {
-					socket.emit('login_success', user_exist);
-				}else{
-					
-				}
+				loginCheck(user_exist);
 			}
 			
 		});

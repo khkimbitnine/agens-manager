@@ -1,4 +1,4 @@
-<div>
+<div class="content_wrapper">
 <form id="registerForm">
 	<div id="username">
 		<label>username</label> <input type="text" name="username" value="" class="notValid" placeholder="a-z,A-Z,_,numbers(number can't be first) only."/>
@@ -42,15 +42,15 @@
 		if($username.hasClass("notValid")) $username.css("border", "2px solid red");
 		
 		if($passwd.val().length == 0) notValid($passwd);
-		if($passwd.val().length > 0 && !pattern.test($passwd.val())){
+		if($passwd.val().length > 0 && !passwdPattern.test($passwd.val())){
 			notValid($passwd);			
 		}
 		
 		if($passwdCfrm.val().length == 0) notValid($passwdCfrm);
-		if($passwdCfrm.val().length > 0 && !pattern.test($passwdCfrm.val())){
+		if($passwdCfrm.val().length > 0 && !passwdPattern.test($passwdCfrm.val())){
 			notValid($passwdCfrm);			
 		}
-		if(pattern.test($passwd.val()) && pattern.test($passwdCfrm.val()) && $passwdCfrm.val() !== $passwd.val()){
+		if(passwdPattern.test($passwd.val()) && passwdPattern.test($passwdCfrm.val()) && $passwdCfrm.val() !== $passwd.val()){
 			notValid($passwdCfrm);
 			$mismatch.show().css("color", "#aaa");
 		}
@@ -59,7 +59,8 @@
 			 socket.emit('register_form', $("#registerForm").serializeArray())
 			 socket.once('register_success', function(error){
  				if(error == null){
-					 alert("User created.");
+ 					$("#registerForm").remove();
+ 					$(".content_wrapper").append("<div id='createMsg'>"+"User created."+"</div>").find("#createMsg").css("color", "#000");
 				 }else{
  					alert(error);
 				 }

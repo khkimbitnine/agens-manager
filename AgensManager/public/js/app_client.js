@@ -1,9 +1,5 @@
-	
-		//window height, width
-		//console.log("window Height: "+$(window).height()+" , window Width: "+$(window).width());
 
-		//tab 플러그인
-		//$('#tab-container').easytabs();
+
 		$(document).ready(function() {//preventDefault 옵션
     		$('#tab-container').easytabs({animationSpeed: 'fast', updateHash: false});
 		});
@@ -103,10 +99,18 @@
 		//create table click event: content에 create_table.html 로드 
 		toolMenuSubUl.on("click", ".object_li>.object", function() {
 			
-			var objectIndex = $(this).parent().index();
-			$content.empty();	
+			var flag = false;
 			
-			if(objectIndex == 0 ){//table
+			if($(".db").val().length > 0){
+				flag = true;
+			}
+			
+			var objectIndex = $(this).parent().index();
+			if(flag){
+				$content.empty();	
+			}
+			
+			if(objectIndex == 0 && flag){//table
 		 		$.ajax({
 	             	url:"create_table.html",
 	             	success:function(data){
@@ -114,7 +118,7 @@
 	              } 
 	        	}); 
 			}
-			if(objectIndex == 1){//schema
+			if(objectIndex == 1 && flag){//schema
 		 		$.ajax({
 	             	url:"create_schema.html",
 	             	success:function(data){
@@ -122,7 +126,7 @@
 	              } 
 	        	}); 
 			}
-			if(objectIndex == 2){//index
+			if(objectIndex == 2 && flag){//index
 		 		$.ajax({
 	             	url:"create_index.html",
 	             	success:function(data){
@@ -130,7 +134,7 @@
 	              } 
 	        	}); 
 			}
-			if(objectIndex == 3){//view
+			if(objectIndex == 3 && flag){//view
 		 		$.ajax({
 	             	url:"create_view.html",
 	             	success:function(data){
@@ -138,7 +142,7 @@
 	              } 
 	        	}); 
 			}
-			if(objectIndex == 4){//function
+			if(objectIndex == 4 && flag){//function
 				
 		 		$.ajax({
 	             	url:"create_function.html",
@@ -147,7 +151,7 @@
 	              } 
 	        	}); 
 			}
-			if(objectIndex == 5){//trigger
+			if(objectIndex == 5 && flag){//trigger
 				
 		 		$.ajax({
 	             	url:"create_trigger.html",
@@ -167,13 +171,7 @@
 			}else{
 				$(".object").not($this).removeClass("on").css("color", "#fff");
 			}
-			
-
-
 		});
-
- 		//====>error msg: Cross origin requests are only supported for protocol schemes: http, data, chrome, chrome-extension, https, chrome-extension-resource.
- 		
 
 		//======================= 트리 생성 ===============================
 		var s = $("#browser").treeview({
@@ -191,16 +189,17 @@
 		var coll = "collapsable lastCollapsable";
 		var db;
 		//========= db 트리 생성
+		
 		socket.on('db', function(data) {
-			db = data.db;
-			for (var i = 0; i < db.length; i++) {
-				$(
-						"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='db'>"
-								+ db[i] + "</span></li>").appendTo(
-						$browser);
-			}
-			socket.removeListener('db');
-		});
+				db = data.db;
+				for (var i = 0; i < db.length; i++) {
+					$(
+							"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='db'>"
+							+ db[i] + "</span></li>").appendTo(
+									$browser);
+				}
+				socket.removeListener('db');
+			});
 
 		//expandable/ collapsable 함수
 		function expand($this) {

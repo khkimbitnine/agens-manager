@@ -18,11 +18,12 @@ var register_user = require('./register_user');
 var login_user = require('./login_user');
 
 //1) connectedDb
-var connectedDb = "bitnine";
-var sourcePath = "C:/Users/user/git/agensmanager/AgensManager/public";
-var fpath = "C:/Users/user/git/agensmanager/AgensManager/";
+var database = "postgres";
+var username = "postgres";
+var passwd = "1111";
+var sourcePath = "C:/Users/Johnahkim/workspace/test/public";
+var fpath = "C:/Users/Johnahkim/workspace/test/";
 //2) constring (postgres://username:password@localhost/database)
-var conString = "postgres://postgres:1111@localhost/"+connectedDb;
 
 var createTable;
 //3) 소스 경로
@@ -39,9 +40,16 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 	var io = require('socket.io').listen(server);
 
 	console.log('server listening on 3000');
+	
+	io.on('connection', function(socket){
+		socket.on('login', function(user){
+			username = user.username;
+			passwd = user.passwd;
+		});		
+	})
 
 	//데이터베이스 연결
-	pg.connect(conString, function(err, client, done) {
+	pg.connect("postgres://"+username+":"+passwd+"@localhost/"+database, function(err, client, done) {
 
 		//에러 핸들러
 		var handleError = function(err) {
@@ -51,12 +59,12 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 			done(client);
 			return true;
 		};
-		object_tree.db(client);
+		//object_tree.db(client);
 
 		//socket 연결
 		io.on('connection', function(socket){
 
-			object_tree.subtree(socket, client, connectedDb);
+			object_tree.subtree(socket, client, database);
 			create_table.create_table(socket, client);
 			create_index.create_index(socket, client);
 			create_schema.create_schema(socket, client);
