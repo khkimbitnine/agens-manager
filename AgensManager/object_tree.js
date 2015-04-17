@@ -14,19 +14,13 @@ var result, rs, trs, vrs, frs, crs, consrs, irs  = null;
 //배열 만드는 함수 (db, 스키마, 테이블)
 
 //selectDb function
-function selectDb(err, result){
-	for(var i=0; i < result.rows.length; i++){
-		arrDB.push(result.rows[i].datname);
-	}
-	//console.log(arrDB);
-}
 
 //selectSc function
 function selectSc(err, rs){
 	for(var j=0; j < rs.rows.length; j++){
 		arrSch.push(rs.rows[j].schema_name);
 	}
-	//console.log("arrSch: "+arrSch.length);
+	//console.log("arrSch: "+arrSch);
 }
 
 //selectTb function
@@ -76,25 +70,35 @@ function selectInd(err, irs){
 	//console.log("arrInd: "+arrInd.length);
 }
 
-exports.db = function(client){
+exports.db = function(socket,client){
+
 	//db 쿼리
 	client.query('select datname from pg_database WHERE datistemplate=\'f\';', function(err, result){
-		selectDb(err, result);
+		if(err){
+			//console.log(err)
+		}else{
+			arrDB = [];
+			for(var i=0; i < result.rows.length; i++){
+				arrDB.push(result.rows[i].datname);
+			}
+			//console.log(arrDB);
+			//db 전송
+			socket.emit('db', {db: arrDB});
+		}
 	});	
+	
 }
 
 exports.subtree = function(socket, client, connectedDb){
 	
-	//db 전송
-	socket.emit('db', {db: arrDB});
-
-	//db 클릭, 스키마 전송
 	socket.on('set_dbname', function (dbname){
 		if(dbname === connectedDb){
 			//console.log("dbname: connected =>   "+dbname+" : "+connectedDb);
 			//arrSch 비우기
 			arrSch = [];
-
+			client.query('select current_user', function(err, rs){
+				console.log("current user: "+rs.rows[0].current_user);
+			});
 			//스키마 쿼리
 			client.query('select schema_name from information_schema.schemata where schema_name not like \'pg_%\' and schema_name <> \'information_schema\'', function(err, rs){
 				selectSc(err, rs);
@@ -104,7 +108,7 @@ exports.subtree = function(socket, client, connectedDb){
 			socket.emit('scname', {schema: 0});
 		}
 	});
-
+	
 	//스키마 테이블 클릭, 테이블 전송
 	socket.on('set_scname_table', function (scname){
 		for(var i = 0 ; i < arrSch.length ; i++){

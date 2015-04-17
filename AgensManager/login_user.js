@@ -10,10 +10,12 @@ exports.login_user = function(socket, client){
 				socket.emit('login_success', {username: false, passwd:false});
 			}else{
 				client.query("select passwd = '"+passwd+"' as p from pg_user_passwd where usename = '"+username+"'", function(err, rs){
-					console.log(rs);
+					if(err){
+						console.log(err);
+					}
 					if(rs.rows[0].p){
-						
 						socket.emit('login_success', {username: username, passwd:passwd});
+						socket.emit('login', {username: username, passwd:passwd});
 					}else{
 						socket.emit('login_success', {username: true, passwd:false});
 					}

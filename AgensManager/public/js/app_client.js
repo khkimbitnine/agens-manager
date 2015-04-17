@@ -93,7 +93,10 @@
 					$content.html(data);
 				}
 			});
-			
+			if($(this).hasClass("logout")){
+				$("#browser").empty();
+				socket.emit('logout',{logout: true} );
+			}
 		});
 		
 		//create table click event: content에 create_table.html 로드 
@@ -188,18 +191,17 @@
 		var collHit = "hitarea collapsable-hitarea lastCollapsable-hitarea";
 		var coll = "collapsable lastCollapsable";
 		var db;
-		//========= db 트리 생성
-		
+		//========= db 트리 생성				
+		//db 클릭, 스키마 전송.
 		socket.on('db', function(data) {
-				db = data.db;
-				for (var i = 0; i < db.length; i++) {
-					$(
-							"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='db'>"
-							+ db[i] + "</span></li>").appendTo(
-									$browser);
-				}
-				socket.removeListener('db');
-			});
+			db = data.db;
+			for (var i = 0; i < db.length; i++) {
+				$(
+						"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='db'>"
+						+ db[i] + "</span></li>").appendTo(
+								$browser);
+			}
+		});
 
 		//expandable/ collapsable 함수
 		function expand($this) {
@@ -211,7 +213,7 @@
 			$this.prev().removeClass().addClass(collHit);
 			$this.parent().removeClass().addClass(coll);
 		}
-
+		
 		//========= db 클릭, 스키마 생성             
 		$browser.on("click", ".db", function() {
 			var $this = $(this);//db

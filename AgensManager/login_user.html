@@ -48,17 +48,18 @@
 					$("#loginForm").remove();
 					$(".content_wrapper").append("<div id='loginMsg'>"+$username.val()+" is logged in.</div>").find("#loginMsg").css("color", "#000");
 					$("#reg").text($username.val());
-					$("#login").text("log-out");
+					$("#login").text("log-out").addClass("logout");
 					socket.emit('login', {username: $username.val(), passwd: $passwd.val()});
 				}
 				if(rs.username && !rs.passwd){
 					alert("The password isn't correct.");
-					$passwd.val("").focus();					
+					$passwd.val("").focus();
 				}
 				if(!rs.username && !rs.passwd){
 					alert("The username doesn't exist.")
 					$username.val("").focus();					
 				}
+				
 			});
 		}
 	}
