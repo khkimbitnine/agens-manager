@@ -16,10 +16,13 @@ var create_function = require('./create_function');
 var create_trigger = require('./create_trigger');
 var register_user = require('./register_user');
 var login_user = require('./login_user');
+var session = require('client-sessions');
 
 //1) connectedDb
-var sourcePath = "C:/Users/Johnahkim/workspace/test/public";
-var fpath = "C:/Users/Johnahkim/workspace/test/";
+//var sourcePath = "C:/Users/Johnahkim/workspace/test/public";
+var sourcePath = "C:/Users/user/git/agensmanager/AgensManager/public";
+//var fpath = "C:/Users/Johnahkim/workspace/test/";
+var fpath = "C:/Users/user/git/agensmanager/AgensManager/";
 //2) constring (postgres://username:password@localhost/database)
 
 var createTable;
@@ -105,6 +108,42 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 	initConnect("postgres", "1111", "postgres");
 	
 });
+	app.use(express.cookieParser());
+	app.use(express.bodyParser());
+	app.use(app.router);
+	app.use(express.session({secret:'keyboard cat', cookie: {maxAge: 600000}}));
+
+app.get('/', function(request, response){
+	if(request.cookies.auth){
+		response.send('<h1>Login Success</h1>');
+	}else{
+		response.redirect('/login');
+	}
+});
+
+app.get('/login', function(request, response){
+	fs.readFile('login_user.html', function(error, data){
+		response.send(data.toString());
+	});
+});
+
+app.post('/login', function(request, response){
+	var username = request.param('username');
+	var passwd = request.param('passwd');
+	
+	console.log(username+", "+passwd);
+	console.log(request.body);
+	if(username == 'jakim2' && passwd == '1111'){
+		response.cookie('auth', true);
+		response.redirect('/');
+		request.session.username = username;
+		console.log(request.session.usernme);
+	}else{
+		response.redirect("/login");
+	}
+});
+
+
 //4) readFile 경로
 app.get('/', function (req, res){
 	fs.readFile(fpath+'app.html', function(error, data){
