@@ -1,5 +1,5 @@
 <div class="content_wrapper">
-<form id="loginForm" method="post" action="/login">
+<form id="loginForm" method="post" action="/login_user.html">
 	<div id="username">
 		<label>username</label> <input type="text" name="username" value="" />
 	</div>
@@ -13,7 +13,6 @@
 	</form>
 </div>
 <script>
-	
 	var $loginBtn = $("#loginBtnBox").find("button").eq(1);
 	function notValid($not){
 		$not.css("border", "2px solid red").addClass("notValid");
@@ -44,12 +43,17 @@
 			
 			socket.once('login_success', function(rs){
 				if(rs.username && rs.passwd){
-					console.log("logged in");
 					$("#loginForm").remove();
 					$(".content_wrapper").append("<div id='loginMsg'>"+$username.val()+" is logged in.</div>").find("#loginMsg").css("color", "#000");
 					$("#reg").text($username.val());
 					$("#login").text("log-out").addClass("logout");
-					socket.emit('login', {username: $username.val(), passwd: $passwd.val()});
+					
+			        $.post("http://localhost:3000/login_user.html",{username:rs.username, passwd:rs.passwd},function(data){        
+			            if(data==='done')           
+			            {
+			                window.location.href="/";
+			            }
+			        });
 				}
 				if(rs.username && !rs.passwd){
 					alert("The password isn't correct.");
@@ -66,15 +70,7 @@
 	
 	$loginBtn.click(function(e){
 		e.preventDefault();
-		//validCheck();
-		var username = $("#username").find('input').val();
-		var passwd = $("#passwd").find('input').val();
-        $.post("http://localhost:3000/login",{username:username,passwd:passwd},function(data){        
-            if(data==='done')           
-            {
-                window.location.href="/admin";
-            }
-        });
+		validCheck();
 	});
 
 </script>
