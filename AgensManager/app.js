@@ -16,13 +16,12 @@ var create_function = require('./create_function');
 var create_trigger = require('./create_trigger');
 var register_user = require('./register_user');
 var login_user = require('./login_user');
-var session = require('client-sessions');
 
 //1) connectedDb
-//var sourcePath = "C:/Users/Johnahkim/workspace/test/public";
-var sourcePath = "C:/Users/user/git/agensmanager/AgensManager/public";
-//var fpath = "C:/Users/Johnahkim/workspace/test/";
-var fpath = "C:/Users/user/git/agensmanager/AgensManager/";
+var sourcePath = "C:/Users/Johnahkim/workspace/test/public";
+//var sourcePath = "C:/Users/user/git/agensmanager/AgensManager/public";
+var fpath = "C:/Users/Johnahkim/workspace/test/";
+//var fpath = "C:/Users/user/git/agensmanager/AgensManager/";
 //2) constring (postgres://username:password@localhost/database)
 
 var createTable;
@@ -32,125 +31,87 @@ app.use('/public', express.static(sourcePath));
 //포트 연결
 //app.set('port', 7474);
 app.set('port', 3000);
-
 //서버 연결
 var server = http.createServer(app).listen(app.get('port'), function(){
-
-	// socket.io 선언
-	var io = require('socket.io').listen(server);
-
-	console.log('server listening on 3000');
-	
-	function pgConnect(username, passwd, database, socket){
-//		console.log("username: "+username);
-//		console.log("passwd: "+passwd);
-//		console.log("database: "+database);
-//		console.log("socket: "+socket);
-		//데이터베이스 연결
-		pg.connect("postgres://"+username+":"+passwd+"@localhost/"+database, function(err, client, done){
-			if(err){
-				return console.error("could not connect to postgres", err);
-			}
-			
-				object_tree.db(socket,client);
-				object_tree.subtree(socket, client, database);
-				create_table.create_table(socket, client);
-				create_index.create_index(socket, client);
-				create_schema.create_schema(socket, client);
-				create_view.create_view(socket, client);
-				create_function.create_function(socket, client);
-				create_trigger.create_trigger(socket, client);
-				
-				socket.on('logout', function(user){
-					
-					if(user.logout){
-						console.log("logout");
-						username = "postgres";
-						passwd = "1111";
-						database = "postgres";
-						initConnect(username, passwd, database, client);
-						client.end();
-					}
-					
-				});
-				
-		});//pgconnect end
-	}
-//	var database = "postgres";
-//	var username = "postgres";
-//	var passwd = "1111";
-//	
-	function initConnect(username, passwd, database){
 		
-		io.on('connect', function(socket){
-			pg.connect("postgres://"+username+":"+passwd+"@localhost/"+database, function(err, client, done){
-				
-				register_user.register_user(socket, client);
-				login_user.login_user(socket,client);
-				
-				socket.on('login', function(user){
-					
-					if(user.username && user.passwd){
-						username = user.username;
-						passwd = user.passwd;
-						database = "postgres";
-						console.log("logged");
-						pgConnect(username, passwd, database, socket);
-						client.end();
-					}
-					
-					
-				});	
-			});
-		});
-	}
-	
-	initConnect("postgres", "1111", "postgres");
-	
+	// socket.io 선언
+	console.log('server listening on 3000');
 });
-	app.use(express.cookieParser());
-	app.use(express.bodyParser());
-	app.use(app.router);
-	app.use(express.session({secret:'keyboard cat', cookie: {maxAge: 600000}}));
-
-app.get('/', function(request, response){
-	if(request.cookies.auth){
-		response.send('<h1>Login Success</h1>');
-	}else{
-		response.redirect('/login');
-	}
-});
-
-app.get('/login', function(request, response){
-	fs.readFile('login_user.html', function(error, data){
-		response.send(data.toString());
-	});
-});
-
-app.post('/login', function(request, response){
-	var username = request.param('username');
-	var passwd = request.param('passwd');
-	
-	console.log(username+", "+passwd);
-	console.log(request.body);
-	if(username == 'jakim2' && passwd == '1111'){
-		response.cookie('auth', true);
-		response.redirect('/');
-		request.session.username = username;
-		console.log(request.session.usernme);
-	}else{
-		response.redirect("/login");
-	}
-});
-
+var io = require('socket.io').listen(server);
+app.use(express.cookieParser());
+app.use(express.bodyParser());
+app.use(express.session({
+	secret:'ssshhh', cookie: {maxAge: 6000000}
+}));
+app.use(app.router);
+var appCnt = 0;
 
 //4) readFile 경로
 app.get('/', function (req, res){
+	appCnt++;
+	console.log(appCnt);
+	console.log(req.session.username+"<-- /")
 	fs.readFile(fpath+'app.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			//ja021017
 	});
+		var	username;
+		io.sockets.on('connection', function(socket){
+			var username =req.session.username;
+			var passwd = req.session.passwd;
+			var conString = "";
+				console.log("username: "+username);
+				if(typeof(username) == 'undefined'){
+					console.log(req.session.username);
+					conString = "postgres://postgres:1111@localhost/postgres";
+					
+					var client = new pg.Client(conString);
+					
+					client.connect(function(err){
+						if(err){
+							return console.error('could not connect to postgres1', err);
+						}
+						register_user.register_user(socket, client);
+						login_user.login_user(socket,client);
+					});
+					
+					socket.on('disconnect', function(){
+						console.log('disconnected');
+					});
+					
+				}else{
+
+					console.log(req.session.username);
+					conString = "postgres://"+username+":"+passwd+"@localhost/postgres";
+					
+					var client = new pg.Client(conString);
+					
+					client.connect(function(err){
+						if(err){
+							return console.error('could not connect to postgres', err);
+						}else{
+							object_tree.db(socket,client);
+							object_tree.subtree(socket, client, 'postgres');
+							create_table.create_table(socket, client);
+							create_index.create_index(socket, client);
+							create_schema.create_schema(socket, client);
+							create_view.create_view(socket, client);
+							create_function.create_function(socket, client);
+							create_trigger.create_trigger(socket, client);
+						}
+
+					});
+					
+
+				}
+				socket.on('disconnect', function(){
+					console.log('disconnected');
+				});
+		});
+	
+
 });
+
 
 app.get('/create_table.html', function (req, res){
 	fs.readFile(fpath+'create_table.html', function(error, data){
@@ -194,9 +155,28 @@ app.get('/register_user.html', function (req, res){
 		res.end(data);			
 	});
 });
+
+app.post('/login_user.html', function(request, response){
+	var username = request.param('username');
+	var passwd = request.param('passwd');
+		request.session.username = username;
+		request.session.passwd = passwd;
+		response.redirect('/');
+});
+
 app.get('/login_user.html', function (req, res){
 	fs.readFile(fpath+'login_user.html', function(error, data){
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			
+	});
+});
+
+app.post('/logout', function(request, response){
+	request.session.destroy(function(err){
+		if(err){
+			console.log(err);
+		}else{
+			request.session = null;
+		}
 	});
 });

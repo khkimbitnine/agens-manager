@@ -5,7 +5,7 @@
 		});
 		//tab z-index
 		var zIndex;
-
+		
 		//tab클릭preventdefault 
 		$(".tab").click(function() {
 			
@@ -94,8 +94,12 @@
 				}
 			});
 			if($(this).hasClass("logout")){
+				$("#reg").text('');
+				$(this).text("log-in").removeClass('logout');
 				$("#browser").empty();
-				socket.emit('logout',{logout: true} );
+		        $.post("http://localhost:3000/logout",function(data){  
+		        	
+		        });
 			}
 		});
 		
@@ -182,6 +186,12 @@
 		});
 		//========= 소켓 연결
 		var socket = io.connect();
+		
+		socket.on('login', function(data){
+			console.log(data);
+		})
+		
+		
 		//========= 트리전체를 감싸는 #browser 선언
 		var $browser = $("#browser");
 

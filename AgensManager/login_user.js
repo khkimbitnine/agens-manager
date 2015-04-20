@@ -15,7 +15,6 @@ exports.login_user = function(socket, client){
 					}
 					if(rs.rows[0].p){
 						socket.emit('login_success', {username: username, passwd:passwd});
-						socket.emit('login', {username: username, passwd:passwd});
 					}else{
 						socket.emit('login_success', {username: true, passwd:false});
 					}
