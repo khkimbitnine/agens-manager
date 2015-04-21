@@ -72,8 +72,6 @@
 	}
 	appendColumn();
 
-	var connectedDb = 'bitnine';
-
 	$(document).on("change", ".checkbox", function() {
 		if ($(this).is(':checked')) {
 			$(this).next().val(1);
@@ -89,7 +87,9 @@
 	var schemaArray = [];
 	var $schema = $("#schemaList");
 	function schemaList($object){
-			socket.emit('set_dbname', connectedDb);
+		$.get('http://localhost:3000/database', function(database){
+			console.log("database: "+database);
+			socket.emit('set_dbname', database);
 			socket
 					.once(
 							'scname',
@@ -102,7 +102,10 @@
 																+ data.schema[i]
 																+ "</option>");
 												});
-							});					
+							});		
+		});
+		
+			
 		}
 	
 	schemaList($schema);

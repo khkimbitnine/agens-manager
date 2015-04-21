@@ -1,4 +1,4 @@
-exports.login_user = function(socket, client){
+exports.login_user = function(socket, client, done){
 	
 	socket.on('login_check', function(formdata){
 		var username = formdata[0].value;

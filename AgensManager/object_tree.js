@@ -70,7 +70,7 @@ function selectInd(err, irs){
 	//console.log("arrInd: "+arrInd.length);
 }
 
-exports.db = function(socket,client){
+exports.db = function(socket,client, username){
 
 	//db 쿼리
 	client.query('select datname from pg_database WHERE datistemplate=\'f\';', function(err, result){
@@ -83,22 +83,22 @@ exports.db = function(socket,client){
 			}
 			//console.log(arrDB);
 			//db 전송
-			socket.emit('db', {db: arrDB});
+			socket.emit('db', {db: arrDB, username:username});
 		}
 	});	
 	
 }
 
 exports.subtree = function(socket, client, connectedDb){
-	
 	socket.on('set_dbname', function (dbname){
 		if(dbname === connectedDb){
-			//console.log("dbname: connected =>   "+dbname+" : "+connectedDb);
+			
+//			console.log("dbname: connected =>   "+dbname+" : "+connectedDb);
 			//arrSch 비우기
 			arrSch = [];
-			client.query('select current_user', function(err, rs){
-				console.log("current user: "+rs.rows[0].current_user);
-			});
+//			client.query('select current_user', function(err, rs){
+//				console.log("current user: "+rs.rows[0].current_user);
+//			});
 			//스키마 쿼리
 			client.query('select schema_name from information_schema.schemata where schema_name not like \'pg_%\' and schema_name <> \'information_schema\'', function(err, rs){
 				selectSc(err, rs);

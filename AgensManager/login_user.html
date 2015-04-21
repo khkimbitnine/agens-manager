@@ -1,5 +1,5 @@
 <div class="content_wrapper">
-<form id="loginForm" method="post" action="/login_user.html">
+<form id="loginForm" method="post" action="/login">
 	<div id="username">
 		<label>username</label> <input type="text" name="username" value="" />
 	</div>
@@ -43,16 +43,9 @@
 			
 			socket.once('login_success', function(rs){
 				if(rs.username && rs.passwd){
-					$("#loginForm").remove();
-					$(".content_wrapper").append("<div id='loginMsg'>"+$username.val()+" is logged in.</div>").find("#loginMsg").css("color", "#000");
-					$("#reg").text($username.val());
-					$("#login").text("log-out").addClass("logout");
-					
-			        $.post("http://localhost:3000/login_user.html",{username:rs.username, passwd:rs.passwd},function(data){        
-			            if(data==='done')           
-			            {
-			                window.location.href="/";
-			            }
+
+					 $.post("http://localhost:3000/login",{username:rs.username, passwd:rs.passwd, database:'postgres'},function(data){        
+						location.href='/';
 			        });
 				}
 				if(rs.username && !rs.passwd){

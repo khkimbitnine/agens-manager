@@ -1,8 +1,8 @@
 
-
 		$(document).ready(function() {//preventDefault 옵션
     		$('#tab-container').easytabs({animationSpeed: 'fast', updateHash: false});
 		});
+		
 		//tab z-index
 		var zIndex;
 		
@@ -86,29 +86,46 @@
 		});
 		$("#login").click(function(e){
 			e.preventDefault();
-			$content.empty();
-			$.ajax({
-				url:"login_user.html",
-				success:function(data){
-					$content.html(data);
-				}
-			});
+			
 			if($(this).hasClass("logout")){
 				$("#reg").text('');
 				$(this).text("log-in").removeClass('logout');
 				$("#browser").empty();
-		        $.post("http://localhost:3000/logout",function(data){  
-		        	
-		        });
+				$.post("http://localhost:3000/logout", function(data){
+					location.href='/';
+				});
+			}else{
+				$content.empty();
+				$.ajax({
+					url:"login_user.html",
+					success:function(data){
+						$content.html(data);
+					}
+				});
 			}
 		});
 		
-		//create table click event: content에 create_table.html 로드 
+		toolMenuSubUl.on("click", ".object_li>.object", function(){
+			var $this = $(this);
+			if(!$this.hasClass("on")){
+				$(".object").removeClass("on").css("color", "#fff");
+				$this.addClass("on").css("color", "#000");	
+			}else{
+				$(".object").not($this).removeClass("on").css("color", "#fff");
+			}
+		});
+
+		//======================= 트리 생성 ===============================
+		var s = $("#browser").treeview({
+			collapsed : true
+		});
+		//========= 소켓 연결
+		var socket = io.connect();
+		
+				//create table click event: content에 create_table.html 로드 
 		toolMenuSubUl.on("click", ".object_li>.object", function() {
-			
 			var flag = false;
-			
-			if($(".db").val().length > 0){
+			if($(".db").text().length > 0){
 				flag = true;
 			}
 			
@@ -155,6 +172,7 @@
 	             	url:"create_function.html",
 	             	success:function(data){
 	             		$content.html(data);
+	             		
 	              } 
 	        	}); 
 			}
@@ -170,28 +188,6 @@
 
 		});
 		
-		toolMenuSubUl.on("click", ".object_li>.object", function(){
-			var $this = $(this);
-			if(!$this.hasClass("on")){
-				$(".object").removeClass("on").css("color", "#fff");
-				$this.addClass("on").css("color", "#000");	
-			}else{
-				$(".object").not($this).removeClass("on").css("color", "#fff");
-			}
-		});
-
-		//======================= 트리 생성 ===============================
-		var s = $("#browser").treeview({
-			collapsed : true
-		});
-		//========= 소켓 연결
-		var socket = io.connect();
-		
-		socket.on('login', function(data){
-			console.log(data);
-		})
-		
-		
 		//========= 트리전체를 감싸는 #browser 선언
 		var $browser = $("#browser");
 
@@ -201,9 +197,10 @@
 		var collHit = "hitarea collapsable-hitarea lastCollapsable-hitarea";
 		var coll = "collapsable lastCollapsable";
 		var db;
+		var username;
 		//========= db 트리 생성				
 		//db 클릭, 스키마 전송.
-		socket.on('db', function(data) {
+		socket.once('db', function(data) {
 			db = data.db;
 			for (var i = 0; i < db.length; i++) {
 				$(
@@ -211,6 +208,9 @@
 						+ db[i] + "</span></li>").appendTo(
 								$browser);
 			}
+			$("#login").addClass('logout').text('log-out');
+			username = data.username;
+			$("#user").text(username+" | ");
 		});
 
 		//expandable/ collapsable 함수
@@ -242,21 +242,27 @@
 
 		//스키마 출력 함수
 		function schname_emit(dbname, $this) {
+			
+			 $.post("http://localhost:3000/db",{database:dbname},function(data){        
+				 location.href='/';
+					//db이름 전송
+				 socket.emit('set_dbname', dbname);
+		        });
+			 
+			 
 
-			//db이름 전송
-			socket.emit('set_dbname', dbname);
 
 			//스키마 수신
 			socket.once('scname', function(data) {//이벤트 리스너 해제를 확실히 하기 위해서, once 메서드(한번만 리스너 실행)를 씀(이유모름. 다른 리스너들은 on을 써도 작동됨.) 
 
-				if (data.schema != 0) {//접속한 db와 dbname이 일치하지 않을 때 0으로 리턴되면 실행하지 않음.
+//				if (data.schema != 0) {//접속한 db와 dbname이 일치하지 않을 때 0으로 리턴되면 실행하지 않음.
 
 					//스키마 배열 생성 함수 호출
 					sch_name(data, $this);
 
 					//스키마 수신 이벤트 리스너 해제
 					socket.removeListener('scname');
-				}
+//				}
 			});
 
 			//스키마 배열 생성 함수(data = 스키마 데이터)
