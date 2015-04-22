@@ -1,4 +1,4 @@
-exports.create_function = function(socket, client){
+exports.create_function = function(socket, client, done){
 	var schemas = [];
 	var types = [];
 	client.query("select schema_name from information_schema.schemata order by 1", function(err, rs){
@@ -10,6 +10,7 @@ exports.create_function = function(socket, client){
 			}
 		}
 		socket.emit('schemas', schemas);
+//		done();
 	});
 	
 	socket.on('schema', function(schema){
@@ -30,8 +31,9 @@ exports.create_function = function(socket, client){
 						types.push(rs.rows[i].t);
 					}
 				}
-				socket.emit('types', types);
 			}
+			socket.emit('types', types);
+//			done();
 		});
 	});
 	

@@ -14,7 +14,7 @@ socket.connect();
 	+ '<input type="checkbox" id="setof" />'
 	+ '<input type="hidden" name="setof" value="" />'
 	+ '<div id="typeBox">'
-	+ '<select name="schema" class="schema"><option></option></select>'
+	+ '<select name="schema" class="schema"><option></option><option value ="">Basic datatype</option></select>'
 	+ '<select name="type" class="type"><option></option></select>'
 	+ '<span>Array</span>'
 	+ '<input type="checkbox" id="array" />'
@@ -98,7 +98,7 @@ socket.connect();
 		+ '</div>';
 	
 	var argtype = '<div class="argtype">'
-		+ '<select name="argschema" class="schema"><option></option></select>'
+		+ '<select name="argschema" class="schema"><option></option><option value="">Basic datatype</option></select>'
 		+ '<select name="argtype" class="type"><option></option></select>'
 		+ '<label for="array">Array</label>'
 		+ '<input type="checkbox" name="array" class="array"/>'
@@ -140,13 +140,16 @@ socket.connect();
 	}
 	
 	function schemaAppend(argInd){
-		
-		var $schema = $(".schema").eq(argInd);
-		$schema.append('<option value = "">'+"Basic datatype"+'</option>');
-		
-		for(var i = 0 ; i < schemas.length ; i++){
-			$schema.append('<option value = "'+schemas[i]+'">'+schemas[i]+'</option>');
-		}	
+		var $schema = $(".schema").eq(0);
+		if(argInd == 0){
+			for(var i = 0 ; i < schemas.length ; i++){
+				$schema.append('<option value = "'+schemas[i]+'">'+schemas[i]+'</option>');
+			}	
+		}else{
+			for(var j = 2 ; j < $schema.find('option').length ; j++){
+				$(".schema").eq(argInd).append("<option value = '"+$schema.find('option').eq(j).val()+"'>"+$schema.find('option').eq(j).val()+"</option>");
+			}
+		}
 	}
 	
 	socket.once('schemas', function(schema){

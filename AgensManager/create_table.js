@@ -1,4 +1,4 @@
-exports.create_table = function(socket, client){
+exports.create_table = function(socket, client, done){
 	socket.on('table_form', function(formdata){
 		var error;
 		
@@ -121,6 +121,7 @@ exports.create_table = function(socket, client){
 				console.log("Table created.");
 			}
 			socket.emit('table_success', error);
+			done();
 		});
 	});
 	
@@ -181,6 +182,7 @@ exports.create_table = function(socket, client){
 					socket.emit('f_checked', {isunique:false, sameType:false});	
 				}
 			}
+			done();
 		});
 		
 		
@@ -197,6 +199,7 @@ exports.create_table = function(socket, client){
 						}
 						//console.log("sameType "+sameType)
 						socket.emit('f_checked', {isunique:true, sameType:sameType});
+						done();
 					});
 		}
 	});

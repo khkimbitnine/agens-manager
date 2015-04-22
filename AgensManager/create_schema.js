@@ -1,4 +1,4 @@
-exports.create_schema = function(socket, client){
+exports.create_schema = function(socket, client, done){
  //select rolname from pg_authid
 	var roles = [];
 		client.query("select rolname from pg_authid", function(err, rs){
@@ -10,6 +10,7 @@ exports.create_schema = function(socket, client){
 				}
 				socket.emit("get_role", roles);
 			}
+			done();
 		});
 		
 		socket.on('schema_form', function(data){
@@ -29,6 +30,7 @@ exports.create_schema = function(socket, client){
 					console.log(query);
 					console.log("Schema created.")
 				}
+				done();
 			});
 		});
 }

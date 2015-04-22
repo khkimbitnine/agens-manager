@@ -86,41 +86,27 @@
 	
 	var schemaArray = [];
 	var $schema = $("#schemaList");
+	
 	function schemaList($object){
-		$.get('http://localhost:3000/database', function(database){
-			console.log("database: "+database);
-			socket.emit('set_dbname', database);
-			socket
-					.once(
-							'scname',
-							function(data) {
-								$
-										.each(
-												data.schema,
-												function(i) {
-														$object.append("<option value='"+data.schema[i]+"'>"
-																+ data.schema[i]
-																+ "</option>");
-												});
-							});		
-		});
-		
-			
+			socket.once('scname',function(data) {
+				$.each(data.schema,function(i) {
+					$object.append("<option value='"+data.schema[i]+"'>"
+						+ data.schema[i]+ "</option>");
+				});
+			});
 		}
 	
 	schemaList($schema);
 
-	$("#column")
-			.on(
-					"click",
-					".f_key.checkbox",
-					function() {
-						var schema = $(this).siblings(".f_schema").css(
+	$("#column").on("click",".f_key.checkbox",function() {
+						var $sch = $(this).siblings(".f_schema").css(
 								"display", "block");
 						if ($(this).is(":checked")) {
 							$(".u_key, .p_key, .not_null").prop('disabled', true);
-							schema.append('<option>');
-							schemaList(schema);
+							console.log($schema.find("option").length);
+							for(var i = 0 ; i < $schema.find("option").length; i++){
+								$sch.append("<option value = '"+$schema.find("option").eq(i).val()+"'>"+$schema.find('option').eq(i).val()+"</option>");
+							}
 						} else {
 
 							$(this).parent().find("select").empty().hide();

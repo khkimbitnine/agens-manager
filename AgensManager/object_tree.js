@@ -17,8 +17,10 @@ var result, rs, trs, vrs, frs, crs, consrs, irs  = null;
 
 //selectSc function
 function selectSc(err, rs){
-	for(var j=0; j < rs.rows.length; j++){
-		arrSch.push(rs.rows[j].schema_name);
+	if(rs){
+		for(var j=0; j < rs.rows.length; j++){
+			arrSch.push(rs.rows[j].schema_name);
+		}
 	}
 	//console.log("arrSch: "+arrSch);
 }
@@ -70,7 +72,7 @@ function selectInd(err, irs){
 	//console.log("arrInd: "+arrInd.length);
 }
 
-exports.db = function(socket,client, username){
+exports.db = function(socket,client, username, done){
 
 	//db 쿼리
 	client.query('select datname from pg_database WHERE datistemplate=\'f\';', function(err, result){
@@ -85,14 +87,14 @@ exports.db = function(socket,client, username){
 			//db 전송
 			socket.emit('db', {db: arrDB, username:username});
 		}
+//		done();
 	});	
 	
 }
 
-exports.subtree = function(socket, client, connectedDb){
+exports.subtree = function(socket, client, connectedDb, done){
 	socket.on('set_dbname', function (dbname){
 		if(dbname === connectedDb){
-			
 //			console.log("dbname: connected =>   "+dbname+" : "+connectedDb);
 			//arrSch 비우기
 			arrSch = [];
@@ -103,6 +105,7 @@ exports.subtree = function(socket, client, connectedDb){
 			client.query('select schema_name from information_schema.schemata where schema_name not like \'pg_%\' and schema_name <> \'information_schema\'', function(err, rs){
 				selectSc(err, rs);
 				socket.emit('scname', {schema: arrSch});
+//				done();
 			}); 
 		} else {//접속한 db와 dbname이 일치하지 않으면, 0을 리턴(편의상)
 			socket.emit('scname', {schema: 0});
@@ -119,6 +122,7 @@ exports.subtree = function(socket, client, connectedDb){
 					selectTb(err, trs);
 					socket.emit('tabname', {table: arrTab});
 					//console.log(arrTab);
+//					done();
 				});
 			}
 		}
@@ -134,6 +138,7 @@ exports.subtree = function(socket, client, connectedDb){
 					selectVw(err, vrs);
 					socket.emit('viewname', {view: arrView});
 					//console.log(arrView);
+//					done();
 				});
 			}
 		}
@@ -146,6 +151,7 @@ exports.subtree = function(socket, client, connectedDb){
 			selectFc(err, frs);
 			socket.emit('funcname', {func: arrFunc});
 			//console.log(arrFunc);
+//			done();
 		});
 	});
 
@@ -158,6 +164,7 @@ exports.subtree = function(socket, client, connectedDb){
 			selectCol(err, crs);
 			socket.emit('colname', {column: arrCol});
 			//console.log(arrCol);
+//			done();
 		});
 	});
 
@@ -180,6 +187,7 @@ exports.subtree = function(socket, client, connectedDb){
 			selectInd(err, irs);
 			socket.emit('indname', {index: arrInd});
 			//console.log(arrInd);
+//			done();
 		});
 	});
 

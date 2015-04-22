@@ -18,6 +18,7 @@ exports.login_user = function(socket, client, done){
 					}else{
 						socket.emit('login_success', {username: true, passwd:false});
 					}
+					done();
 				});	
 			}
 		}
@@ -33,7 +34,7 @@ exports.login_user = function(socket, client, done){
 				}
 				loginCheck(user_exist);
 			}
-			
+			done();
 		});
 	});
 

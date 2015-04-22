@@ -22,6 +22,7 @@ var sourcePath = "C:/Users/Johnahkim/workspace/test/public";
 //var sourcePath = "C:/Users/user/git/agensmanager/AgensManager/public";
 var fpath = "C:/Users/Johnahkim/workspace/test/";
 //var fpath = "C:/Users/user/git/agensmanager/AgensManager/";
+
 //2) constring (postgres://username:password@localhost/database)
 
 var createTable;
@@ -53,16 +54,13 @@ app.post('/login', function(request, response){
 	request.session.database = request.param('database');//===database postgres 넘어옴
 	response.redirect('/');
 });
-
+//app.post('/db', function(request, response){
+//	request.session.database = request.param('database');
+//	response.redirect('/');
+//});
 app.get('/database', function(req, res){
-	res.json(req.session.database)
+	res.json(req.session.database);
 });
-
-app.post('/db', function(request, response){
-	request.session.database = request.param('database');
-	response.redirect('/');
-});
-
 app.post('/logout', function(request, response){
 	request.session.regenerate(function(err){
 		if(err){
@@ -87,41 +85,37 @@ var prevDatabase
 		var	username;
 		
 		if(req.session.username){
+			conString = "postgres://"+req.session.username+":"+req.session.passwd+"@localhost/"+req.session.database;
+			pg.connect(conString, function(err, client, done){
+				if(err){
+					return console.error('could not connect to postgres', err);
+				}else{
+					io.sockets.on('connection', function(socket){
+						object_tree.db(socket,client, req.session.username, done);
+						object_tree.subtree(socket, client, req.session.database, done);
+						create_table.create_table(socket, client, done);
+						create_index.create_index(socket, client, done);
+						create_schema.create_schema(socket, client, done);
+						create_view.create_view(socket, client, done);
+						create_function.create_function(socket, client, done);
+						create_trigger.create_trigger(socket, client, done);
+					});
+					
+				}
+			});
 			
-			io.sockets.once('connection', function(socket){
-				console.log("username: "+req.session.username);
-				conString = "postgres://"+req.session.username+":"+req.session.passwd+"@localhost/"+req.session.database;
-				socket.emit('connectedDb', req.session.database);
-				pg.connect(conString, function(err, client, done){
-					if(err){
-						return console.error('could not connect to postgres', err);
-					}else{
-						
-						object_tree.db(socket,client, req.session.username);
-						object_tree.subtree(socket, client, req.session.database);
-						create_table.create_table(socket, client);
-						create_index.create_index(socket, client);
-						create_schema.create_schema(socket, client);
-						create_view.create_view(socket, client);
-						create_function.create_function(socket, client);
-						create_trigger.create_trigger(socket, client);
-					}
-				});
-			})
 		}else{
-			io.sockets.once('connection', function(socket){
-						console.log("username: "+req.session.username);
-						var conString = "postgres://postgres:1111@localhost/postgres";
-						
-						pg.connect(conString, function(err, client, done){
-							if(err){
-								return console.error('could not connect to postgres', err);
-							}else{
-								login_user.login_user(socket, client, done);
-							}
-
-							
-						});
+			console.log("username: "+req.session.username);
+			var conString = "postgres://postgres:1111@localhost/postgres";
+			
+			pg.connect(conString, function(err, client, done){
+				if(err){
+					return console.error('could not connect to postgres', err);
+				}else{
+					io.sockets.on('connection', function(socket){
+						login_user.login_user(socket, client, done);
+					});
+				}
 			});
 		}
 });
