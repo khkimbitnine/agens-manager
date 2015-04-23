@@ -35,10 +35,47 @@ app.set('port', 3000);
 //서버 연결
 var server = http.createServer(app).listen(app.get('port'), function(){
 		
+	var io = require('socket.io').listen(server);
 	// socket.io 선언
 	console.log('server listening on 3000');
+	
+	var conString = "postgres://postgres:1111@localhost/postgres";
+	
+	pg.connect(conString, function(err, client, done){
+		var handleError = function(err) {
+			// no error occurred, continue with the request
+			if(!err) {
+				return false;
+			}
+
+			done(client);
+			return true;
+		};
+		var arrDB = [];
+		client.query('select datname from pg_database WHERE datistemplate=\'f\';', function(err, result){
+			if(err){
+				//console.log(err)
+			}else{
+				arrDB = [];
+				for(var i=0; i < result.rows.length; i++){
+					arrDB.push(result.rows[i].datname);
+				}
+			}
+		});	
+			io.on('connection', function(socket){
+				socket.emit('db', {db: arrDB});
+				object_tree.subtree(socket, client, 'postgres', done);
+				create_table.create_table(socket, client, 'postgres', done);
+				create_index.create_index(socket, client, done);
+				create_schema.create_schema(socket, client, done);
+				create_view.create_view(socket, client, done);
+				create_function.create_function(socket, client, done);
+				create_trigger.create_trigger(socket, client, done);
+			});
+	});
+	
 });
-var io = require('socket.io').listen(server);
+
 
 app.use(express.cookieParser());
 app.use(express.bodyParser());
@@ -82,42 +119,6 @@ var prevDatabase
 		res.writeHead(200, {'Content-Type': 'text/html'});
 		res.end(data);			//ja021017
 	});
-		var	username;
-		
-		if(req.session.username){
-			conString = "postgres://"+req.session.username+":"+req.session.passwd+"@localhost/"+req.session.database;
-			pg.connect(conString, function(err, client, done){
-				if(err){
-					return console.error('could not connect to postgres', err);
-				}else{
-					io.sockets.on('connection', function(socket){
-						object_tree.db(socket,client, req.session.username, done);
-						object_tree.subtree(socket, client, req.session.database, done);
-						create_table.create_table(socket, client, done);
-						create_index.create_index(socket, client, done);
-						create_schema.create_schema(socket, client, done);
-						create_view.create_view(socket, client, done);
-						create_function.create_function(socket, client, done);
-						create_trigger.create_trigger(socket, client, done);
-					});
-					
-				}
-			});
-			
-		}else{
-			console.log("username: "+req.session.username);
-			var conString = "postgres://postgres:1111@localhost/postgres";
-			
-			pg.connect(conString, function(err, client, done){
-				if(err){
-					return console.error('could not connect to postgres', err);
-				}else{
-					io.sockets.on('connection', function(socket){
-						login_user.login_user(socket, client, done);
-					});
-				}
-			});
-		}
 });
 
 

@@ -1,4 +1,25 @@
-exports.create_table = function(socket, client, done){
+exports.create_table = function(socket, client, connectedDb, done){
+	
+	socket.on('set_dbname_table', function (dbname){
+		var arrSch = [];
+		if(dbname === connectedDb){
+			arrSch = [];
+			//스키마 쿼리
+			client.query('select schema_name from information_schema.schemata where schema_name not like \'pg_%\' and schema_name <> \'information_schema\'', function(err, rs){
+				if(rs){
+					for(var j=0; j < rs.rows.length; j++){
+						arrSch.push(rs.rows[j].schema_name);
+						console.log(arrSch);
+						socket.emit('scname_table', arrSch);
+					}
+				}				
+//				done();
+			}); 
+		} else {//접속한 db와 dbname이 일치하지 않으면, 0을 리턴(편의상)
+			socket.emit('scname_table', {schema: 0});
+		}
+	});
+	
 	socket.on('table_form', function(formdata){
 		var error;
 		

@@ -46,22 +46,32 @@
 
 		for (var i = 0; i < toolMenuLabelText.length; i++) {
 			toolMenuSubUl.children("li:eq(" + i + ")").append(
-					"<span class='label'>" + toolMenuLabelText[i] + "</span>");
+					"<a href='' class='label'>" + toolMenuLabelText[i] + "</a>");
 		}
-
+		
+		$(".label").click(function(e){
+				e.preventDefault();
+				if($(this).hasClass("on")){
+					$(this).removeClass('on').css("color", "#fff");
+				}else{
+					$(this).addClass("on").css("color", "rgb(6,201,229)");
+					$(".label").not($(this)).removeClass("on").css("color", "#fff");
+					if(!$(".label").not($(this)).next().is(":hidden")){
+						$(".label").not($(this)).next().slideToggle().find(".object").removeClass("on").css({"background": "rgb(36,39,45)","color": "#fff", "font-weight":"normal"});
+					}
+				}
+		})
+		
 		//createMenu's sub <ul>
 		var createLi = $("#create");
-		var $createSubUl = $("<ul>").appendTo(createLi).css({
-			"width" : 100,
-			"height" : 120,
-		});
+		var $createSubUl = $("<ul>").appendTo(createLi).css("background", "rgb(36,39,45)");
 
 		for (var i = 0; i < create.length; i++) {
-
-			$createSubUl.append("<li class='object_li'><span class='object'>"
-					+ create[i] + "</span></li>");
-
+			$createSubUl.append("<li class='object_li'><a class='object'>"
+					+ create[i] + "</a></li>");
 		}
+		
+
 
 		//hide createMenu's sub <ul>
 		$createSubUl.hide();
@@ -105,13 +115,14 @@
 			}
 		});
 		
-		toolMenuSubUl.on("click", ".object_li>.object", function(){
+		toolMenuSubUl.on("click", ".object", function(e){
+			e.preventDefault();
 			var $this = $(this);
-			if(!$this.hasClass("on")){
-				$(".object").removeClass("on").css("color", "#fff");
-				$this.addClass("on").css("color", "#000");	
+			if($this.hasClass("on")){
+				$this.removeClass("on").css({"color": "#fff", "font-weight":"normal", "background":"rgb(36,39,45)"});
 			}else{
-				$(".object").not($this).removeClass("on").css("color", "#fff");
+				$this.addClass("on").css({"background":"#fff","color":"rgb(30,109,170)", "font-weight":"bold"});
+				$(".object").not($this).removeClass("on").css({"background": "rgb(36,39,45)","color": "#fff", "font-weight":"normal"});
 			}
 		});
 
@@ -124,6 +135,7 @@
 		
 				//create table click event: content에 create_table.html 로드 
 		toolMenuSubUl.on("click", ".object_li>.object", function() {
+			var $content = $(".content");
 			var flag = false;
 			if($(".db").text().length > 0){
 				flag = true;
@@ -212,9 +224,9 @@
 						+ db[i] + "</span></li>").appendTo(
 								$browser);
 			}
-			$("#login").addClass('logout').text('log-out');
-			username = data.username;
-			$("#user").text(username+" | ");
+//			$("#login").addClass('logout').text('log-out');
+//			username = data.username;
+//			$("#user").text(username+" | ");
 		});
 
 		//expandable/ collapsable 함수

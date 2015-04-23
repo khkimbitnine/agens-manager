@@ -1,6 +1,7 @@
 exports.create_function = function(socket, client, done){
 	var schemas = [];
 	var types = [];
+	
 	client.query("select schema_name from information_schema.schemata order by 1", function(err, rs){
 		if(err){
 			console.log(err)
@@ -8,15 +9,16 @@ exports.create_function = function(socket, client, done){
 			for(var i = 0 ; i < rs.rows.length ; i++){
 				schemas.push(rs.rows[i].schema_name);
 			}
+			socket.emit('schemas', schemas);
 		}
-		socket.emit('schemas', schemas);
+		
 //		done();
 	});
 	
 	socket.on('schema', function(schema){
 		types = [];
 		var query = "";
-		if(schema.length == 0) {
+		if(schema == "Basic datatype") {
 			query = "select typname as t from pg_type, (select oid from pg_namespace where nspname = 'pg_catalog') n where typnamespace = n.oid and typtype <> 'c'";
 		}else{
 			query = "select table_name as t from information_schema.tables where table_schema = '"+schema+"' order by 1";
@@ -24,15 +26,16 @@ exports.create_function = function(socket, client, done){
 		
 		client.query(query, function(err, rs){
 			if(err){
-				console.log(err)
+				console.log("schema error: "+err);
 			}else{
 				for(var i = 0 ; i < rs.rows.length ; i++){
 					if(rs.rows[i].t){
 						types.push(rs.rows[i].t);
 					}
 				}
+				socket.emit('types', types);
 			}
-			socket.emit('types', types);
+			
 //			done();
 		});
 	});

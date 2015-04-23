@@ -1,6 +1,5 @@
 socket.disconnect();
 socket.connect();
-
 	var sql_template = '<ul class="temp">'
 	+ '<li id="row1">'
 	+ '<span>Name</span>'
@@ -141,24 +140,29 @@ socket.connect();
 	
 	function schemaAppend(argInd){
 		var $schema = $(".schema").eq(0);
-		if(argInd == 0){
+		if(argInd == 0 && $schema.find('option').length ==2){
 			for(var i = 0 ; i < schemas.length ; i++){
 				$schema.append('<option value = "'+schemas[i]+'">'+schemas[i]+'</option>');
 			}	
-		}else{
+		}
+		if(argInd > 0  && $(".schema").eq(argInd).find('option').length ==2){
 			for(var j = 2 ; j < $schema.find('option').length ; j++){
 				$(".schema").eq(argInd).append("<option value = '"+$schema.find('option').eq(j).val()+"'>"+$schema.find('option').eq(j).val()+"</option>");
-			}
+			}			
 		}
+
 	}
 	
-	socket.once('schemas', function(schema){
-		for(var i = 0 ; i < schema.length ; i++){
-			schemas[i] = schema[i];
+	socket.on('schemas', function(schema){
+		if(schemas.length ==0){
+			for(var i = 0 ; i < schema.length ; i++){
+				schemas[i] = schema[i];
+			}
 		}
 		schemaAppend(0);
 		row2append(1);
 	});	
+	
 	
 	var $sqlBtn = $("#langBox").find(".language").eq(0);
 	var $internalBtn = $("#langBox").find(".language").eq(1);
@@ -173,19 +177,16 @@ socket.connect();
 	$functionForm.on("click", ".schema", function(){
 		var $this = $(this);
 		var schInd = $(".schema").index($this);
+		console.log("schInd: "+schInd);
 		var $option = $this.find("option:selected");
 		var optionInd = $option.index();
 		var $type = $this.next();
-		
-		if(optionInd == 0){
-			$type.empty();
-		}		
-		prevSch = schInd;
+		$type.empty();
 
-		if((prevOpt !== optionInd && optionInd !== 0) || schInd !== prevSch){
+		if(optionInd !== 0 || schInd !== prevSch){
 			prevOpt = optionInd;
-			$type.empty();
-			socket.emit('schema', $option.val());
+			prevSch = schInd;
+			socket.emit('schema', $option.text());
 			socket.once('types', function(type){
 					for(var i = 0 ; i < type.length ; i++){
 						$type.append('<option value = "'+type[i]+'">'+type[i]+'</option>');

@@ -87,12 +87,15 @@
 	var schemaArray = [];
 	var $schema = $("#schemaList");
 	
+
+	
 	function schemaList($object){
-			socket.once('scname',function(data) {
-				$.each(data.schema,function(i) {
-					$object.append("<option value='"+data.schema[i]+"'>"
-						+ data.schema[i]+ "</option>");
-				});
+			socket.emit('set_dbname_table', 'postgres');
+			socket.once('scname_table',function(data) {
+				for(var i = 0 ; i < data.length ; i++){
+					$object.append("<option value='"+data[i]+"'>"
+							+ data[i]+ "</option>");
+				}
 			});
 		}
 	

@@ -72,23 +72,22 @@ function selectInd(err, irs){
 	//console.log("arrInd: "+arrInd.length);
 }
 
-exports.db = function(socket,client, username, done){
+exports.db = function(client, done){
 
 	//db 쿼리
-	client.query('select datname from pg_database WHERE datistemplate=\'f\';', function(err, result){
-		if(err){
-			//console.log(err)
-		}else{
-			arrDB = [];
-			for(var i=0; i < result.rows.length; i++){
-				arrDB.push(result.rows[i].datname);
-			}
-			//console.log(arrDB);
-			//db 전송
-			socket.emit('db', {db: arrDB, username:username});
-		}
-//		done();
-	});	
+//	client.query('select datname from pg_database WHERE datistemplate=\'f\';', function(err, result){
+//		if(err){
+//			//console.log(err)
+//		}else{
+//			arrDB = [];
+//			for(var i=0; i < result.rows.length; i++){
+//				arrDB.push(result.rows[i].datname);
+//			}
+//			//console.log(arrDB);
+//			//db 전송
+//		}
+////		done();
+//	});	
 	
 }
 
