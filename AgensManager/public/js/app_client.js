@@ -53,11 +53,15 @@
 				e.preventDefault();
 				if($(this).hasClass("on")){
 					$(this).removeClass('on').css("color", "#fff");
+					if(!$(this).siblings('ul').is(":hidden")){
+						$(this).siblings('ul').find(".object").removeClass("on").css({"background": "rgb(36,39,45)","color": "#fff", "font-weight":"normal"});
+					}
 				}else{
 					$(this).addClass("on").css("color", "rgb(6,201,229)");
 					$(".label").not($(this)).removeClass("on").css("color", "#fff");
-					if(!$(".label").not($(this)).next().is(":hidden")){
-						$(".label").not($(this)).next().slideToggle().find(".object").removeClass("on").css({"background": "rgb(36,39,45)","color": "#fff", "font-weight":"normal"});
+					
+					if(!$(".label").not($(this)).siblings('ul').is(":hidden")){
+						$(".label").not($(this)).siblings('ul').slideToggle().find(".object").removeClass("on").css({"background": "rgb(36,39,45)","color": "#fff", "font-weight":"normal"});
 					}
 				}
 		})
