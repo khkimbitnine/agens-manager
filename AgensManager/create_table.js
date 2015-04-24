@@ -23,7 +23,7 @@ exports.create_table = function(socket, client, connectedDb, done){
 	socket.on('table_form', function(formdata){
 		var error;
 		
-		var interval = 12	
+		var interval = 9	
 		//columnName, typeName, array, typeLength, constraint, not_null
 		//unique, primary, foreign, default, column_comment, check
 		
@@ -34,65 +34,39 @@ exports.create_table = function(socket, client, connectedDb, done){
 		for(var i = 2 ; i < formdata.length-1; i++){
 			column[i-2] = formdata[i].value;
 		}
-		
-		
+		console.log(schema+","+name+","+comment);
 		//create Table
 		var createTable = "CREATE TABLE "+schema+"."+name+"(";
-		var comments = ''; //col_comment, comment
 		for(var i = 0 ; i < (column.length)/interval ; i++){// row index
-			var columnName;
-			var typeName;
-			var array;
-			var typeLength;
-			var cs;
-			var nn;
-			var uk;
-			var pk;
-			var fk;
-			var def;
-			var cc;
-			var ck;
+			var colName = '';
+			var type = '';
+			var length = '';
+			var nn = '';
+			var pk = '';
+			var uk = '';
+			var def = '';
+			var fk = '';
+			var chk = '';
+			
 
-			var columnRow = [];//column values per row
+			var row = [];//column values per row
 			var k = 0;
 			for(var j = (interval*i) ; j < interval*(i+1) ; j++){// per row
-					columnRow[k++] = column[j];
+					row[k++] = column[j];
 			}
-			columnName = columnRow[0];
-			typeName = columnRow[1];
-			array = columnRow[2];
-			typeLength = columnRow[3];
-			cs = columnRow[4];
-			nn = columnRow[5];
-			uk = columnRow[6];
-			pk = columnRow[7];
-			fk = columnRow[8];
-			def = columnRow[9];
-			cc = columnRow[10];
-			ck = columnRow[11];
-			
-			if(typeLength.length!== 0){
-				typeLength = "("+typeLength+")";
-			}
-			
-			if(ck.length !== 0){
-				ck = " CHECK ("+ck+")";
-			}else{
-				ck = '';
-			}
-			
-			if(def.length !== 0 && typeName=="character"){
-				def = " DEFAULT '"+def+"'";
-			}
-			if(def.length == 0) def = "";
-			if(def.length !== 0 && typeName !== "character"){
-				def = " DEFAULT "+def;
-			}
-			
-			if(cs == 0) {
-				cs = '';
-			}else{
-				cs = ' CONSTRAINT "'+cs+'"';
+			colName = row[0];
+			type = row[1];
+			length = row[2];
+			nn = row[3];
+			pk = row[4];
+			uk = row[5];
+			def = row[6];
+			fk = row[7];
+			chk = row[8];
+			cmt = row[9];
+			console.log(column);
+			if(length.length!== 0){
+				length = "("+length+")";
 			}
 			
 			if(nn == 1) {
@@ -101,16 +75,25 @@ exports.create_table = function(socket, client, connectedDb, done){
 				nn = '';
 			}
 			
+			if(pk == 1) {
+				pk = " PRIMARY KEY";
+			}else{
+				pk = '';
+			}
+			
 			if(uk == 1) {
 				uk = " UNIQUE";
 			}else{
 				uk = '';
 			}
 			
-			if(pk == 1) {
-				pk = " PRIMARY KEY";
-			}else{
-				pk = '';
+			if(def.length !== 0 && typeName=="character"){
+				def = " DEFAULT '"+def+"'";
+			}
+			if(def.length == 0) def = "";
+			
+			if(def.length !== 0 && typeName !== "character"){
+				def = " DEFAULT "+def;
 			}
 			
 			if(fk == 0){
@@ -119,19 +102,22 @@ exports.create_table = function(socket, client, connectedDb, done){
 				fk = " REFERENCES "+fk;
 			}
 			
-			createTable += columnName+" "+typeName+typeLength+array+cs+nn+ck+def+uk+pk+fk;
-			if(i == ((column.length)/interval)-1){
-				createTable += ");" 
+			if(chk.length !== 0){
+				chk = " CHECK ("+ck+")";
 			}else{
-				createTable += ", " 
+				chk = '';
 			}
-
-			//if(cc.length !== 0) comments += "COMMENT ON COLUMN "+name+"."+columnName+" IS '"+cc+"';"
+			
+			if(i == ((column.length)/interval)-1){
+				createTable += colName+" "+type+length+nn+chk+def+uk+pk+fk+");" 
+			}else{
+				createTable += colName+" "+type+length+nn+chk+def+uk+pk+fk+", " 
+			}
 
 		}
 
-		if(comment.length !== 0) comments += "COMMENT ON TABLE "+name+" IS '"+comment+"';"
-		createTable += comments;
+		if(comment.length !== 0) createTable += "COMMENT ON TABLE "+name+" IS '"+comment+"';"
+		
 		console.log(createTable);
 		//======= create Table end
 
@@ -142,7 +128,6 @@ exports.create_table = function(socket, client, connectedDb, done){
 				console.log("Table created.");
 			}
 			socket.emit('table_success', error);
-			done();
 		});
 	});
 	

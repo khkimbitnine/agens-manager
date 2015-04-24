@@ -10,6 +10,7 @@ body {
 
 .wrapper {
 	width: 1920px;
+	height: 976px;
 	position: relative;
 	font-family: Arial, Helvetica, sans-serif;
 }
@@ -40,9 +41,8 @@ body {
 }
 
 .content {
-	width: 1630px;
-	min-height: 817px;
-	padding: 20px;
+	width: 1684px;
+	height: 976px;
 	float: right;
 	background: #eee;
 	position: relative;
@@ -55,29 +55,22 @@ body {
 
 .sidebar {
 	width: 236px;
+	height:976px;
 	float: left;
 }
-
-#objectBrowser, #toolMenu {
-	width: 236px;
-	min-height: 817px;
-}
-
 .bar {
-	height: 100%;
-	cursor: default;
-	cursor: default;
+	width:236px;
+	height:909px;
 }
-
 .bar .bar_wrapper {
-	height: 817px;
+	height:909px;
 	width: 236px;
 	background: rgb(42, 45, 54);
 }
 
 .bar .bar_content {
 	font: 14px/16px Arial, Helvetica, sans-serif;
-	height: 797px;
+	height: 909px;
 	overflow: auto;
 }
 
@@ -187,9 +180,9 @@ body {
 	right: 0;
 }
 
-.tab a {
+.tab a:nth-of-type(1) {
 	width: 118px;
-	height: 67px;
+	height: 62px;
 	line-height: 67px;
 	font-size: 14px;
 	color:#fff;
@@ -198,19 +191,27 @@ body {
 	text-decoration: none;
 	text-align: center;
 }
-
+.tab.active a:nth-of-type(2){
+	display:block;
+	width:118px;
+	height:5px;
+	background: rgb(6,201,229);
+}
 .tab.active {
 	background: rgb(42, 45, 54);
 	border-color: #666;
 	height: 67px;
 }
 
-.tab a.active {
+.tab a:nth-of-type(1).active {
 	color:rgb(6,201,229);
 	font-weight:bold;
 }
+#browser span{
+	cursor:pointer;
+}
 
-.last span:hover {
+#browser .last span:hover {
 	cursor: text;
 	color: #fff;
 }

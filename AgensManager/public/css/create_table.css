@@ -19,65 +19,63 @@ li:nth-of-type(4)>.field>span {
 	display: block;
 }
 
-#column th {
-	background: rgb(230, 230, 204);
-}
-
 #column th:last-child {
 	background: none;
 }
 
 #column td {
-	text-align: center;
+	padding:0;
 }
-
+#column td:nth-of-type(4),#column td:nth-of-type(5),#column td:nth-of-type(6){
+	text-align:center;
+}
 #comment {
 	width: 1050px;
 	height: 100px;
 	resize: none;
 }
 
-.column {
-	width: 200px;
+.column .column_input{
+	width:183px;
+	height:35px;
+	padding:0;
 }
 
-.column input {
-	width: 80%;
-}
-
-.type_box{
-	width:200px;	
-}
 .type {
-	width: 80%;
+	width:222px;
+	height:39px;
 }
-
-.array {
-	width: 20%;
-}
-
 .length {
-	width: 100px;
+	width:83px;
+	height:35px;
+	padding:0;	
+}
+.checkbox{
+	width:24px;
+	height:24px;
+	background:url('images/chkbox_default.png');
 }
 .constraint_box, .constraint_box>.c{
 	width: 100px;
 }
-.f_key_box{
-	width:100px;
+.f_key{
+	width:254px;
+	height:35px;
+	padding:0;
 }
-.f{
-	width:70px;
-}
-
 .default {
-	width: 150px;
+	width: 92px;
+	height:35px;
+	padding:0;
 }
 
 .comment {
 	width: 200px;
 }
 .check{
-	width:200px;
+	width:255px;
+	height:35px;
+	padding:0;
 }
 
 .button {
@@ -88,18 +86,223 @@ li:nth-of-type(4)>.field>span {
 	text-indent: -9999px;
 	background-size: 100%;
 }
-
+.button{
+	margin-left:28px;
+}
 .add {
-	background: url("images/plus.png") no-repeat;
+	width:20px;
+	height:20px;
+	border-radius:10px 10px;
+	box-shadow:none;
+	background: url("images/plus_btn.png") no-repeat;
+	background-size:20px 20px;
 }
 
 .remove {
-	background: url("images/minus.png") no-repeat;
+	width:20px;
+	height:20px;
+	border-radius:10px 10px;
+	box-shadow:none;
+	background: url("images/minus_btn.png") no-repeat;
+	background-size:20px 20px;
 }
-.field>div {
-	display:inline-block;
+.content_wrapper{
+	width:100%;
+	height:976px;
 }
 #tableForm{
-	margin:auto;
-	width:1400px;
+	width:100%;
+	height:976px;
 }
+#tableForm>ul{
+	margin:0;
+	width:100%;
+	height:976px;
+}
+#tableForm>ul>li:nth-of-type(1){
+	width:100%;
+	height:123px;
+	background:#ddd;
+	position:relative;
+}
+.field.name{
+	position:absolute;
+	width:800px;
+	height:40px;
+	left:71px;
+	top:42px;
+}
+.field.name>div {
+	display:inline-block;
+	width:380px;
+	height:40px;
+}
+.field #schema label, .field #table label{
+	font-size: 19.42px;
+	font-weight: bold;
+	color:rgb(31,112,175);
+}
+#schemaList, #name{
+	width: 213px;
+	height:39px;
+	padding:0;
+}
+#tableForm>ul>li:nth-of-type(2){
+	width:100%;
+	min-height:353px;
+	background:#eee;
+	overflow:auto;
+}
+.field.column{
+	width:1400px;
+	margin-left:71px;
+	margin-top:56px;
+}
+table#column th{
+	font-size:14px;
+	font-weight:bold;
+	color:rgb(31,112,175);
+}
+#tableForm>ul>li:nth-of-type(3){
+	width:100%;
+	height:500px;
+	background:#eee;
+	position:relative;
+}
+.field.comment{
+	width:1400px;
+	height:240px;
+	position:absolute;
+	left:71px;
+	top:56px;
+}
+.field.comment>span{
+	display:block;
+	font-size:14px;
+	font-weight:bold;
+	color:rgb(31,112,175);
+}
+textarea#comment{
+	width:481px;
+	height:195px;
+	position:absolute;
+	bottom:0;
+}
+.field#btnBox{
+	position:absolute;
+	width:264px;
+	left:71px;
+	top:340px;
+}
+.field#btnBox>button{
+	width:129px;
+	height:44px;
+	text-indent:-9999px;
+	border:none;
+}
+.field#btnBox>button:nth-of-type(1){
+	background:url('images/create_btn.png');
+}
+.field#btnBox>button:nth-of-type(2){
+	background:url('images/cancel_btn.png');
+}
+.f_key{
+	cursor:pointer;
+}
+
+#fKeyPop{
+	width:605px;
+	height:330px;
+	background:url('images/popup_board.png');
+	position:absolute;
+	top:214px;
+	right:300px;
+	z-index:2;
+	display:none;
+}
+
+#fKeyPop>span{
+	font-weight:bold;
+	font-size:18px;
+	color:rgb(2,131,231);
+	display:block;
+	position:absolute;
+	left:37px;
+	top:37px;
+}
+#fKeyPop>div>label{
+	font-size:14px;
+	color:#fff;
+	display:block;
+	margin-bottom:5px;
+}
+#fKeyPop>div>span{
+	font-size:14px;
+	color:#fff;
+	display:inline-block;
+	margin-right: 5px;
+}
+#fKeyPop button{
+	font-size:18px;
+	font-weight:bold;
+	border:none;
+	width:91px;
+	height:39px;
+}
+
+#fKeyPop>div:nth-of-type(1){
+	width: 314px;
+	height:39px;
+	position:absolute;
+	left:37px;
+	top:84px;
+}
+#fChosen{
+	width:182px;
+	height:39px;
+}
+#fKeyPop>div:nth-of-type(2){
+	width:173px;
+	height:75px;
+	position:absolute;
+	left:37px;
+	top:153px;
+}
+#fKeyPop>div:nth-of-type(3){
+	width:173px;
+	height:75px;
+	position:absolute;
+	left:215px;
+	top:153px;
+}
+#fKeyPop>div:nth-of-type(4){
+	width:173px;
+	height:75px;
+	position:absolute;
+	left:396px;
+	top:153px;
+}
+#fSchema, #fTable, #fColumn{
+	width: 173px;
+	height:39px;
+}
+
+#fBtnBox{
+	width: 190px;
+	position:absolute;
+	right:37px;
+	bottom:37px;
+}
+#popupBG{
+	width:1684px;
+	height:975px;
+	position:absolute;
+	top:0;
+	right:0;
+	opacity:.8;
+	background:url('images/popup_BG.png');
+	border-radius:10px;
+	z-index:1;
+	display:none;
+}
+

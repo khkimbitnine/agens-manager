@@ -3,50 +3,74 @@
 	<form id="tableForm">
 		<ul>
 			<li>
-				<div class="field">
-					<div>
-						<select name="schema" id="schemaList">
+				<div class="field name">
+					<div id="schema">
+						<label for="schemaList">SCHEMA NAME</label> <select name="schema"
+							id="schemaList">
 							<option value=""></option>
 						</select>
 					</div>
-					<div>
-					<label for="name">Table Name</label><input type="text" name="name"
-						id="name" />
+					<div id="table">
+						<label for="name">TABLE NAME</label><input type="text" name="name"
+							id="name" />
 					</div>
 				</div>
 			</li>
 			<li>
-				<div class="field">
+				<div class="field column">
 					<table id="column">
 						<tr>
-							<th>Column</th>
-							<th>Type</th>
-							<th>Length</th>
-							<th>Constraint</th>
-							<th>Not Null</th>
-							<th>Unique key</th>
-							<th>Primary key</th>
-							<th>Foreign key</th>
-							<th>Default</th>
-							<th>Comment</th>
-							<th>Check</th>
+							<th>COLUMN</th>
+							<th>TYPE</th>
+							<th>LENGTH</th>
+							<th>NOT NULL</th>
+							<th>PRIMARY KEY</th>
+							<th>UNIQUE KEY</th>
+							<th>DEFAULT</th>
+							<th>FOREIGN KEY</th>
+							<th>CHECK</th>
 							<th><button class="add button">add</button></th>
 						</tr>
 					</table>
 				</div>
 			</li>
 			<li>
-				<div class="field">
-					<span>Comment: </span>
+				<div class="field comment">
+					<span>COMMENT</span>
 					<textarea name="comment" id="comment"></textarea>
 				</div>
-			</li>
-			<li>
-				<button type="submit" id="submitBtn">Create</button>
-				<button>Cancel</button>
+				<div id="btnBox" class="field">
+					<button type="submit" id="submitBtn">Create</button>
+					<button>Cancel</button>
+				</div>
 			</li>
 		</ul>
+		<div id="fKeyPop">
+			<span>FOREIGN KEY</span> 
+			<div>
+				<span>Select column</span>
+				<select id="fChosen">
+				</select>
+			</div>
+			<div>
+				<label for="fSchema">Schema</label> <select id="fSchema">
+				</select>
+			</div>
+			<div>
+				<label for="fTable">Table</label> <select id="fTable">
+				</select>
+			</div>
+			<div>
+				<label for="fColumn">Column</label> <select id="fColumn">
+				</select>
+			</div>
+			<div id="fBtnBox">
+				<button>Ok</button>
+				<button>Cancel</button>
+			</div>
+		</div>
 	</form>
+	<div id="popupBG"></div>
 </div>
 <script src="public/js/create_table_client.js"></script>
 

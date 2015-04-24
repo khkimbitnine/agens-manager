@@ -1,58 +1,45 @@
 	
 	var col_template = '<tr>'
-			+ '<td class="column">'
+			+ '<td>'
 			+ '<input type="text" name="column" class="column_input" value=""/>'
 			+ '</td>'
-			+ '<td class="type_box">'
+			+ '<td>'
 			+ '<select name="type" class="type">'
 			+ '<option value="" />'
-			+ '</select>'
-			+ '<select name="array" class="array">'
-			+ '<option value="" />'
-			+ '<option value="[]">[]</option>'
 			+ '</select>'
 			+ '</td>'
 			+ '<td>'
 			+ '<input type="text" name="length" class="length" value="" disabled />'
 			+ '<input type="hidden" name="length2" class="length"/>'
 			+ '</td>'
-			+ '<td class="constraint_box">'
-			+ '<input type="checkbox" class="constraint checkbox"/>'
-			+ '<input type="hidden" class="const" name="constraint" value="0" />'
-			+ '<input value="" class="c" style="display: none" />'
-			+ '</td>'
 			+ '<td>'
-			+ '<input type="checkbox" class="not_null checkbox" />'
+			+ '<img class="not_null checkbox" src="public/css/images/chkbox_default.png"/>'
 			+ '<input type="hidden" name="not_null" value="0" />'
 			+ '</td>'
 			+ '<td>'
-			+ '<input type="checkbox" class="u_key checkbox" />'
-			+ '<input type="hidden" name="u_key" value="0" />'
-			+ '</td>'
-			+ '<td>'
-			+ '<input type="checkbox" class="p_key checkbox" />'
+			+ '<img class="p_key checkbox" src="public/css/images/chkbox_default.png"/>'
 			+ '<input type="hidden" name="p_key" value="0" />'
 			+ '</td>'
-			+ '<td class="f_key_box">'
-			+ '<input type="checkbox" class="f_key checkbox" />'
-			+ '<input type="hidden" name="f_key" value="0" />'
-			+ '<select class="f f_schema" style="display: none" />'
-			+ '<select class="f f_table" style="display: none" />'
-			+ '<select class="f f_column" style="display: none" />'
+			+ '<td>'
+			+ '<img class="u_key checkbox" src="public/css/images/chkbox_default.png"/>'
+			+ '<input type="hidden" name="u_key" value="0" />'
 			+ '</td>'
 			+ '<td><input type="text" name="de_fault" class="default" value=""/></td>'
-			+ '<td><input type="text" name="col_comment" class="comment" value=""/></td>'
+			+ '<td>'
+			+ '<input type="text" class="f_key" readonly/>'
+			+ '<input type="hidden" name="f_key" value="0" />'
+			+ '</td>'
 			+ '<td><input type="text" name="check" class="check" value=""/></td>'
 			+ '</tr>';
 
-	var type = [ "bigint", "bigserial", "boolean", "box", "bytea", "cidr",
-			"circle", "date", "double precision", "inet", "integer", "json",
-			"line", "lseg", "macaddr", "money", "path", "point", "polygon",
-			"real", "smallint", "smallserial", "serial", "text", "tsquery",
-			"tsvector", "txid_snapshot", "uuid", "xml", "bit", "bit varying",
-			"character", "character varying", "interval", "time",
-			"time with time zone", "timestamp", "timestamp with time zone",
-			"numeric" ];
+	var type = [ "bigint", "bigint[]", "bigserial", "bigserial[]", "boolean", "boolean[]", "box", "box[]", "bytea", "bytea[]", "cidr", "cidr[]",
+			"circle", "circle[]", "date", "date[]", "double precision", "double precision[]", "inet", "inet[]", "integer", "integer[]", "json", "json[]",
+			"line", "line[]", "lseg", "lseg[]", "macaddr", "macaddr[]", "money", "money[]", "path", "path[]", "point", "point[]", "polygon", "polygon[]",
+			"real", "real[]", "smallint", "smallint[]", "smallserial", "smallserial[]", "serial", "serial[]", "text", "text[]", "tsquery", "tsquery[]",
+			"tsvector", "tsvector[]", "txid_snapshot", "txid_snapshot[]", "uuid", "uuid[]", "xml", "xml[]", "bit", "bit[]", "bit varying", "bit varying[]",
+			"character", "character[]", "character varying", "character varying[]", "interval", "interval[]", "time", "time[]",
+			"time with time zone", "time with time zone[]", "timestamp", "timestamp[]", "timestamp with time zone", "timestamp with time zone[]",
+			"numeric", "numeric[]" ];
 
 	function appendColumn() {
 
@@ -72,18 +59,21 @@
 	}
 	appendColumn();
 
-	$(document).on("change", ".checkbox", function() {
-		if ($(this).is(':checked')) {
-			$(this).next().val(1);
-		} else {
+	$(document).on("click", ".checkbox", function() {
+		if($(this).hasClass("p_key") && !$(this).hasClass('on')){
+			$(".p_key").prop("src", "public/css/images/chkbox_default.png").next().val(0);
+		}
+		if ($(this).hasClass('on')) {
+			$(this).removeClass('on');
 			$(this).next().val(0);
+			$(this).prop("src", "public/css/images/chkbox_default.png");
+		} else {
+			$(this).addClass('on');
+			$(this).next().val(1);
+			$(this).prop("src", "public/css/images/chkbox_btn.png");
 		}
 	});
 
-	$("#column").on("click",".p_key.checkbox",function() {
-		$(".p_key").not($(this)).prop('checked', false).next().val(0);
-	});
-	
 	var schemaArray = [];
 	var $schema = $("#schemaList");
 	
@@ -100,7 +90,16 @@
 		}
 	
 	schemaList($schema);
-
+	
+	$(".f_key").click(function(){
+		$("#fKeyPop, #popupBG").fadeIn();
+	});
+	$("#fKeyPop button").click(function(e){
+		e.preventDefault();
+		$("#fKeyPop, #popupBG").fadeOut();
+	});
+	
+	
 	$("#column").on("click",".f_key.checkbox",function() {
 						var $sch = $(this).siblings(".f_schema").css(
 								"display", "block");
@@ -351,35 +350,41 @@
 		var lengthParent = $(this).parent().next();
 		var length = lengthParent.children(".length");
 		var typeInd = $(this).children("option:selected").index();
-		//console.log(typeInd);
-		if (typeInd >= 30 && typeInd < type.length) {//length로 전송(numeric 외 length가 필요한 경우.)
-			length.eq(0).prop("disabled", false).css("width", 100);
+		var numericInd = $(".type").find('option').length-2;
+		console.log(typeInd == numericInd);
+		
+		if (typeInd >= 61 && $(this).children("option:selected").is(":even")) {//length로 전송(numeric 외 length가 필요한 경우.)
+			length.parents("#column").width(1400);
+			length.eq(0).prop("disabled", false).css("width", 83);
 			length.eq(1).prop({
 				"type" : "hidden",
 				"disabled" : true
 			});
-
-		} else if (typeInd == type.length) {//numeric
-			lengthParent.width(104);
+			length.closest('td').width(87);
+		} else if (typeInd == numericInd) {//numeric
+			length.parents("#column").width(1430);
+			length.closest('td').width(200);
 			length.prop({
 				"type" : "text",
 				"disabled" : false
-			}).css("width", "48px");
+			}).css("width", 83);
 			length.eq(0).css("float", "left");
 			length.eq(1).css("float", "right");
 
 		} else {//length 필요 없는 경우 - length2전송
+			length.parents("#column").width(1400);
 			length.eq(0).prop({
 				"disabled" : true,
 				"value" : ""
-			}).css("width", 100);
+			}).css("width", 83);
 			length.eq(1).prop({
 				"type" : "hidden",
 				"disabled" : false
 			});
-			if (typeInd == 1 && typeInd == 23) {
+			if (typeInd == 1 && typeInd == 77) {
 				lengthParent.prev().find(".array").prop("disabled", true);
 			}
+			length.closest('td').width(87);
 		}
 
 		$(this).next().children('option:first').prop('selected', true);
@@ -410,3 +415,4 @@
 					length.eq(1).css("float", "right");
 				}
 			});
+	

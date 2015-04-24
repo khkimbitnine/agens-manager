@@ -4,16 +4,15 @@
 		});
 		
 		//tab z-index
-		var zIndex;
+		var zInd;
 		
 		//tab클릭preventdefault 
 		$(".tab").click(function() {
+			zInd = parseInt($(this).css("z-index")) + 1;
 			
-			zIndex = parseInt($(this).css("z-index")) + 1;
-			$(this).css({
-				"z-index" : zIndex
-			});
+			$(this).css("z-index", zInd);
 			//console.log($(this).css("z-index"));
+			
 		});
 
 
@@ -59,9 +58,8 @@
 				}else{
 					$(this).addClass("on").css("color", "rgb(6,201,229)");
 					$(".label").not($(this)).removeClass("on").css("color", "#fff");
-					
-					if(!$(".label").not($(this)).siblings('ul').is(":hidden")){
-						$(".label").not($(this)).siblings('ul').slideToggle().find(".object").removeClass("on").css({"background": "rgb(36,39,45)","color": "#fff", "font-weight":"normal"});
+					if(!$(".label").not($(this)).next().is(":hidden")){
+						$(".label").not($(this)).next().slideToggle().find(".object").removeClass("on").css({"background": "rgb(36,39,45)","color": "#fff", "font-weight":"normal"});
 					}
 				}
 		})
@@ -122,10 +120,8 @@
 		toolMenuSubUl.on("click", ".object", function(e){
 			e.preventDefault();
 			var $this = $(this);
-			if($this.hasClass("on")){
-				$this.removeClass("on").css({"color": "#fff", "font-weight":"normal", "background":"rgb(36,39,45)"});
-			}else{
-				$this.addClass("on").css({"background":"#fff","color":"rgb(30,109,170)", "font-weight":"bold"});
+			if(!$this.hasClass("on")){
+				$this.addClass("on").css({"background":"#eee","color":"rgb(30,109,170)", "font-weight":"bold"});
 				$(".object").not($this).removeClass("on").css({"background": "rgb(36,39,45)","color": "#fff", "font-weight":"normal"});
 			}
 		});

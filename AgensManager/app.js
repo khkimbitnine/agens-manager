@@ -54,7 +54,7 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 		var arrDB = [];
 		client.query('select datname from pg_database WHERE datistemplate=\'f\';', function(err, result){
 			if(err){
-				//console.log(err)
+				//console.log(err);
 			}else{
 				arrDB = [];
 				for(var i=0; i < result.rows.length; i++){
@@ -111,7 +111,7 @@ app.post('/logout', function(request, response){
 
 //4) readFile 경로
 app.get('/', function (req, res){
-var prevDatabase
+var prevDatabase;
 	appCnt++;
 	console.log(appCnt);
 	//console.log(req.session);
