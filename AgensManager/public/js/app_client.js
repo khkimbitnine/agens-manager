@@ -249,7 +249,6 @@
 				$this.next().remove();
 				expand($this);
 			} else {
-				console.log("expandable");
 				collapse($this);
 				//스키마 출력 함수 호출
 				//스키마 수신
@@ -316,12 +315,11 @@
 
 		//테이블 출력 함수 (scname = 스키마 이름)
 		function tabname_emit(scname, $parent) {
-
 			//스키마 이름 전송
 			socket.emit('set_scname_table', scname);
 
 			//테이블 수신
-			socket.on('tabname', function(data) {
+			socket.once('tabname', function(data) {
 
 				if (data.table.length !== 0) {
 
@@ -329,24 +327,23 @@
 							$parent);
 
 					//테이블 배열 생성 함수 호출
-					tab_name(data);
+					for (var i = 0; i < data.table.length; i++) {
+						$(
+								"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='table'>"
+										+ data.table[i] + "</span></li>").appendTo(
+								$parent.children(".tableUl"));
+					}
 
 				}
+				socket.removeListener('tabname');
 			});
 			//테이블 배열 생성 함수 (data = 테이블 데이터)
 			function tab_name(data) {
 
-				//console.log(data);
-				for (var i = 0; i < data.table.length; i++) {
-					//console.log(data.table[i]);
-					$(
-							"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='table'>"
-									+ data.table[i] + "</span></li>").appendTo(
-							$parent.children(".tableUl"));
-				}
+
 
 				//테이블 수신 이벤트 리스너 해제
-				socket.removeListener('tabname');
+			
 			}
 		}
 

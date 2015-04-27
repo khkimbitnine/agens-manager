@@ -18,10 +18,10 @@ var login_user = require('./login_user');
 var sessions = require("client-sessions");
 
 //1) connectedDb
-var sourcePath = "C:/Users/Johnahkim/workspace/test/public";
-//var sourcePath = "C:/Users/user/git/agensmanager/AgensManager/public";
-var fpath = "C:/Users/Johnahkim/workspace/test/";
-//var fpath = "C:/Users/user/git/agensmanager/AgensManager/";
+//var sourcePath = "C:/Users/Johnahkim/workspace/test/public";
+var sourcePath = "C:/Users/user/git/AgensManager/agens-manager/AgensManager/public";
+//var fpath = "C:/Users/Johnahkim/workspace/test/";
+var fpath = "C:/Users/user/git/AgensManager/agens-manager/AgensManager/";
 
 //2) constring (postgres://username:password@localhost/database)
 
@@ -38,23 +38,16 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 	var io = require('socket.io').listen(server);
 	// socket.io 선언
 	console.log('server listening on 3000');
-	
 	var conString = "postgres://postgres:1111@localhost/postgres";
 	
 	pg.defaults.poolSize = 25;
 	
 	io.on('connection', function(socket){
-		pg.defaults.database='postgres'
-		pg.connect(function(err, client, done){
-			var handleError = function(err) {
-				// no error occurred, continue with the request
-				if(!err) {
-					return false;
-				}
-	
-				done(client);
-				return true;
-			};
+		var client = new pg.Client(conString);
+		client.connect(function(err){
+			if(err){
+				console.error('couldnt connect','err');
+			}
 			var arrDB = [];
 			client.query('select datname from pg_database WHERE datistemplate=\'f\';', function(err, result){
 				if(err){
@@ -65,67 +58,48 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 						arrDB.push(result.rows[i].datname);
 					}
 					socket.emit('db', {db: arrDB});
-					done(client);
 				}
 				
 			});	
 		});
-	
-	});
-	
-	io.on('connection', function(socket){
-		
+
 		socket.on('set_dbname', function (dbname){
-			
-			pg.connect("postgres://postgres:1111@localhost/"+dbname, function(err, client2, done){
-				var handleError= function(err){
-					if(!err){
-						return false;
-					}
-					console.log("db connection error");
-					done(client);
-					return true;
-				}
-				
-				arrSch = [];
-				
-					client2.query('select schema_name from information_schema.schemata where schema_name not like \'pg_%\' and schema_name <> \'information_schema\'', function(err, rs){
-						if(err){
-							console.log("set_dbname err: "+err);
-						}else{
-								for(var j=0; j < rs.rows.length; j++){
-									arrSch.push(rs.rows[j].schema_name);
-								}
-								socket.emit('scname', {schema: arrSch});
-								socket.once('set_scname_table', function (scname){
-									arrTab = [];
-									//get table list
-									client2.query('SELECT current_database()', function(err, trs){
-										if(err){
-											console.log("set_scname_table err: "+err)
-										}else{
-											console.log("current database: "+trs.rows[0].current_database);
-										}
-									});
-						});
-								object_tree.subtree(socket, client2, dbname, done);
-								create_table.create_table(socket, client2, dbname, done);
-								create_index.create_index(socket, client2, done);
-								create_schema.create_schema(socket, client2, done);
-								create_view.create_view(socket, client2, done);
-								create_function.create_function(socket, client2, done);
-								create_trigger.create_trigger(socket, client2, done);
+			client.end();
+				pg.connect("postgres://postgres:1111@localhost/"+dbname, function(err, client2, done){
+					var handleError= function(err){
+						if(!err){
+							return false;
 						}
-
-					}); 
+						console.log("db connection error");
+						done(client2);
+						return true;
+					}
 					
+					arrSch = [];
+					
+						client2.query('select schema_name from information_schema.schemata where schema_name not like \'pg_%\' and schema_name <> \'information_schema\'', function(err, rs){
+							if(err){
+								console.log("set_dbname err: "+err);
+							}else{
+									for(var j=0; j < rs.rows.length; j++){
+										arrSch.push(rs.rows[j].schema_name);
+									}
+									socket.emit('scname', {schema: arrSch});
+										//get table list
+									object_tree.subtree(socket, client2, dbname, done);
+									create_table.create_table(socket, client2, dbname, done);
+									create_index.create_index(socket, client2, done);
+									create_schema.create_schema(socket, client2, done);
+									create_view.create_view(socket, client2, done);
+									create_function.create_function(socket, client2, done);
+									create_trigger.create_trigger(socket, client2, done);
+							}
 
-				});
+						}); 
+						
 
-			
+					});
 		});
-		
-
 	});
 });
 

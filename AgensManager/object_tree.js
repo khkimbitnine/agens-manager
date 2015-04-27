@@ -64,18 +64,17 @@ function selectInd(irs){
 }
 
 exports.subtree = function(socket, client, connectedDb, done){
-
 	//스키마 테이블 클릭, 테이블 전송
 	socket.on('set_scname_table', function (scname){
 				arrTab = [];
 				//get table list
-				client.query('SELECT current_database()', function(err, trs){
+				client.query('SELECT DISTINCT(table_name) FROM information_schema.tables WHERE table_schema = \''+scname+'\' AND table_type = \'BASE TABLE\' ORDER BY table_name ASC;', function(err, trs){
 					if(err){
 						console.log("set_scname_table err: "+err)
-					}else{
-						console.log("current database: "+trs.rows[0].current_database);
 					}
-//					done();
+					selectTb(trs);
+					socket.emit('tabname', {table: arrTab});
+					
 				});
 				
 //				client.query('SELECT DISTINCT(table_name) FROM information_schema.tables WHERE table_schema = \''+scname+'\' AND table_type = \'BASE TABLE\' ORDER BY table_name ASC;', function(err, trs){

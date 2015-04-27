@@ -10,7 +10,6 @@ exports.create_schema = function(socket, client, done){
 				}
 				socket.emit("get_role", roles);
 			}
-			done();
 		});
 		
 		socket.on('schema_form', function(data){
@@ -30,7 +29,6 @@ exports.create_schema = function(socket, client, done){
 					console.log(query);
 					console.log("Schema created.")
 				}
-				done();
 			});
 		});
 }
