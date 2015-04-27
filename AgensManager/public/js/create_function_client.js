@@ -132,6 +132,7 @@ socket.connect();
 	});
 	
 	function row2append(argInd){
+		console.log("row2append")
 		var $li = $("<li>").appendTo($row2Ul);
 		
 		$li.append(argmode+argname+argtype);
@@ -153,7 +154,7 @@ socket.connect();
 
 	}
 	
-	socket.on('schemas', function(schema){
+	socket.once('schemas', function(schema){
 		if(schemas.length ==0){
 			for(var i = 0 ; i < schema.length ; i++){
 				schemas[i] = schema[i];

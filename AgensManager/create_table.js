@@ -9,7 +9,6 @@ exports.create_table = function(socket, client, connectedDb, done){
 				if(rs){
 					for(var j=0; j < rs.rows.length; j++){
 						arrSch.push(rs.rows[j].schema_name);
-						console.log(arrSch);
 						socket.emit('scname_table', arrSch);
 					}
 				}				
@@ -34,7 +33,6 @@ exports.create_table = function(socket, client, connectedDb, done){
 		for(var i = 2 ; i < formdata.length-1; i++){
 			column[i-2] = formdata[i].value;
 		}
-		console.log(schema+","+name+","+comment);
 		//create Table
 		var createTable = "CREATE TABLE "+schema+"."+name+"(";
 		for(var i = 0 ; i < (column.length)/interval ; i++){// row index
@@ -64,7 +62,7 @@ exports.create_table = function(socket, client, connectedDb, done){
 			fk = row[7];
 			chk = row[8];
 			cmt = row[9];
-			console.log(column);
+			
 			if(length.length!== 0){
 				length = "("+length+")";
 			}
@@ -131,82 +129,17 @@ exports.create_table = function(socket, client, connectedDb, done){
 		});
 	});
 	
-	var search_type =
-	["int", "int", "bool", "box", "bytea", "cidr",
-		"circle", "date", "float", "inet", "int", "json",
-		"line", "lseg", "macaddr", "money", "path", "point", "polygon",
-		"float", "int", "int", "int", "text", "tsquery",
-		"tsvector", "txid_snapshot", "uuid", "xml", "bit", "bit",
-		"char", "char", "interval", "time",
-		"timetz", "timestamp", "timestamptz",
-		"numeric"];
+	var table = [];
 	
-
-	socket.on('f_check', function(data){
-		var isunique=false;
-		var sameType = false;
-		var schema = data.schema;
-		var table = data.table;
-		var column = data.column;
-		var typeInd = data.typeInd;
-		var array = data.array;
-		
-		console.log("schema: "+schema)
-		console.log("table: "+table)
-		console.log("column: "+column)
-		console.log("typeInd: "+typeInd)
-		console.log("array: "+array)
-		var type_query = "";
-		var atttypid;
-		var attname;
-		var unique_query = "select attname from (select indexrelid from (select rtrim(substr(relname, 10), ' index') id from (select reltoastrelid from pg_class, (select oid from pg_namespace where nspname='"+schema+"') n	where relname = '"+table+"' and relnamespace = n.oid) r, pg_class c where c.relfilenode = r.reltoastrelid) p, (select cast(indrelid as text) id, indexrelid, indisunique from pg_index) i where i.id=p.id and indisunique = true) pp, pg_attribute a where a.attrelid = pp.indexrelid";
-		
-		var equal;
-		if(array){
-			equal = "=";
+	client.query('SELECT DISTINCT(table_name) FROM information_schema.tables', function(err, rs){
+		if(err){
+			console.log('table err: '+err)
 		}else{
-			equal = "<>";
-		}
-		type_query = "select column_name from information_schema.columns where table_schema='"+schema+"' and table_name='"+table+"' and data_type"+equal+"'ARRAY' and udt_name like '%"+search_type[typeInd -1]+"%';";
-		
-		client.query(unique_query, function(err, rs){
-			if(err){
-				console.log(err);
-			}else{
-				for(var i=0; i < rs.rows.length; i++){
-					//console.log("column:"+column +", rs.rows[i].attname: " +rs.rows[i].attname)
-					if(column == rs.rows[i].attname) {
-						isunique = true;
-						attname = rs.rows[i].attname;
-					}
-				}
-				//console.log("isunique "+isunique)
-				
-				if(isunique){
-					dataCheck(attname);	
-				}else{
-					socket.emit('f_checked', {isunique:false, sameType:false});	
-				}
+			for(var i = 0 ; i < rs.rows.length ; i++){
+				table[i] = rs.rows[i].table_name;
 			}
-			done();
-		});
-		
-		
-		function dataCheck(attname){
-				client.query(type_query, function(err, rs){
-					if(err){
-						console.log(err);
-					}else{
-							for(var i = 0 ; i < rs.rows.length ; i++){
-								if(attname == rs.rows[i].column_name){
-									sameType = true;
-								}
-							}
-						}
-						//console.log("sameType "+sameType)
-						socket.emit('f_checked', {isunique:true, sameType:sameType});
-						done();
-					});
+			socket.emit('table', table);
 		}
+
 	});
 }

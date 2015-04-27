@@ -46,22 +46,19 @@
 			</li>
 		</ul>
 		<div id="fKeyPop">
-			<span>FOREIGN KEY</span> 
+			<span id="fTitle">FOREIGN KEY</span> 
+			<span id="selectedCol"></span>
+			<span id="fKeyInd" style="display:none"></span>
 			<div>
-				<span>Select column</span>
-				<select id="fChosen">
+				<label for="fSchema">Schema</label> <select id="fSchema" class="pop">
 				</select>
 			</div>
 			<div>
-				<label for="fSchema">Schema</label> <select id="fSchema">
+				<label for="fTable">Table</label> <select id="fTable" class="pop">
 				</select>
 			</div>
 			<div>
-				<label for="fTable">Table</label> <select id="fTable">
-				</select>
-			</div>
-			<div>
-				<label for="fColumn">Column</label> <select id="fColumn">
+				<label for="fColumn">Column</label> <select id="fColumn" class="pop">
 				</select>
 			</div>
 			<div id="fBtnBox">

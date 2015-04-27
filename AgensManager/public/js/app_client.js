@@ -188,7 +188,6 @@
 	             	url:"create_function.html",
 	             	success:function(data){
 	             		$content.html(data);
-	             		
 	              } 
 	        	}); 
 			}
@@ -215,7 +214,7 @@
 		var db;
 		var username;
 		//========= db 트리 생성				
-		//db 클릭, 스키마 전송.
+		//db 목록.
 		socket.once('db', function(data) {
 			db = data.db;
 			for (var i = 0; i < db.length; i++) {
@@ -244,63 +243,40 @@
 		$browser.on("click", ".db", function() {
 			var $this = $(this);//db
 			var dbname = $this.text();//db 이름
-
+			socket.emit('set_dbname', dbname);
+			
 			if ($this.parent().hasClass("collapsable")) {
 				$this.next().remove();
 				expand($this);
 			} else {
+				console.log("expandable");
 				collapse($this);
-
 				//스키마 출력 함수 호출
-				schname_emit(dbname, $this);
+				//스키마 수신
+				var schema = [];
+				socket.once('scname', function(data) {//이벤트 리스너 해제를 확실히 하기 위해서, once 메서드(한번만 리스너 실행)를 씀(이유모름. 다른 리스너들은 on을 써도 작동됨.) 
+					
+						//스키마 배열 생성 함수 호출
+						$("<ul style='display: block;' class='sch'>").insertAfter($this);
+
+						for (var i = 0; i < data.schema.length; i++) {
+							schema[i] = data.schema[i];
+							$("<li class='"+exp+"'><div class='"+expHit+"'></div><span class='schema'>"
+									+ data.schema[i] + "</span></li>").appendTo($this.next());
+						}
+
+						//스키마 수신 이벤트 리스너 해제
+						socket.removeListener('scname');
+				});
+
+				//스키마 배열 생성 함수(data = 스키마 데이터)
+				function sch_name(data, $this) {
+
+
+				}
 			}
 		});
-		var schema = [];
-//		$.ajax({
-//			method:"POST"
-//		})
 		
-//		socket.emit('set_dbname', )
-		//스키마 출력 함수
-		function schname_emit(dbname, $this) {
-//			$.ajax({
-//				method:"POST",
-//				url:"http://localhost:3000/db",
-//				data:{database:dbname}
-//			}).done(function(msg){
-//				location.href='/';
-//			});
-//			 $.post("http://localhost:3000/db",{database:dbname},function(data){        
-//				 //location.href='/';
-//					//db이름 전송
-//				 
-//		        });
-			socket.emit('set_dbname', dbname);
-			//스키마 수신
-			socket.once('scname', function(data) {//이벤트 리스너 해제를 확실히 하기 위해서, once 메서드(한번만 리스너 실행)를 씀(이유모름. 다른 리스너들은 on을 써도 작동됨.) 
-
-			if (data.schema != 0) {//접속한 db와 dbname이 일치하지 않을 때 0으로 리턴되면 실행하지 않음.
-
-				//스키마 배열 생성 함수 호출
-				$("<ul style='display: block;' class='sch'>").insertAfter($this);
-
-				for (var i = 0; i < data.schema.length; i++) {
-					schema[i] = data.schema[i];
-					$("<li class='"+exp+"'><div class='"+expHit+"'></div><span class='schema'>"
-							+ data.schema[i] + "</span></li>").appendTo($this.next());
-				}
-			
-					//스키마 수신 이벤트 리스너 해제
-					socket.removeListener('scname');
-				}
-			});
-
-			//스키마 배열 생성 함수(data = 스키마 데이터)
-			function sch_name(data, $this) {
-
-
-			}
-		}
 
 		//========= 스키마 클릭, 테이블/뷰/함수(이름만) 생성
 

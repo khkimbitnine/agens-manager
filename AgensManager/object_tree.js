@@ -16,141 +16,103 @@ var result, rs, trs, vrs, frs, crs, consrs, irs  = null;
 //selectDb function
 
 //selectSc function
-function selectSc(err, rs){
-	if(rs){
+function selectSc(rs){
 		for(var j=0; j < rs.rows.length; j++){
 			arrSch.push(rs.rows[j].schema_name);
 		}
-	}
-	//console.log("arrSch: "+arrSch);
 }
 
 //selectTb function
-function selectTb(err, trs){
+function selectTb(trs){
 	for(var k=0; k < trs.rows.length; k++){
 		arrTab.push(trs.rows[k].table_name);
 	}
-	//console.log("arrTab: "+arrTab.length);
 }
 
 //selectVw function
-function selectVw(err, vrs){
+function selectVw(vrs){
 	for(var k=0; k < vrs.rows.length; k++){
 		arrView.push(vrs.rows[k].table_name);
 	}
-	//console.log("arrView: "+arrView.length);
 }
 
 //selectFc function
-function selectFc(err, frs){
+function selectFc(frs){
 	for(var k=0; k < frs.rows.length; k++){
 		arrFunc.push(frs.rows[k].proname);
 	}
-	//console.log("arrFunc: "+arrFunc.length);
 }
 
 //selectCol function
-function selectCol(err, crs){
+function selectCol(crs){
 	for(var l=0; l < crs.rows.length; l++){
 		arrCol.push(crs.rows[l].column_name);
 	}
-	//console.log("arrCol: "+arrCol.length);
 }
 
 //selectCons function
-function selectCons(err, consrs){
+function selectCons(consrs){
 	for(var l=0; l < consrs.rows.length; l++){
 		arrCons.push(consrs.rows[l].constraint_name);
 	}
-	//console.log("arrCons: "+arrCons.length);
 }
 //selectInd function
-function selectInd(err, irs){
+function selectInd(irs){
 	for(var l=0; l < irs.rows.length; l++){
 		arrInd.push(irs.rows[l].relname);
 	}
-	//console.log("arrInd: "+arrInd.length);
-}
-
-exports.db = function(client, done){
-
-	//db 쿼리
-//	client.query('select datname from pg_database WHERE datistemplate=\'f\';', function(err, result){
-//		if(err){
-//			//console.log(err)
-//		}else{
-//			arrDB = [];
-//			for(var i=0; i < result.rows.length; i++){
-//				arrDB.push(result.rows[i].datname);
-//			}
-//			//console.log(arrDB);
-//			//db 전송
-//		}
-////		done();
-//	});	
-	
 }
 
 exports.subtree = function(socket, client, connectedDb, done){
-	socket.on('set_dbname', function (dbname){
-		if(dbname === connectedDb){
-//			console.log("dbname: connected =>   "+dbname+" : "+connectedDb);
-			//arrSch 비우기
-			arrSch = [];
-//			client.query('select current_user', function(err, rs){
-//				console.log("current user: "+rs.rows[0].current_user);
-//			});
-			//스키마 쿼리
-			client.query('select schema_name from information_schema.schemata where schema_name not like \'pg_%\' and schema_name <> \'information_schema\'', function(err, rs){
-				selectSc(err, rs);
-				socket.emit('scname', {schema: arrSch});
-//				done();
-			}); 
-		} else {//접속한 db와 dbname이 일치하지 않으면, 0을 리턴(편의상)
-			socket.emit('scname', {schema: 0});
-		}
-	});
-	
+
 	//스키마 테이블 클릭, 테이블 전송
 	socket.on('set_scname_table', function (scname){
-		for(var i = 0 ; i < arrSch.length ; i++){
-			if(arrSch[i] === scname){
 				arrTab = [];
 				//get table list
-				client.query('SELECT DISTINCT(table_name) FROM information_schema.tables WHERE table_schema = \''+scname+'\' AND table_type = \'BASE TABLE\' ORDER BY table_name ASC;', function(err, trs){
-					selectTb(err, trs);
-					socket.emit('tabname', {table: arrTab});
-					//console.log(arrTab);
+				client.query('SELECT current_database()', function(err, trs){
+					if(err){
+						console.log("set_scname_table err: "+err)
+					}else{
+						console.log("current database: "+trs.rows[0].current_database);
+					}
 //					done();
 				});
-			}
-		}
+				
+//				client.query('SELECT DISTINCT(table_name) FROM information_schema.tables WHERE table_schema = \''+scname+'\' AND table_type = \'BASE TABLE\' ORDER BY table_name ASC;', function(err, trs){
+//					if(err){
+//						console.log("set_scname_table err: "+err)
+//					}else{
+//						selectTb(trs);
+//						socket.emit('tabname', {table: arrTab});
+//					}
+////					done();
+//				});
 	});
 
 	//스키마 뷰 클릭, 뷰 전송
 	socket.on('set_scname_view', function (scname){
-		for(var i = 0 ; i < arrSch.length ; i++){
-			if(arrSch[i] === scname){
 				arrView = [];
 				//get view list
 				client.query('SELECT DISTINCT(table_name) FROM information_schema.views WHERE table_schema = \''+scname+'\' ORDER BY table_name ASC;', function(err, vrs){
-					selectVw(err, vrs);
-					socket.emit('viewname', {view: arrView});
-					//console.log(arrView);
-//					done();
+					if(err){
+						console.log("set_scname_view err: "+err);
+					}else{
+						selectVw(vrs);
+						socket.emit('viewname', {view: arrView});
+					}
 				});
-			}
-		}
 	});
 	//스키마 함수 클릭, 함수 전송
 	socket.on('set_scname_func', function (scname){
 		arrFunc = [];
 		//get function list
 		client.query('select proname from pg_proc inner join pg_namespace ns on (pg_proc.pronamespace = ns.oid) where ns.nspname = \''+scname+'\' order by proname;', function(err, frs){
-			selectFc(err, frs);
-			socket.emit('funcname', {func: arrFunc});
-			//console.log(arrFunc);
-//			done();
+			if(err){
+				console.log("set_scname_func err: "+err)
+			}else{
+				selectFc(frs);
+				socket.emit('funcname', {func: arrFunc});
+			}
 		});
 	});
 
@@ -160,10 +122,12 @@ exports.subtree = function(socket, client, connectedDb, done){
 		arrCol = [];
 		//get column list
 		client.query('SELECT column_name FROM information_schema.columns WHERE table_schema=\''+data.scname+'\' and table_name =\''+data.tabname+'\' order by column_name;', function(err, crs){
-			selectCol(err, crs);
-			socket.emit('colname', {column: arrCol});
-			//console.log(arrCol);
-//			done();
+			if(err){
+				console.log('set_tabname_col err: '+err)
+			}else{
+				selectCol(crs);
+				socket.emit('colname', {column: arrCol});
+			}
 		});
 	});
 
@@ -172,9 +136,12 @@ exports.subtree = function(socket, client, connectedDb, done){
 		arrCons = [];
 		//get constraint list
 		client.query('select constraint_name from information_schema.constraint_column_usage where table_schema=\''+data.scname+'\' and table_name=\''+data.tabname+'\' order by constraint_name;', function(err, consrs){
-			selectCons(err, consrs);
-			socket.emit('consname', {constraint: arrCons});
-			//console.log(arrCons);
+			if(err){
+				console.log('set_tabname_cons err: '+err)
+			}else{
+				selectCons(consrs);
+				socket.emit('consname', {constraint: arrCons});
+			}
 		});
 	});
 
@@ -183,10 +150,12 @@ exports.subtree = function(socket, client, connectedDb, done){
 		arrInd = [];
 		//get index list
 		client.query('select relname from pg_class c, pg_index i, (select distinct(relfilenode) from pg_class, (select oid from pg_namespace where nspname = \''+data.scname+'\') s where relname = \''+data.tabname+'\' and relnamespace=s.oid) t where c.relkind = \'i\' and i.indexrelid = c.oid and i.indrelid = t.relfilenode and c.oid NOT IN (select conindid from pg_constraint);', function(err, irs){
-			selectInd(err, irs);
-			socket.emit('indname', {index: arrInd});
-			//console.log(arrInd);
-//			done();
+			if(err){
+				console.log("set_tabname_ind err: "+err)
+			}else{
+				selectInd(irs);
+				socket.emit('indname', {index: arrInd});
+			}
 		});
 	});
 

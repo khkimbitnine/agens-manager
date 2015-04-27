@@ -26,8 +26,7 @@
 			+ '</td>'
 			+ '<td><input type="text" name="de_fault" class="default" value=""/></td>'
 			+ '<td>'
-			+ '<input type="text" class="f_key" readonly/>'
-			+ '<input type="hidden" name="f_key" value="0" />'
+			+ '<input type="text" name="f_key" class="f_key" value="" readonly/>'
 			+ '</td>'
 			+ '<td><input type="text" name="check" class="check" value=""/></td>'
 			+ '</tr>';
@@ -91,165 +90,100 @@
 	
 	schemaList($schema);
 	
-	$(".f_key").click(function(){
-		$("#fKeyPop, #popupBG").fadeIn();
-	});
-	$("#fKeyPop button").click(function(e){
-		e.preventDefault();
-		$("#fKeyPop, #popupBG").fadeOut();
+	
+	$("#column").on("click", ".f_key",function(){
+		
+		var trInd = $(this).closest('tr').index(); 
+		var rowInd = trInd - 1;
+		
+		if($("tr").eq(trInd).find('.type>option:selected').index() == 0){
+				alert("Please select type before foreign key.");
+		}else{
+
+			$(".pop").empty();
+			$("#fKeyPop, #popupBG").fadeIn();
+			$("#fKeyInd").text(rowInd);		
+			var $fSchema = $("#fSchema");
+
+			
+			for(var i = 0 ; i < $schema.find("option").length; i++){
+				$fSchema.append("<option value = '"+$schema.find("option").eq(i).val()+"'>"+$schema.find('option').eq(i).val()+"</option>");
+			}
+			
+			$("#selectedCol").text($(this).val());
+		}
+		
 	});
 	
-	
-	$("#column").on("click",".f_key.checkbox",function() {
-						var $sch = $(this).siblings(".f_schema").css(
-								"display", "block");
-						if ($(this).is(":checked")) {
-							$(".u_key, .p_key, .not_null").prop('disabled', true);
-							console.log($schema.find("option").length);
-							for(var i = 0 ; i < $schema.find("option").length; i++){
-								$sch.append("<option value = '"+$schema.find("option").eq(i).val()+"'>"+$schema.find('option').eq(i).val()+"</option>");
-							}
-						} else {
-
-							$(this).parent().find("select").empty().hide();
-						}
-					});
-
-	$("#column").on("click", ".constraint.checkbox", function() {
-		var c = $(this).parent().find(".c")
-
-		if (c.hasClass('on')) {
-			c.hide().removeClass("on notValid");
-		} else {
-			c.show().addClass("on");
+	$("#fSchema").click(function(){
+		
+		if($(this).find('option:selected').index()>=0){
+			$("#fTable").empty();
+			socket.emit('set_scname_table', $(this).find("option:selected").text());
+			socket.on('tabname', function(data) {
+				$("#fTable").append('<option>');
+				$.each(data.table, function(i) {
+					console.log(data.table[i]);
+					$("#fTable").append("<option value='"+data.table[i]+"'>"+ data.table[i] + "</option>");
+				});
+				socket.removeListener('tabname');
+			});
 		}
 	});
-
-	$(".c").change(function() {
-		$(this).parent().find(".const").val($(this).val());
+	
+	$("#fTable").click(function(){
+		
+		if($(this).find('option:selected').index()>0){
+			$("#fColumn").empty();
+			socket.emit('set_tabname_col', {scname: $("#fSchema").find('option:selected').text(), tabname: $(this).find('option:selected').text()});
+			socket.on('colname', function(data){
+				$("#fColumn").append('<option>');
+				$.each(data.column, function(i){
+					$("#fColumn").append("<option value='"+data.column[i]+"'>"+ data.column[i] + "</option>")
+				});
+				socket.removeListener('colname');
+			});
+		}
 	});
-	var refschema;//f_key value
-	var reftable;
-	var refcolumn;
-
-	$("#column").on(
-			"click",
-			".f_schema",
-			function() {
-
-				refschema = $(this).find("option:selected").val();
-				var trInd = $(this).parent().parent().index();
-
-				if ($(this).find("option:selected").index() > 0) {
-					var table = $("#column tr").eq(trInd).find(".f_table")
-							.show();
-					table.empty();
-					table.append("<option>");
-
-					socket.emit('set_scname_table', $(this).find(
-							"option:selected").text());
-					socket.on('tabname', function(data) {
-						$.each(data.table, function(i) {
-							table.append("<option value='"+data.table[i]+"'>"
-									+ data.table[i] + "</option>");
-						});
-						socket.removeListener('tabname');
-					});
-				}
-
-			});
-
-	$("#column").on(
-			"click",
-			".f_table",
-			function() {
-
-				reftable = $(this).find("option:selected").val();
-				$(this).parent().find(".f_key").next().val(reftable);
-
-				var trInd = $(this).parent().parent().index();
-
-				if ($(this).find("option:selected").index() > 0) {
-					var column = $("#column tr").eq(trInd).find(".f_column")
-							.show();
-					column.empty();
-					column.append("<option>");
-
-					socket.emit('set_tabname_col', {
-						tabname : $(this).find("option:selected").text(),
-						scname : $(this).prev().find("option:selected").text()
-					});
-					socket.on('colname', function(data) {
-						$.each(data.column, function(i) {
-							column.append("<option value='"+data.column[i]+"'>"
-									+ data.column[i] + "</option>");
-						});
-						socket.removeListener('colname');
-					});
-				}
-
-			});
-	$("#column")
-			.on(
-					"click",
-					".f_column",
-					function() {
-						var $this = $(this);
-						if($this.find("option:selected").index()>0){
-								var tr = $this.parent().parent().index();
-								
-								var dataType = $this.parent().parent().find(".type")
-										.find("option:selected"); //to match & compare datatype
-								var i = $this.find("option:selected").index();
-								var $f_key = $this.parent().find(".f_key").next(); //f_key input value to change
+	
+	$("#fBtnBox button:eq(0)").click(function(e){//ok button
+		e.preventDefault();
 		
-								if (dataType.index() == 0){
-									alert("Please select type");
-									$this.find("option:eq(0)").prop('selected', true);	
-								}
+		var fKeyInd = $("#fKeyInd").text();
+		var trInd = fKeyInd + 1;
 		
-								if (dataType.index() > 0 && i > 0) {
-									reftable = $this.parent().find(".f_table").find('option:selected').val();
-									refcolumn = $this.find("option:selected").val();
+		var schema = $("#fSchema").find('option:selected').val();
+		var table = $("#fTable").find('option:selected').val();
+		var column = $("#fColumn").find('option:selected').val();
 		
-									var emit = socket.emit('f_check', {
-										schema : refschema,
-										table : reftable,
-										column : refcolumn,
-										typeInd : dataType.index()
-									});
-									
-									//console.log(emit);
-									
-									socket.once('f_checked', function(data) {
-										var isunique = data.isunique;
-										var sameType = data.sameType;
-										if(!isunique){
-											alert("There is no unique constraint matching '"+refcolumn+"' for referenced table '"
-													+ reftable + "'");
-											$this.find("option:eq(0)").prop('selected', true);
-										}else if(isunique && !sameType){
-											alert(refcolumn
-													+ "'s dataType and "+dataType.val()+" are incompatible types.");
-											$this.find("option:eq(0)").prop('selected', true);	
-										}else{
-											$f_key.val(reftable + " ("
-													+ refcolumn + ")");
-											console.log("foreign key added");
-										}
-									});
-								}
-						}
-					});
+		$("#fKeyPop, #popupBG").fadeOut();
+		$(".f_key").eq(fKeyInd).val(schema+"."+table+"("+column+")");
+		
+	});
 	
 
-
-	var trLth;
+	
+	$("#fBtnBox button:eq(1)").click(function(e){
+		e.preventDefault();
+		$("#fKeyPop, #popupBG").fadeOut();
+		
+	});
+	
+	
 
 	$("#submitBtn").click(function(e) {
 		e.preventDefault();
 		console.log($("#tableForm").serializeArray());
-		validCheck();
+		var table = [];
+		socket.disconnect();
+		socket.connect();
+		socket.once('table', function(rs){
+			for(var i = 0 ; i < rs.length ; i ++){
+				table[i] = rs[i];
+			}
+			
+			validCheck(table);
+		})
 
 	});
 	$(".add").click(function(e) {
@@ -268,7 +202,7 @@
 		notValid.css("border", "2px solid red").addClass("notValid");
 	}
 
-	function validCheck() {
+	function validCheck(table) {
 		$(".notValid").removeClass("notValid").css({
 			"border" : "1px solid #aaa"
 		});//temp default border
@@ -277,11 +211,27 @@
 		var index = $("#column tr").length - 1;
 		var $schema = $("#schema");
 		var $name = $("#name");
+		if (!namePattern.test($name.val()) && !onePattern.test($name.val())){
+			notValid($name);
+		}
+		var dup = false;
+		if(namePattern.test($name.val()) || onePattern.test($name.val())){
+			
+			for(var i = 0 ; i < table.length ; i++){
+				if(table[i]== $name.val()){
+					dup = true;
+				}
+			}
+			
+			if(dup){
+				alert("Table name duplicated");
+				notValid($name);
+			}
+		}
 
 		if ($schema.children("option:selected").index() ==0)
 			notValid($schema);
-		if (!namePattern.test($name.val()) && !onePattern.test($name.val()))
-			notValid($name);
+
 
 		for (var i = 1; i <= index; i++) {
 			var $column = $columnTr.eq(i).find(".column_input")
@@ -331,6 +281,9 @@
 		//유효성 검사 - 통과하는 걸 어떻게 검사?1) notValid 클래스가 있는지 확인(실패)
 
 	}
+	
+
+	var trLth;
 
 	$("#column").on("click", ".remove", function(e) {//첫번째 컬럼 줄에는 remove가 없어야 함.
 		e.preventDefault();
@@ -390,29 +343,4 @@
 		$(this).next().children('option:first').prop('selected', true);
 	});
 
-	$("#tableForm").on(
-			"click",
-			"select.array",
-			function() {
-				var length = $(this).parent().next().children(".length");
-				var typeInd = $(this).prev().children("option:selected")
-						.index();
-				if ($(this).children('option:selected').val() == '[]') {
-					length.eq(0).prop("disabled", true).css("width", 100);
-					length.eq(1).prop("type", "hidden");
-				} else if (typeInd >= 30 && typeInd < type.length
-						&& $(this).children('option:selected').val() == '') {
-					length.eq(0).prop("disabled", false).css("width", 100);
-					length.eq(1).prop("type", "hidden");
-				} else if (typeInd == type.length
-						&& $(this).children('option:selected').val() == '') {
-					length.parent().width(104);
-					length.prop({
-						"type" : "text",
-						"disabled" : false
-					}).css("width", "48px");
-					length.eq(0).css("float", "left");
-					length.eq(1).css("float", "right");
-				}
-			});
 	
