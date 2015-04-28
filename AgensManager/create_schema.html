@@ -3,6 +3,7 @@
 		<h2>Create schema</h2>
 		<ul id="schema">
 			<li><span>Name</span><input type="text" name="name" id="name" /></li>
+			<li><span>Database</span><select id="database"></select></li>
 			<li><span>Owner</span><select name="owner" id="owner"></select></li>
 			<li><span>Comment</span>
 			<textarea name="comment" id="comment"></textarea></li>
@@ -12,17 +13,25 @@
 	<button id="cancelBtn">Cancel</button>
 </div>
 <script>
-	socket.disconnect();//소켓 연결이 안돼서 재연결
-	socket.connect();
 
-	socket.once("get_role", function(data) {
-		console.log(data);
-		for (var i = data.length - 1; i >= 0; i--) {
-			$("#owner").append(
-					'<option class="role" value="'+data[i]+'">' + data[i]
-							+ '</option>');
+	$("#database").append('<option>Select Database</option>');
+	for(var i = 0 ; i < $(".db").length ; i++){
+		$("#database").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
+	}
+	
+	$("#database").change(function(){
+		$("#owner").empty();
+		if($(this).find('option:selected').index()>0){
+			socket.emit('set_dbname', {dbname: $(this).find('option:selected').val(), to:'create_schema'});
+			socket.once("get_role", function(data) {
+				for (var i = data.length - 1; i >= 0; i--) {
+					$("#owner").append(
+							'<option class="role" value="'+data[i]+'">' + data[i]
+									+ '</option>');
+				}
+			});
 		}
-	});
+	})
 
 	var namePattern = /^[a-zA-Z_][a-zA-Z_\d]+$/;
 	var onePattern = /^[a-zA-Z_]+$/;//한글자일 경우

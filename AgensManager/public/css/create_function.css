@@ -90,3 +90,10 @@
 	right:0;
 	botton:0;
 }
+#langBox{
+	width:250px;
+	display:inline-block;
+}
+#dbBox{
+	display:inline-block;
+}

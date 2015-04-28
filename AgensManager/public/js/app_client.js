@@ -153,10 +153,6 @@
 	             		$content.html(data);
 	              } 
 	        	}); 
-		 		$.get('http://localhost:3000/database', function(database){
-					console.log("database: "+database);
-					socket.emit('set_dbname', database);
-		 		});
 			}
 			if(objectIndex == 1 && flag){//schema
 		 		$.ajax({
@@ -215,17 +211,11 @@
 		var username;
 		//========= db 트리 생성				
 		//db 목록.
-		socket.once('db', function(data) {
-			db = data.db;
+		socket.once('db', function(db) {
 			for (var i = 0; i < db.length; i++) {
-				$(
-						"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='db'>"
-						+ db[i] + "</span></li>").appendTo(
-								$browser);
+				$("<li class='"+exp+"'><div class='"+expHit+"'></div><span class='db'>"
+						+ db[i] + "</span></li>").appendTo($browser);
 			}
-//			$("#login").addClass('logout').text('log-out');
-//			username = data.username;
-//			$("#user").text(username+" | ");
 		});
 
 		//expandable/ collapsable 함수
@@ -246,6 +236,7 @@
 			socket.emit('set_dbname', dbname);
 			
 			if ($this.parent().hasClass("collapsable")) {
+				
 				$this.next().remove();
 				expand($this);
 			} else {
@@ -309,43 +300,30 @@
 			} else {
 				collapse($this);
 				//테이블 출력 함수 호출
-				tabname_emit(scname, $parent);
+				//스키마 이름 전송
+				socket.emit('set_scname_table', scname);
+
+				//테이블 수신
+				socket.once('tabname', function(data) {
+
+					if (data.table.length !== 0) {
+
+						$("<ul style='display: block;' class='tableUl'>").appendTo(
+								$parent);
+
+						//테이블 배열 생성 함수 호출
+						for (var i = 0; i < data.table.length; i++) {
+							$(
+									"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='table'>"
+											+ data.table[i] + "</span></li>").appendTo(
+									$this.next());
+						}
+
+					}
+					socket.removeListener('tabname');
+				});
 			}
 		});
-
-		//테이블 출력 함수 (scname = 스키마 이름)
-		function tabname_emit(scname, $parent) {
-			//스키마 이름 전송
-			socket.emit('set_scname_table', scname);
-
-			//테이블 수신
-			socket.once('tabname', function(data) {
-
-				if (data.table.length !== 0) {
-
-					$("<ul style='display: block;' class='tableUl'>").appendTo(
-							$parent);
-
-					//테이블 배열 생성 함수 호출
-					for (var i = 0; i < data.table.length; i++) {
-						$(
-								"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='table'>"
-										+ data.table[i] + "</span></li>").appendTo(
-								$parent.children(".tableUl"));
-					}
-
-				}
-				socket.removeListener('tabname');
-			});
-			//테이블 배열 생성 함수 (data = 테이블 데이터)
-			function tab_name(data) {
-
-
-
-				//테이블 수신 이벤트 리스너 해제
-			
-			}
-		}
 
 		//========= 스키마뷰 클릭, 뷰 생성             
 		$browser.on("click", ".schemaView", function() {
@@ -358,45 +336,33 @@
 			} else {
 
 				collapse($this);
-				//뷰 출력 함수 호출
-				viewname_emit(scname, $parent);
+				//스키마 이름 전송
+				socket.emit('set_scname_view', scname);
+
+				//뷰 수신
+				socket.once('viewname', function(data) {
+
+					if (data.view.length !== 0) {
+
+						$("<ul style='display: block;' class='vw'>").appendTo(
+								$parent);
+
+						//console.log(data);
+						for (var i = 0; i < data.view.length; i++) {
+							//console.log(data.view[i]);
+							$(
+									"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='view'>"
+											+ data.view[i] + "</span></li>").appendTo(
+									$this.next());
+						}
+
+						//뷰 수신 이벤트 리스너 해제
+						socket.removeListener('viewname');
+					}
+				});
 			}
 		});
 
-		//뷰 출력 함수 (scname = 스키마 이름)
-		function viewname_emit(scname, $parent) {
-
-			//스키마 이름 전송
-			socket.emit('set_scname_view', scname);
-
-			//뷰 수신
-			socket.on('viewname', function(data) {
-
-				if (data.view.length !== 0) {
-
-					$("<ul style='display: block;' class='vw'>").appendTo(
-							$parent);
-
-					//뷰 배열 생성 함수 호출
-					view_name(data);
-				}
-			});
-			//뷰 배열 생성 함수 (data = 뷰 데이터)
-			function view_name(data) {
-
-				//console.log(data);
-				for (var i = 0; i < data.view.length; i++) {
-					//console.log(data.view[i]);
-					$(
-							"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='view'>"
-									+ data.view[i] + "</span></li>").appendTo(
-							$parent.children(".vw"));
-				}
-
-				//뷰 수신 이벤트 리스너 해제
-				socket.removeListener('viewname');
-			}
-		}
 
 		//========= 스키마함수 클릭, 함수 생성             
 		$browser.on("click", ".schemaFunc", function() {
@@ -410,46 +376,30 @@
 			} else {
 
 				collapse($this);
-				//함수 출력 함수 호출
-				funcname_emit(scname, $parent);
+
+				//스키마 이름 전송
+				socket.emit('set_scname_func', scname);
+
+				//함수 수신
+				socket.once('funcname', function(data) {
+
+					if (data.func.length !== 0) {
+
+						$("<ul style='display: block;' class='func'>").appendTo(
+								$parent);
+
+						//console.log(data);
+						for (var i = 0; i < data.func.length; i++) {
+							//console.log(data.func[i]);
+							$(
+									"<li class='last'><span class='func'>"
+											+ data.func[i] + "</span></li>").appendTo(
+									$this.next());
+						}
+					}
+				});
 			}
 		});
-
-		//함수 출력 함수 (scname = 스키마 이름)
-		function funcname_emit(scname, $parent) {
-
-			//스키마 이름 전송
-			socket.emit('set_scname_func', scname);
-
-			//함수 수신
-			socket.on('funcname', function(data) {
-
-				if (data.func.length !== 0) {
-
-					$("<ul style='display: block;' class='func'>").appendTo(
-							$parent);
-
-					//함수 배열 생성 함수 호출
-					func_name(data);
-
-				}
-			});
-			//함수 배열 생성 함수 (data = 함수 데이터)
-			function func_name(data) {
-
-				//console.log(data);
-				for (var i = 0; i < data.func.length; i++) {
-					//console.log(data.func[i]);
-					$(
-							"<li class='last'><span class='func'>"
-									+ data.func[i] + "</span></li>").appendTo(
-							$parent.children(".func"));
-				}
-
-				//함수 수신 이벤트 리스너 해제
-				socket.removeListener('funcname');
-			}
-		}
 
 		//========= 테이블 클릭, column/index/constraints(이름만) 생성
 		$browser
@@ -512,47 +462,34 @@
 			} else {
 
 				collapse($this);
-				// 컬럼 출력 함수 호출
-				colname_emit(tabname, scname, $parent);
+				//테이블 이름 전송
+				socket.emit('set_tabname_col', {
+					tabname : tabname,
+					scname : scname
+				});
+
+				//컬럼 수신
+				socket.once('colname', function(data) {
+
+					if (data.column.length !== 0) {
+
+						$("<ul style='display: block;' class='col'>").appendTo(
+								$parent);
+
+						//컬럼 배열 생성 함수 호출
+
+						for (var i = 0; i < data.column.length; i++) {
+							//console.log(data.column[i]);
+							$(
+									"<li class='last'><span class='column'>"
+											+ data.column[i] + "</span></li>")
+									.appendTo($this.next());
+						}
+					}
+				});
 			}
 		});
 
-		//컬럼 출력 함수 
-		function colname_emit(tabname, scname, $parent) {
-
-			//테이블 이름 전송
-			socket.emit('set_tabname_col', {
-				tabname : tabname,
-				scname : scname
-			});
-
-			//컬럼 수신
-			socket.on('colname', function(data) {
-
-				if (data.column.length !== 0) {
-
-					$("<ul style='display: block;' class='col'>").appendTo(
-							$parent);
-
-					//컬럼 배열 생성 함수 호출
-					col_name(data);
-				}
-			});
-
-			//컬럼 배열 생성 함수 (data = 컬럼 데이터)
-			function col_name(data) {
-
-				for (var i = 0; i < data.column.length; i++) {
-					//console.log(data.column[i]);
-					$(
-							"<li class='last'><span class='column'>"
-									+ data.column[i] + "</span></li>")
-							.appendTo($parent.children(".col"));
-				}
-				//컬럼 수신 이벤트 리스너 해제
-				socket.removeListener('colname');
-			}
-		}
 
 		//========= 테이블제약키 클릭, 제약키 생성 
 		$browser.on("click", ".tableConstraint", function() {
@@ -567,46 +504,39 @@
 			} else {
 
 				collapse($this);
-				// 제약키 출력 함수 호출
-				consname_emit(tabname, scname, $parent);
+				
+				//테이블 이름 전송
+				socket.emit('set_tabname_cons', {
+					tabname : tabname,
+					scname : scname
+				});
+
+				//제약키 수신
+				socket.once('consname', function(data) {
+
+					if (data.constraint.length !== 0) {
+
+						$("<ul style='display: block;' class='cons'>").appendTo(
+								$parent);
+
+						//제약키 배열 생성 함수 호출
+						for (var i = 0; i < data.constraint.length; i++) {
+							//console.log(data.constraint[i]);
+							$(
+									"<li class='last'><span class='cons'>"
+											+ data.constraint[i] + "</span></li>")
+									.appendTo($this.next());
+						}
+					}
+				});
 			}
 		});
 
 		//제약키 출력 함수 
 		function consname_emit(tabname, scname, $parent) {
 
-			//테이블 이름 전송
-			socket.emit('set_tabname_cons', {
-				tabname : tabname,
-				scname : scname
-			});
 
-			//제약키 수신
-			socket.on('consname', function(data) {
 
-				if (data.constraint.length !== 0) {
-
-					$("<ul style='display: block;' class='cons'>").appendTo(
-							$parent);
-
-					//제약키 배열 생성 함수 호출
-					cons_name(data);
-				}
-			});
-
-			//제약키 배열 생성 함수 (data = 제약키 데이터)
-			function cons_name(data) {
-
-				for (var i = 0; i < data.constraint.length; i++) {
-					//console.log(data.constraint[i]);
-					$(
-							"<li class='last'><span class='cons'>"
-									+ data.constraint[i] + "</span></li>")
-							.appendTo($parent.children(".cons"));
-				}
-				//제약키 수신 이벤트 리스너 해제
-				socket.removeListener('consname');
-			}
 		}
 
 		//========= 테이블인덱스 클릭, 인덱스 생성 
@@ -637,7 +567,7 @@
 			});
 
 			//인덱스 수신
-			socket.on('indname', function(data) {
+			socket.once('indname', function(data) {
 
 				if (data.index.length !== 0) {
 
@@ -657,10 +587,8 @@
 					$(
 							"<li class='last'><span class='ind'>"
 									+ data.index[i] + "</span></li>").appendTo(
-							$parent.children(".ind"));
+							$this.next());
 				}
 
-				//인덱스 수신 이벤트 리스너 해제
-				socket.removeListener('indname');
 			}
 		}

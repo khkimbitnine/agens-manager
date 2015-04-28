@@ -1,6 +1,6 @@
-exports.create_view = function(socket, client, done){
+exports.create_view = function(socket, client, data){
 	var query;
-	socket.on('view_form', function(data){
+
 		var name = data[0].value;
 		var query = data[1].value;
 		var comment = data[2].value;
@@ -17,8 +17,6 @@ exports.create_view = function(socket, client, done){
 			}else{
 				console.log("View created.");
 			}
-			done();
 		});
-	});
 
 }

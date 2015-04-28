@@ -21,7 +21,7 @@
 		<option value="ROW">ROW</option>
 		<option value="STATEMENT">STATEMENT</option>
 		</select></li><!-- 
-	 --><li><label for="function">Function</label><select name="function" id="function"></select>
+	 --><li><label for="database">Database</label><select id="database"></select><label for="function">Function</label><select name="function" id="function"></select>
 		</li><!-- 
 	 --><li><label for="arguments">Arguments</label>(<input type="text" name="arguments" id="arguments"/>)</li>
 	</ul>
@@ -30,16 +30,25 @@
 </form>
 </div>
 <script>
-	var username = 'postgres'; //임의 유저
-	socket.emit('username', username);
-	var $function = $('#function');
-	if($function.length ==1){
-		socket.once('trigger_function', function(data){
-			for(var i = 0 ; i < data.length ; i ++){
-				$("#function").append('<option value="'+data[i]+'">'+data[i]+'</option>');
-			}
-		});		
+var username = 'postgres'; //임의 유저
+	
+	$("#database").append('<option>Select Database</option>');
+	for(var i = 0 ; i < $(".db").length ; i++){
+		$("#database").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
 	}
 	
+	$("#database").change(function(){
+		$("#function").empty();
+		if($(this).find('option:selected').index()>0){
+			socket.emit('set_dbname', {dbname: $(this).find('option:selected').val(), to:'create_trigger'});
+			socket.emit('username', username);
+			
+			socket.once('trigger_function', function(data){
+				for(var i = 0 ; i < data.length ; i ++){
+					$("#function").append('<option value="'+data[i]+'">'+data[i]+'</option>');
+				}
+			});	
+		}
+	})
 
 </script>

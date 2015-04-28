@@ -1,25 +1,5 @@
-exports.create_table = function(socket, client, connectedDb, done){
+exports.create_table = function(socket, client, formdata){
 	
-	socket.on('set_dbname_table', function (dbname){
-		var arrSch = [];
-		if(dbname === connectedDb){
-			arrSch = [];
-			//스키마 쿼리
-			client.query('select schema_name from information_schema.schemata where schema_name not like \'pg_%\' and schema_name <> \'information_schema\'', function(err, rs){
-				if(rs){
-					for(var j=0; j < rs.rows.length; j++){
-						arrSch.push(rs.rows[j].schema_name);
-						socket.emit('scname_table', arrSch);
-					}
-				}				
-//				done();
-			}); 
-		} else {//접속한 db와 dbname이 일치하지 않으면, 0을 리턴(편의상)
-			socket.emit('scname_table', {schema: 0});
-		}
-	});
-	
-	socket.on('table_form', function(formdata){
 		var error;
 		
 		var interval = 9	
@@ -34,7 +14,7 @@ exports.create_table = function(socket, client, connectedDb, done){
 			column[i-2] = formdata[i].value;
 		}
 		//create Table
-		var createTable = "CREATE TABLE "+schema+"."+name+"(";
+		var createTable = 'CREATE TABLE "'+schema+'".'+name+'(';
 		for(var i = 0 ; i < (column.length)/interval ; i++){// row index
 			var colName = '';
 			var type = '';
@@ -127,19 +107,4 @@ exports.create_table = function(socket, client, connectedDb, done){
 			}
 			socket.emit('table_success', error);
 		});
-	});
-	
-	var table = [];
-	
-	client.query('SELECT DISTINCT(table_name) FROM information_schema.tables', function(err, rs){
-		if(err){
-			console.log('table err: '+err)
-		}else{
-			for(var i = 0 ; i < rs.rows.length ; i++){
-				table[i] = rs.rows[i].table_name;
-			}
-			socket.emit('table', table);
-		}
-
-	});
 }

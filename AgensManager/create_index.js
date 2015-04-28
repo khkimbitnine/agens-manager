@@ -1,5 +1,5 @@
-exports.create_index = function(socket, client, done){
-	socket.once('index_form', function(formdata){
+exports.create_index = function(socket, client, formdata){
+
 		//index_name, access_method, unique, concurrently
 		//database, schema, table, desc
 		//order, first, last, operator_class
@@ -38,8 +38,6 @@ exports.create_index = function(socket, client, done){
 				console.log("Index created.");
 			}
 			socket.emit('index_success', error);
-			done();
 		});
 		
-	});
 }

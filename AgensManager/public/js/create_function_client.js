@@ -1,5 +1,3 @@
-socket.disconnect();
-socket.connect();
 	var sql_template = '<ul class="temp">'
 	+ '<li id="row1">'
 	+ '<span>Name</span>'
@@ -13,7 +11,7 @@ socket.connect();
 	+ '<input type="checkbox" id="setof" />'
 	+ '<input type="hidden" name="setof" value="" />'
 	+ '<div id="typeBox">'
-	+ '<select name="schema" class="schema"><option></option><option value ="">Basic datatype</option></select>'
+	+ '<select name="schema" class="schema"><option></option></select>'
 	+ '<select name="type" class="type"><option></option></select>'
 	+ '<span>Array</span>'
 	+ '<input type="checkbox" id="array" />'
@@ -97,7 +95,7 @@ socket.connect();
 		+ '</div>';
 	
 	var argtype = '<div class="argtype">'
-		+ '<select name="argschema" class="schema"><option></option><option value="">Basic datatype</option></select>'
+		+ '<select name="argschema" class="schema"><option></option></select>'
 		+ '<select name="argtype" class="type"><option></option></select>'
 		+ '<label for="array">Array</label>'
 		+ '<input type="checkbox" name="array" class="array"/>'
@@ -131,39 +129,36 @@ socket.connect();
 		}
 	});
 	
-	function row2append(argInd){
-		console.log("row2append")
+	$("#dbList").append('<option>Select Database</option>');
+	for(var i = 0 ; i < $(".db").length ; i++){
+		$("#dbList").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
+	}
+	
+	$("#dbList").change(function(){
+		$(".schema, .type").empty();
+		if($(this).find('option:selected').index()>0){
+			socket.emit('set_dbname', $(this).find('option:selected').val());
+			socket.once('schemas', function(schema){
+				$(".schema").append('<option>').append('<option>Basic datatype</option>');
+				for(var i = 0 ; i < schema.length ; i++){
+					$(".schema").append('<option value = "'+schema[i]+'">'+schema[i]+'</option>');
+				}
+			});
+		}
+	})
+	
+	function row2append(){
 		var $li = $("<li>").appendTo($row2Ul);
-		
 		$li.append(argmode+argname+argtype);
-		schemaAppend(argInd);
 	}
 	
 	function schemaAppend(argInd){
-		var $schema = $(".schema").eq(0);
-		if(argInd == 0 && $schema.find('option').length ==2){
 			for(var i = 0 ; i < schemas.length ; i++){
-				$schema.append('<option value = "'+schemas[i]+'">'+schemas[i]+'</option>');
+				$(".schema").eq(i).append('<option value = "'+schemas[i]+'">'+schemas[i]+'</option>');
 			}	
-		}
-		if(argInd > 0  && $(".schema").eq(argInd).find('option').length ==2){
-			for(var j = 2 ; j < $schema.find('option').length ; j++){
-				$(".schema").eq(argInd).append("<option value = '"+$schema.find('option').eq(j).val()+"'>"+$schema.find('option').eq(j).val()+"</option>");
-			}			
-		}
-
 	}
 	
-	socket.once('schemas', function(schema){
-		if(schemas.length ==0){
-			for(var i = 0 ; i < schema.length ; i++){
-				schemas[i] = schema[i];
-			}
-		}
-		schemaAppend(0);
-		row2append(1);
-	});	
-	
+	row2append();
 	
 	var $sqlBtn = $("#langBox").find(".language").eq(0);
 	var $internalBtn = $("#langBox").find(".language").eq(1);
@@ -175,7 +170,7 @@ socket.connect();
 	var prevOpt = 0;
 	var prevSch = -1;
 	
-	$functionForm.on("click", ".schema", function(){
+	$functionForm.on("change", ".schema", function(){
 		var $this = $(this);
 		var schInd = $(".schema").index($this);
 		console.log("schInd: "+schInd);
@@ -184,9 +179,7 @@ socket.connect();
 		var $type = $this.next();
 		$type.empty();
 
-		if(optionInd !== 0 || schInd !== prevSch){
-			prevOpt = optionInd;
-			prevSch = schInd;
+		if(optionInd > 0){
 			socket.emit('schema', $option.text());
 			socket.once('types', function(type){
 					for(var i = 0 ; i < type.length ; i++){
@@ -211,14 +204,14 @@ socket.connect();
 	});
 	$internalBtn.click(function(){//link symbol
 		$row2.children("ul").children("li").remove();
-		row2append(1);
+		row2append();
 		$row4.removeClass("def").empty().append('<label>Link Symbol</label><input type="text" name="link_symbol" id="linkSymbol">').find("#linkSymbol").width("100%");//definition
 		$lang.empty().removeClass("sql c").addClass("internal").append('<div><span>internal</span><input type="hidden" name="language" value="internal"/></div>');
 		
 	});
 	$cBtn.click(function(){//object file, link symbol
 		$row2.children("ul").children("li").remove();
-		row2append(1);
+		row2append();
 		$row4.removeClass("def").empty().append('<div id="objectFile"><label>Object File</label><input type="text" name="object_file"></div><div id="objectFile"><label>Link Symbol</label><input type="text" name="link_symbol" id="linkSymbol"></div>').find('div').css({"width": "50%", "display":"inline-block"}).children("input").width("100%");//definition
 		$lang.empty().removeClass("sql internal").addClass("c").append('<div><span>c</span><input type ="hidden" name="language" value="c" /></div>');
 	});
@@ -231,8 +224,15 @@ socket.connect();
 	
 	$add.click(function(e){
 		e.preventDefault();
-		var argInd = $(".argmode").length + 1; //second argument
-		row2append(argInd);
+		
+		if($("#dbList").find('option:selected').index() == 0){
+			alert("Select databse.")
+		}else{
+			$("#row2>ul").append("<li>"+$("#row2>ul>li:eq(0)").html()+"</li>").children('li').last().find('.schema>option:eq(0)').prop('selected', true).parent().next().empty();
+			
+		}
+		
+		
 	});
 	
 	var $down = $(".down");//below index exchange

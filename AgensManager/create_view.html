@@ -2,7 +2,9 @@
 	<form id="viewForm">
 		<h2>Create view</h2>
 		<ul id = "view">
-			<li><span>Name</span><input type='text' name='name' id="name"/></li>
+			<li><span>Name</span><input type='text' name='name' id="name"/>
+			<label for="dbList">database</label><select id="dbList"></select>
+			</li>
 			<li><span>Query</span><textarea name='query' id='query'></textarea></li>
 			<li><span>Comment</span><textarea name='comment' id='comment'></textarea></li>
 		</ul>
@@ -11,6 +13,18 @@
 	<button id="Cancel">Cancel</button>
 </div>
 <script>
+$("#dbList").append('<option>Select Database</option>');
+for(var i = 0 ; i < $(".db").length ; i++){
+	$("#dbList").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
+}
+
+$("#dbList").change(function(){
+	$(".schema, .type").empty();
+	if($(this).find('option:selected').index()>0){
+		socket.emit('set_dbname', {dbname: $(this).find('option:selected').val(), to:'create_view'});
+	}
+})
+
 	$("#createBtn").click(function(e){
 		e.preventDefault();
 		validCheck();

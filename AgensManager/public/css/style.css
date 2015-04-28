@@ -209,11 +209,11 @@ body {
 }
 #browser span{
 	cursor:pointer;
+	color:#fff;
 }
 
 #browser .last span:hover {
 	cursor: text;
-	color: #fff;
 }
 
 #schemaForm, #viewForm {

@@ -77,29 +77,43 @@
 	var $schema = $("#schemaList");
 	
 
-	
-	function schemaList($object){
-			socket.emit('set_dbname_table', 'postgres');
-			socket.once('scname_table',function(data) {
-				for(var i = 0 ; i < data.length ; i++){
-					$object.append("<option value='"+data[i]+"'>"
-							+ data[i]+ "</option>");
-				}
-			});
+		for(var i = 0 ; i < $(".db").length ; i++){
+			$("#dbList").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
 		}
-	
-	schemaList($schema);
-	
-	
+		var table = [];		
+		$("#dbList").change(function(){
+			
+			if($(this).find('option:selected').index() > 0){
+				$schema.empty();
+				
+				socket.emit('set_dbname', $(this).find('option:selected').val());
+				socket.once('table', function(rs){
+					for(var i = 0 ; i < rs.length ; i ++){
+						table[i] = rs[i];
+					}
+				});
+				socket.once('scname',function(data) {
+					$schema.append('<option>')
+					for(var i = 0 ; i < data.schema.length ; i++){
+						$schema.append("<option value='"+data.schema[i]+"'>"+ data.schema[i]+ "</option>");
+					}
+				});
+			}
+		});
 	$("#column").on("click", ".f_key",function(){
 		
 		var trInd = $(this).closest('tr').index(); 
 		var rowInd = trInd - 1;
 		
 		if($("tr").eq(trInd).find('.type>option:selected').index() == 0){
-				alert("Please select type before foreign key.");
-		}else{
-
+			alert("Please select type before foreign key.");
+		}
+		
+		if($("#dbList").find('option:selected').index() == 0){
+			alert('Please select database.')
+		}
+		
+		if($("tr").eq(trInd).find('.type>option:selected').index()>0 && $("#dbList").find('option:selected').index() >0){
 			$(".pop").empty();
 			$("#fKeyPop, #popupBG").fadeIn();
 			$("#fKeyInd").text(rowInd);		
@@ -111,37 +125,35 @@
 			}
 			
 			$("#selectedCol").text($(this).val());
-		}
 		
+		}
 	});
 	
-	$("#fSchema").click(function(){
+	$("#fSchema").change(function(){
 		
 		if($(this).find('option:selected').index()>=0){
 			$("#fTable").empty();
-			socket.emit('set_scname_table', $(this).find("option:selected").text());
-			socket.on('tabname', function(data) {
+			socket.emit('set_scname_table', $(this).find("option:selected").val());
+			socket.once('tabname', function(data) {
 				$("#fTable").append('<option>');
-				$.each(data.table, function(i) {
+				for(var i = 0 ; i < data.table.length ; i++){
 					console.log(data.table[i]);
 					$("#fTable").append("<option value='"+data.table[i]+"'>"+ data.table[i] + "</option>");
-				});
-				socket.removeListener('tabname');
+				}
 			});
 		}
 	});
 	
-	$("#fTable").click(function(){
+	$("#fTable").change(function(){
 		
 		if($(this).find('option:selected').index()>0){
 			$("#fColumn").empty();
 			socket.emit('set_tabname_col', {scname: $("#fSchema").find('option:selected').text(), tabname: $(this).find('option:selected').text()});
-			socket.on('colname', function(data){
+			socket.once('colname', function(data){
 				$("#fColumn").append('<option>');
 				$.each(data.column, function(i){
 					$("#fColumn").append("<option value='"+data.column[i]+"'>"+ data.column[i] + "</option>")
 				});
-				socket.removeListener('colname');
 			});
 		}
 	});
@@ -173,17 +185,7 @@
 
 	$("#submitBtn").click(function(e) {
 		e.preventDefault();
-		console.log($("#tableForm").serializeArray());
-		var table = [];
-		socket.disconnect();
-		socket.connect();
-		socket.once('table', function(rs){
-			for(var i = 0 ; i < rs.length ; i ++){
-				table[i] = rs[i];
-			}
-			
-			validCheck(table);
-		})
+		validCheck(table);
 
 	});
 	$(".add").click(function(e) {
@@ -215,6 +217,14 @@
 			notValid($name);
 		}
 		var dup = false;
+		
+		if($("#dbList").find('option:selected').index() == 0){
+			notValid($("#dbList"));
+		}
+		
+		if($("#schemaList").find('option:selected').index() == 0){
+			notValid($("#schemaList"));
+		}
 		if(namePattern.test($name.val()) || onePattern.test($name.val())){
 			
 			for(var i = 0 ; i < table.length ; i++){
@@ -241,7 +251,6 @@
 			var $fkey = $columnTr.eq(i).find(".f_key.checkbox")
 			var $def = $columnTr.eq(i).find(".default")
 			var $columnComment = $columnTr.eq(i).find(".comment")
-			//var $check = $columnTr.eq(i).find(".check")
 			
 			if (!colPattern.test($column.val()))
 				notValid($column);
@@ -258,8 +267,6 @@
 			if (!commentPattern.test($columnComment.val())
 					&& !$columnComment.val() == '')
 				notValid($columnComment);
-			//if (!commentPattern.test($check.val()) && !$check.val() == '')
-			//	notValid($check);
 
 		}
 
@@ -268,6 +275,7 @@
 			notValid($comment);
 
 		if ($(".notValid").size() == 0) {
+			socket.emit('submit_table', true);
 			socket.emit('table_form', $("#tableForm").serializeArray());
 			socket.once('table_success', function(error){
 				if(error==null){
@@ -275,6 +283,7 @@
 				}else{
 					alert(error);
 				}
+				socket.emit('submit_table', false);
 			})
 		}
 

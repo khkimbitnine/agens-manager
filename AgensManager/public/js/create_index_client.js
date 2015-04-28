@@ -13,46 +13,40 @@
 	});
  	$("#last").prop('checked', true).next().val(1);
  	
- 	$.each(db, function(i){
- 	$(".database").append("<option value='"+db[i]+"'>"+db[i]+"</option>");
- 	});
+	for(var i = 0 ; i < $(".db").length ; i++){
+		$(".ind.database").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
+	}
  	
- 	
- 	$("#indexForm").on("click", "option", function(){
- 		var parent = $(this).parent();
- 		var name = $(this).text();
- 		if(parent.hasClass("database")){
-	 		$(".schema, .table, .column, .index").empty();
- 	 		socket.emit('set_dbname', name);
+		$(".ind.database").change(function(){
+	 		$(".ind.schema, .ind.table, .ind.column, .ind.index").empty();
+ 	 		socket.emit('set_dbname', $(this).find('option:selected').val());
  	 		socket.once('scname', function(data){
- 	 			$.each(data.schema, function(i){
- 	 				$(".schema").append("<option value='"+data.schema[i]+"'>"+data.schema[i]+"</option>");
- 	 			});
+ 	 			for(var i = 0 ; i < data.schema.length ; i++){
+ 	 				$(".ind.schema").append("<option value='"+data.schema[i]+"'>"+data.schema[i]+"</option>");
+ 	 			}
  	 		});
- 		}
- 		if(parent.hasClass("schema")){
- 			scname = name;
- 			$(".table, .column, .index").empty();
- 			socket.emit('set_scname_table', name);
- 			socket.on('tabname', function(data){
- 				$.each(data.table, function(i){
- 					$(".table").append("<option value='"+data.table[i]+"'>"+data.table[i]+"</option>");
- 				});
- 				socket.removeListener('tabname');
+ 		})
+ 		$(".ind.schema").change(function(){
+ 	 		$(".ind.table, .ind.column, .ind.index").empty();
+ 			socket.emit('set_scname_table', $(this).find("option:selected").val());
+ 			socket.once('tabname', function(data){
+ 				for(var i = 0 ; i < data.table.length ; i++){
+ 					$(".ind.table").append("<option value='"+data.table[i]+"'>"+data.table[i]+"</option>");
+ 				}
  			});
- 		}
- 		if(parent.hasClass("table")){
- 			$(".column, .index").empty();
- 			socket.emit('set_tabname_col', {tabname: name, scname:scname});
- 			socket.on('colname', function(data){
- 				$.each(data.column, function(i){
- 					$(".column").append("<option value='"+data.column[i]+"'>"+data.column[i]+"</option>");
- 				});
- 				socket.removeListener('colname');
+ 		})
+ 		
+ 		$(".ind.table").change(function(){
+ 			$(".ind.column, .ind.index").empty();
+ 			socket.emit('set_tabname_col', {tabname: $(this).find('option:selected').val(), scname:$(".ind.schema").find('option:selected').val()});
+ 			socket.once('colname', function(data){
+ 				for(var i = 0 ; i < data.column.length ; i++){
+ 					$(".ind.column").append("<option value='"+data.column[i]+"'>"+data.column[i]+"</option>");
+ 				}
  			});
- 		}
- 	});
- 	
+ 		});
+		
+		
  	$("#btnBox>button").click(function(e){
  		e.preventDefault();
  		var column = $(".column>option:selected");
@@ -82,6 +76,7 @@
  		var idxVal = $("#indexName").val();
  		var test = pattern.test(idxVal);
  		var columns = [];
+ 		
  		if(( test || idxVal === '' )&& $(".index").has('option').length!==0){
  			for(var i = 0 ; i < $(".index>option").length ; i++){
  				columns[i] = $(".index>option").eq(i).val();

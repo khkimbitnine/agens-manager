@@ -221,7 +221,7 @@ textarea#comment{
 	display:none;
 }
 
-#fKeyPop>span{
+#fTitle{
 	font-weight:bold;
 	font-size:18px;
 	color:rgb(2,131,231);
@@ -236,12 +236,7 @@ textarea#comment{
 	display:block;
 	margin-bottom:5px;
 }
-#fKeyPop>div>span{
-	font-size:14px;
-	color:#fff;
-	display:inline-block;
-	margin-right: 5px;
-}
+
 #fKeyPop button{
 	font-size:18px;
 	font-weight:bold;
@@ -251,31 +246,20 @@ textarea#comment{
 }
 
 #fKeyPop>div:nth-of-type(1){
-	width: 314px;
-	height:39px;
-	position:absolute;
-	left:37px;
-	top:84px;
-}
-#fChosen{
-	width:182px;
-	height:39px;
-}
-#fKeyPop>div:nth-of-type(2){
 	width:173px;
 	height:75px;
 	position:absolute;
 	left:37px;
 	top:153px;
 }
-#fKeyPop>div:nth-of-type(3){
+#fKeyPop>div:nth-of-type(2){
 	width:173px;
 	height:75px;
 	position:absolute;
 	left:215px;
 	top:153px;
 }
-#fKeyPop>div:nth-of-type(4){
+#fKeyPop>div:nth-of-type(3){
 	width:173px;
 	height:75px;
 	position:absolute;
@@ -305,4 +289,9 @@ textarea#comment{
 	z-index:1;
 	display:none;
 }
-
+#selectedCol{
+	display:block;
+	position:absolute;
+	left:37px;
+	top:77px;
+}
