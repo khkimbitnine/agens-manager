@@ -80,9 +80,46 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 						for(var i=0; i < result.rows.length; i++){
 							arrSch.push(result.rows[i].schema_name);
 						}
-//						console.log(arrSch);
 						socket.emit('scname', {schema: arrSch});
 				});	
+				
+				//create table for duplicate names
+				client.query('SELECT DISTINCT(table_name) FROM information_schema.tables', function(err, rs){
+					if(err){
+						console.log('table err: '+err)
+					}
+						var table = [];
+						for(var i = 0 ; i < rs.rows.length ; i++){
+							table[i] = rs.rows[i].table_name;
+						}
+						socket.emit('table', table);
+				});
+				//create table for data types
+				client.query("SELECT pg_catalog.format_type(t.oid, NULL) AS name FROM pg_catalog.pg_type t LEFT JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace WHERE (t.typrelid = 0 OR (SELECT c.relkind = 'c' FROM pg_catalog.pg_class c WHERE c.oid = t.typrelid)) AND NOT EXISTS(SELECT 1 FROM pg_catalog.pg_type el WHERE el.oid = t.typelem AND el.typarray = t.oid) AND pg_catalog.pg_type_is_visible(t.oid) ORDER BY 1;", function(err, res){
+					if(err){
+						console.log(err);
+					}
+						var arrType = [];
+						for(var i = 0 ; i < res.rows.length ; i++){
+							arrType.push(res.rows[i].name);
+						}
+						
+						socket.emit('type', arrType);
+				});
+				
+				//create table for variable length data types
+				client.query("SELECT pg_catalog.format_type(t.oid, NULL) AS name FROM pg_catalog.pg_type t LEFT JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace WHERE (t.typrelid = 0 OR (SELECT c.relkind = 'c' FROM pg_catalog.pg_class c WHERE c.oid = t.typrelid)) AND NOT EXISTS(SELECT 1 FROM pg_catalog.pg_type el WHERE el.oid = t.typelem AND el.typarray = t.oid) AND pg_catalog.pg_type_is_visible(t.oid) AND typlen < 0 ORDER BY 1;", function(err, res){
+					if(err){
+						console.log(err);
+					}
+					var arrVar = [];
+					for(var i = 0 ; i < res.rows.length ; i++){
+						arrVar.push(res.rows[i].name);
+					}
+					
+					socket.emit('var_type', arrVar);
+				});
+				
 				//create function
 				client.query("select schema_name from information_schema.schemata order by 1", function(err, rs){
 					if(err){
@@ -107,19 +144,6 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 						socket.emit("get_role", roles);
 					}
 				});
-				
-				//create table for duplicate names
-				client.query('SELECT DISTINCT(table_name) FROM information_schema.tables', function(err, rs){
-					if(err){
-						console.log('table err: '+err)
-					}
-						var table = [];
-						for(var i = 0 ; i < rs.rows.length ; i++){
-							table[i] = rs.rows[i].table_name;
-						}
-						socket.emit('table', table);
-				});
-				
 			});
 		});
 		

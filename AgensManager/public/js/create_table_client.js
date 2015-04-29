@@ -1,7 +1,7 @@
 	
 	var col_template = '<tr>'
 			+ '<td>'
-			+ '<input type="text" name="column" class="column_input" value=""/>'
+			+ '<input type="text" name="column" class="column_input" />'
 			+ '</td>'
 			+ '<td>'
 			+ '<select name="type" class="type">'
@@ -9,10 +9,12 @@
 			+ '</select>'
 			+ '</td>'
 			+ '<td>'
-			+ '<input type="text" name="length" class="length" value="" disabled />'
+			+ '<input type="text" class="length" disabled/>'
+			+ '<input type="hidden" name="length" value = ""/>'
 			+ '</td>'
 			+ '<td>'
-			+ '<input type="text" name="precision" class="precision" value="" disabled />'
+			+ '<input type="text" class="precision" disabled/>'
+			+ '<input type="hidden" name="precision" value=""/>'
 			+ '</td>'
 			+ '<td>'
 			+ '<img class="not_null checkbox" src="public/css/images/chkbox_default.png"/>'
@@ -26,22 +28,14 @@
 			+ '<img class="u_key checkbox" src="public/css/images/chkbox_default.png"/>'
 			+ '<input type="hidden" name="u_key" value="0" />'
 			+ '</td>'
-			+ '<td><input type="text" name="de_fault" class="default" value=""/></td>'
+			+ '<td><input type="text" name="de_fault" class="default" /></td>'
 			+ '<td>'
-			+ '<input type="text" name="f_key" class="f_key" value="" readonly/>'
+			+ '<input type="text" name="f_key" class="f_key" readonly/>'
 			+ '</td>'
-			+ '<td><input type="text" name="check" class="check" value=""/></td>'
+			+ '<td><input type="text" name="check" class="check" /></td>'
 			+ '</tr>';
-
-	var type = [ "bigint", "bigint[]", "bigserial", "bigserial[]", "boolean", "boolean[]", "box", "box[]", "bytea", "bytea[]", "cidr", "cidr[]",
-			"circle", "circle[]", "date", "date[]", "double precision", "double precision[]", "inet", "inet[]", "integer", "integer[]", "json", "json[]",
-			"line", "line[]", "lseg", "lseg[]", "macaddr", "macaddr[]", "money", "money[]", "path", "path[]", "point", "point[]", "polygon", "polygon[]",
-			"real", "real[]", "smallint", "smallint[]", "smallserial", "smallserial[]", "serial", "serial[]", "text", "text[]", "tsquery", "tsquery[]",
-			"tsvector", "tsvector[]", "txid_snapshot", "txid_snapshot[]", "uuid", "uuid[]", "xml", "xml[]", "bit", "bit[]", "bit varying", "bit varying[]",
-			"character", "character[]", "character varying", "character varying[]", "interval", "interval[]", "time", "time[]",
-			"time with time zone", "time with time zone[]", "time without time zone","time without time zone[]","timestamp", "timestamp[]", "timestamp with time zone", "timestamp with time zone[]","timestamp without time zone","timestamp without time zone[]",
-			"numeric", "numeric[]" ];
-
+	
+	
 	function appendColumn() {
 
 		if ($("#column tr").length == 1) {
@@ -50,13 +44,6 @@
 			$("#column").append(col_template).find("tr:last").append(
 					'<td><button class= "remove button" /></td>')
 		}
-
-		var $col = $("#column tr").eq($("#column tr").length - 1);
-		var $col_type = $col.find(".type");
-		for (var i = 0; i < type.length; i++)
-			$col_type
-					.append("<option class='typeOption' data-num='"+i+"' value='"+type[i]+"'>"
-							+ type[i] + "</option>");
 	}
 	appendColumn();
 
@@ -76,13 +63,27 @@
 		for(var i = 0 ; i < $(".db").length ; i++){
 			$("#dbList").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
 		}
-		var table = [];		
+		var table = [];
+		var varType = [];
 		$("#dbList").change(function(){
 			
 			if($(this).find('option:selected').index() > 0){
 				$schema.empty();
-				
+				var $col = $("#column tr").eq($("#column tr").length - 1);
+				var $col_type = $col.find(".type");
 				socket.emit('set_dbname', $(this).find('option:selected').val());
+				
+				socket.once('type', function(rs){
+					for(i = 0 ; i < rs.length ; i ++){
+						$col_type.append("<option class='typeOption' value='"+rs[i]+"'>"
+								+ rs[i] + "</option>");
+					}
+				});
+				socket.once('var_type', function(rs){
+					for(i = 0 ; i <rs.length ; i++){
+						varType[i] = rs[i];
+					}
+				});
 				socket.once('table', function(rs){
 					for(var i = 0 ; i < rs.length ; i ++){
 						table[i] = rs[i];
@@ -133,7 +134,6 @@
 			socket.once('tabname', function(data) {
 				$("#fTable").append('<option>');
 				for(var i = 0 ; i < data.table.length ; i++){
-					console.log(data.table[i]);
 					$("#fTable").append("<option value='"+data.table[i]+"'>"+ data.table[i] + "</option>");
 				}
 			});
@@ -264,9 +264,6 @@
 					&& !$columnComment.val() == '')
 				notValid($columnComment);
 			
-			for(var i = 0 ; i < $(".scale").length ; i ++){
-				console.log(i);
-			}
 		}
 
 		var $comment = $("#comment");
@@ -305,48 +302,20 @@
 		//console.log(trLth);
 	});
 
-//	$("#column").on("click", "select.type", function() {
-//		
-//		var lengthParent = $(this).parent().next();
-//		var length = lengthParent.children(".length");
-//		var typeInd = $(this).children("option:selected").index();
-//		var numericInd = $(".type").find('option').length-2;
-//		console.log(typeInd == numericInd)
-//		if (typeInd >= 61 && (typeInd % 2 == 1) && typeInd !== numericInd) {//length
-//			length.parents("#column").width(1400);
-//			length.eq(0).prop("disabled", false).css("width", 83);
-//			$('.scale').prop({
-//				"type" : "hidden",
-//				"disabled" : true
-//			});
-//			length.closest('td').width(87);
-//		} else if (typeInd == numericInd) {//numeric
-//			length.parents("#column").width(1430);
-//			length.closest('td').width(200);
-//			length.prop({
-//				"type" : "text",
-//				"disabled" : false
-//			}).css("width", 83);
-//			length.eq(0).css("float", "left");
-//			$('.scale').css("float", "right");
-//
-//		} else {//length 필요 없는 경우 - length2전송
-//			length.parents("#column").width(1400);
-//			length.eq(0).prop({
-//				"disabled" : true,
-//				"value" : ""
-//			}).css("width", 83);
-//			$('.scale').prop({
-//				"type" : "hidden",
-//				"disabled" : false
-//			});
-//			if (typeInd == 1 && typeInd == 77) {
-//				lengthParent.prev().find(".array").prop("disabled", true);
-//			}
-//			length.closest('td').width(87);
-//		}
-//
-//		$(this).next().children('option:first').prop('selected', true);
-//	});
-
+	$("select.type").change(function(){
+		var $length = $(this).closest('td').next().find('.length').prop('disabled', true);
+		var $precision = $(this).closest('td').next().next().find('.precision').prop('disabled', true);
+		var optionSel = $(this).find('option:selected').val();
+		for(var i = 0 ; i < varType.length; i ++){
+			if(varType[i] == optionSel){
+				$length.prop('disabled', false);
+			}
+		}
+		if(optionSel == 'numeric'){
+			$precision.prop('disabled', false);
+		}
+	});
+	$(".length, .precision").change(function(){
+		$(this).next().val($(this).val());
+	})
 	
