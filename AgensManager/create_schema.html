@@ -1,25 +1,38 @@
+<link rel="stylesheet" href="public/css/create_schema.css" />
 <div class="content_wrapper">
 	<form id="schemaForm">
-		<h2>Create schema</h2>
+		<div>
+			<label for="name">SCHEMA NAME</label>
+			<input type="text" name="name" id="name" />
+		</div>
 		<ul id="schema">
-			<li><span>Name</span><input type="text" name="name" id="name" /></li>
-			<li><span>Database</span><select id="database"></select></li>
-			<li><span>Owner</span><select name="owner" id="owner"></select></li>
-			<li><span>Comment</span>
-			<textarea name="comment" id="comment"></textarea></li>
+			<li>
+				<label>DB</label>
+				<select id="dbList"></select>
+			</li>
+			<li>
+				<label>OWNER</label>
+				<select name="owner" id="owner"></select>
+			</li>
+			<li>
+				<label>COMMENT</label>
+				<textarea name="comment" id="comment"></textarea>
+			</li>
 		</ul>
 	</form>
-	<button id="createBtn">Create</button>
-	<button id="cancelBtn">Cancel</button>
+	<div id="btnBox">
+		<button id="createBtn">Create</button>
+		<button id="cancelBtn">Cancel</button>
+	</div>
 </div>
 <script>
 
-	$("#database").append('<option>Select Database</option>');
+	$("#dbList").append('<option>Select Database</option>');
 	for(var i = 0 ; i < $(".db").length ; i++){
-		$("#database").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
+		$("#dbList").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
 	}
 	
-	$("#database").change(function(){
+	$("#dbList").change(function(){
 		$("#owner").empty();
 		if($(this).find('option:selected').index()>0){
 			socket.emit('set_dbname', {dbname: $(this).find('option:selected').val(), to:'create_schema'});

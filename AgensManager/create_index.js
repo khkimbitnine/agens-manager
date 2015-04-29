@@ -7,7 +7,6 @@ exports.create_index = function(socket, client, formdata){
 		//CREATE [UNIQUE] INDEX [CONCURRENTLY] [index_name] ON table [USING accessmethod] (column [ops] [DESC/ASC] NULLS FIRST/LAST)
 		//[ALTER TABLE table CLUSTER ON column]
 		var form = formdata.form;
-		
 		var accessMethod;
 		var desc;
 		var order;
@@ -18,7 +17,7 @@ exports.create_index = function(socket, client, formdata){
 		if(form[2].value==1) query = "CREATE UNIQUE INDEX";
 		if(form[3].value==1) query += " CONCURRENTLY";
 		if(form[0].value.length !== 0) query += " "+form[0].value;
-		query += " ON "+form[6].value;
+		query += ' ON "'+form[5].value+'".'+form[6].value;
 		if(form[1].value.length !== 0) query += " USING "+form[1].value;
 		query += " (";
 		var columns = formdata.column;
@@ -32,11 +31,12 @@ exports.create_index = function(socket, client, formdata){
 		}
 		console.log(query);
 		client.query(query, function(err, rs){
+		var error;
 			if(err){
 				error = err.toString();
-			}else{
-				console.log("Index created.");
 			}
+				console.log("Index created.");
+			
 			socket.emit('index_success', error);
 		});
 		

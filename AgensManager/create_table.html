@@ -4,14 +4,6 @@
 		<ul>
 			<li>
 				<div class="field name">
-				<div>
-				<label for="dbList">DATABASE NAME</label><select id="dbList"><option value=""></option></select>
-				</div>
-					<div id="schema">
-						<label for="schemaList">SCHEMA NAME</label> <select name="schema"
-							id="schemaList">
-						</select>
-					</div>
 					<div id="table">
 						<label for="name">TABLE NAME</label><input type="text" name="name"
 							id="name" />
@@ -19,12 +11,24 @@
 				</div>
 			</li>
 			<li>
+				<div id="database" >
+					<label for="dbList">DATABASE NAME</label>
+					<select id="dbList">
+						<option value=""></option>
+					</select>
+				</div>
+				<div id="schema">
+					<label for="schemaList">SCHEMA NAME</label> 
+					<select name="schema" id="schemaList">
+					</select>
+				</div>
 				<div class="field column">
 					<table id="column">
 						<tr>
 							<th>COLUMN</th>
 							<th>TYPE</th>
 							<th>LENGTH</th>
+							<th>PRECISION</th>
 							<th>NOT NULL</th>
 							<th>PRIMARY KEY</th>
 							<th>UNIQUE KEY</th>

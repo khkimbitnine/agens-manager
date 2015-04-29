@@ -3,6 +3,17 @@
     		$('#tab-container').easytabs({animationSpeed: 'fast', updateHash: false});
 		});
 		
+		$(document).on("click", ".checkbox", function() {
+			if ($(this).hasClass('on')) {
+				$(this).removeClass('on');
+				$(this).next().val(0);
+				$(this).prop("src", "public/css/images/chkbox_default.png");
+			} else {
+				$(this).addClass('on');
+				$(this).next().val(1);
+				$(this).prop("src", "public/css/images/chkbox_btn.png");
+			}
+		});
 		//tab z-index
 		var zInd;
 		
@@ -125,14 +136,6 @@
 				$(".object").not($this).removeClass("on").css({"background": "rgb(36,39,45)","color": "#fff", "font-weight":"normal"});
 			}
 		});
-
-		//======================= 트리 생성 ===============================
-		var s = $("#browser").treeview({
-			collapsed : true
-		});
-		//========= 소켓 연결
-		var socket = io.connect();
-		
 				//create table click event: content에 create_table.html 로드 
 		toolMenuSubUl.on("click", ".object_li>.object", function() {
 			var $content = $(".content");
@@ -198,7 +201,13 @@
 			}
 
 		});
-		
+
+		//======================= 트리 생성 ===============================
+		var s = $("#browser").treeview({
+			collapsed : true
+		});
+		//========= 소켓 연결
+		var socket = io.connect();
 		//========= 트리전체를 감싸는 #browser 선언
 		var $browser = $("#browser");
 
@@ -207,9 +216,9 @@
 		var exp = "expandable lastExpandable";
 		var collHit = "hitarea collapsable-hitarea lastCollapsable-hitarea";
 		var coll = "collapsable lastCollapsable";
-		var db;
 		var username;
-		//========= db 트리 생성				
+		
+		//========= db 트리 생성
 		//db 목록.
 		socket.once('db', function(db) {
 			for (var i = 0; i < db.length; i++) {
@@ -228,54 +237,56 @@
 			$this.prev().removeClass().addClass(collHit);
 			$this.parent().removeClass().addClass(coll);
 		}
-		
-		//========= db 클릭, 스키마 생성             
+		var prevDb;
+		//========= db 클릭, 스키마 생성
 		$browser.on("click", ".db", function() {
 			var $this = $(this);//db
 			var dbname = $this.text();//db 이름
+			prevDb = dbname;
 			socket.emit('set_dbname', dbname);
 			
 			if ($this.parent().hasClass("collapsable")) {
 				
 				$this.next().remove();
 				expand($this);
+				
 			} else {
+				
 				collapse($this);
 				//스키마 출력 함수 호출
 				//스키마 수신
 				var schema = [];
-				socket.once('scname', function(data) {//이벤트 리스너 해제를 확실히 하기 위해서, once 메서드(한번만 리스너 실행)를 씀(이유모름. 다른 리스너들은 on을 써도 작동됨.) 
-					
+				socket.once('scname', function(data) { 
+						
 						//스키마 배열 생성 함수 호출
 						$("<ul style='display: block;' class='sch'>").insertAfter($this);
-
 						for (var i = 0; i < data.schema.length; i++) {
 							schema[i] = data.schema[i];
 							$("<li class='"+exp+"'><div class='"+expHit+"'></div><span class='schema'>"
 									+ data.schema[i] + "</span></li>").appendTo($this.next());
 						}
-
-						//스키마 수신 이벤트 리스너 해제
-						socket.removeListener('scname');
 				});
-
-				//스키마 배열 생성 함수(data = 스키마 데이터)
-				function sch_name(data, $this) {
-
-
-				}
 			}
 		});
 		
 
 		//========= 스키마 클릭, 테이블/뷰/함수(이름만) 생성
-
+		
 		$browser.on("click", ".schema", function() {
 			var $this = $(this);//schema
-
+			
+			var dbname = $this.closest(".sch").prev().text();
+			if(prevDb !== dbname){
+				prevDb = dbname;
+				socket.emit('set_dbname', dbname);
+				
+			}
+			
 			if ($this.parent().hasClass("collapsable")) {
+				
 				$this.next().remove();
 				expand($this);
+				
 			} else {
 				collapse($this);
 
@@ -294,6 +305,14 @@
 			var $this = $(this);
 			var $parent = $this.parent();//.collapsable.lastCollapsable
 			var scname = $parent.parent().prev().text();//ex) public
+			
+			var dbname = $this.closest(".sch").prev().text();
+			if(prevDb !== dbname){
+				prevDb = dbname;
+				socket.emit('set_dbname', dbname);
+				
+			}
+			
 			if ($this.prev().hasClass("collapsable-hitarea")) {
 				$parent.children(".tableUl").remove();
 				expand($this);
@@ -320,7 +339,6 @@
 						}
 
 					}
-					socket.removeListener('tabname');
 				});
 			}
 		});
@@ -330,6 +348,14 @@
 			var $this = $(this);
 			var $parent = $this.parent();
 			var scname = $parent.parent().prev().text();
+
+			var dbname = $this.closest(".sch").prev().text();
+			if(prevDb !== dbname){
+				prevDb = dbname;
+				socket.emit('set_dbname', dbname);
+				
+			}
+			
 			if ($this.prev().hasClass("collapsable-hitarea")) {
 				$parent.children(".vw").remove();
 				expand($this);
@@ -356,8 +382,6 @@
 									$this.next());
 						}
 
-						//뷰 수신 이벤트 리스너 해제
-						socket.removeListener('viewname');
 					}
 				});
 			}
@@ -369,6 +393,13 @@
 			var $this = $(this);
 			var $parent = $this.parent();
 			var scname = $parent.parent().prev().text();
+
+			var dbname = $this.closest(".sch").prev().text();
+			if(prevDb !== dbname){
+				prevDb = dbname;
+				socket.emit('set_dbname', dbname);
+				
+			}
 
 			if ($this.prev().hasClass("collapsable-hitarea")) {
 				$parent.children(".func").remove();
@@ -402,12 +433,15 @@
 		});
 
 		//========= 테이블 클릭, column/index/constraints(이름만) 생성
-		$browser
-				.on(
-						"click",
-						".table",
-						function() {
+		$browser.on("click",".table",function() {
 							var $this = $(this);
+
+							var dbname = $this.closest(".sch").prev().text();
+							if(prevDb !== dbname){
+								prevDb = dbname;
+								socket.emit('set_dbname', dbname);
+								
+							}
 
 							if ($this.parent().hasClass("collapsable")) {
 								$this.next().remove();
@@ -436,6 +470,13 @@
 		$browser.on("click", ".view", function() {
 			var $this = $(this);
 
+			var dbname = $this.closest(".sch").prev().text();
+			if(prevDb !== dbname){
+				prevDb = dbname;
+				socket.emit('set_dbname', dbname);
+				
+			}
+
 			if ($this.parent().hasClass("collapsable")) {
 				$this.next().remove();
 				expand($this);
@@ -454,8 +495,15 @@
 			var $this = $(this);
 			var $parent = $this.parent();
 			var tabname = $parent.parent().prev().text();
-			var scname = $parent.parent().parent().parent().parent().parent()
-					.prev().text();
+			var scname = $parent.parent().parent().parent().parent().parent().prev().text();
+
+			var dbname = $this.closest(".sch").prev().text();
+			if(prevDb !== dbname){
+				prevDb = dbname;
+				socket.emit('set_dbname', dbname);
+				
+			}
+			
 			if ($this.prev().hasClass("collapsable-hitarea")) {
 				$parent.children(".col").remove();
 				expand($this);
@@ -496,8 +544,15 @@
 			var $this = $(this);
 			var $parent = $this.parent();
 			var tabname = $parent.parent().prev().text();
-			var scname = $parent.parent().parent().parent().parent().parent()
-					.prev().text();
+			var scname = $parent.parent().parent().parent().parent().parent().prev().text();
+
+			var dbname = $this.closest(".sch").prev().text();
+			if(prevDb !== dbname){
+				prevDb = dbname;
+				socket.emit('set_dbname', dbname);
+				
+			}
+			
 			if ($this.prev().hasClass("collapsable-hitarea")) {
 				$parent.children(".cons").remove();
 				expand($this);
@@ -532,63 +587,53 @@
 			}
 		});
 
-		//제약키 출력 함수 
-		function consname_emit(tabname, scname, $parent) {
-
-
-
-		}
-
 		//========= 테이블인덱스 클릭, 인덱스 생성 
 		$browser.on("click", ".tableIndex", function() {
 			var $this = $(this);
 			var $parent = $this.parent();
 			var tabname = $parent.parent().prev().text();
-			var scname = $parent.parent().parent().parent().parent().parent()
-					.prev().text();
+			var scname = $parent.parent().parent().parent().parent().parent().prev().text();
+			
+
+			var dbname = $this.closest(".sch").prev().text();
+			if(prevDb !== dbname){
+				prevDb = dbname;
+				socket.emit('set_dbname', dbname);
+				
+			}
+			
+			
 			if ($this.prev().hasClass("collapsable-hitarea")) {
 				$parent.children(".ind").remove();
 				expand($this);
 			} else {
 
 				collapse($this);
-				// 인덱스 출력 함수 호출
-				indname_emit(tabname, scname, $parent);
+				
+				//테이블 이름 전송
+				socket.emit('set_tabname_ind', {
+					tabname : tabname,
+					scname : scname
+				});
+
+				//인덱스 수신
+				socket.once('indname', function(data) {
+					if (data.index.length !== 0) {
+
+						$("<ul style='display: block;' class='ind'>").appendTo(
+								$parent);
+
+						for (var i = 0; i < data.index.length; i++) {
+							//console.log(data.index[i]);
+							$(
+									"<li class='last'><span class='ind'>"
+											+ data.index[i] + "</span></li>").appendTo(
+									$this.next());
+						}
+					}
+				});
+
+				
 			}
 		});
 
-		//인덱스 출력 함수
-		function indname_emit(tabname, scname, $parent) {
-
-			//테이블 이름 전송
-			socket.emit('set_tabname_ind', {
-				tabname : tabname,
-				scname : scname
-			});
-
-			//인덱스 수신
-			socket.once('indname', function(data) {
-
-				if (data.index.length !== 0) {
-
-					$("<ul style='display: block;' class='ind'>").appendTo(
-							$parent);
-
-					//인덱스 배열 생성 함수 호출
-					ind_name(data);
-				}
-			});
-
-			//인덱스 배열 생성 함수 (data = 인덱스 데이터)
-			function ind_name(data) {
-
-				for (var i = 0; i < data.index.length; i++) {
-					//console.log(data.index[i]);
-					$(
-							"<li class='last'><span class='ind'>"
-									+ data.index[i] + "</span></li>").appendTo(
-							$this.next());
-				}
-
-			}
-		}

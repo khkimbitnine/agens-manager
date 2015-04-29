@@ -2,12 +2,12 @@ exports.create_table = function(socket, client, formdata){
 	
 		var error;
 		
-		var interval = 9	
-		//columnName, typeName, array, typeLength, constraint, not_null
-		//unique, primary, foreign, default, column_comment, check
+		var interval = 10	
+		//column_name, type, length, precision, not_null
+		//primary, unique, default, foreign, check
 		
-		var schema = formdata[0].value;
-		var name = formdata[1].value;
+		var name = formdata[0].value;
+		var schema = formdata[1].value;
 		var comment = formdata[formdata.length-1].value;
 		var column = [];//all column values
 		for(var i = 2 ; i < formdata.length-1; i++){
@@ -19,6 +19,7 @@ exports.create_table = function(socket, client, formdata){
 			var colName = '';
 			var type = '';
 			var length = '';
+			var precision = '';
 			var nn = '';
 			var pk = '';
 			var uk = '';
@@ -35,18 +36,22 @@ exports.create_table = function(socket, client, formdata){
 			colName = row[0];
 			type = row[1];
 			length = row[2];
-			nn = row[3];
-			pk = row[4];
-			uk = row[5];
-			def = row[6];
-			fk = row[7];
-			chk = row[8];
-			cmt = row[9];
+			precision = row[3];
+			nn = row[4];
+			pk = row[5];
+			uk = row[6];
+			def = row[7];
+			fk = row[8];
+			chk = row[9];
+			cmt = row[10];
 			
-			if(length.length!== 0){
+			if(length.length !== 0 && precision.length == 0){
 				length = "("+length+")";
 			}
-			
+			if(precision.length !==0){
+				length = "("+length+",";
+				precision = precision+")";
+			}
 			if(nn == 1) {
 				nn = " NOT NULL";
 			}else{
@@ -87,9 +92,9 @@ exports.create_table = function(socket, client, formdata){
 			}
 			
 			if(i == ((column.length)/interval)-1){
-				createTable += colName+" "+type+length+nn+chk+def+uk+pk+fk+");" 
+				createTable += colName+" "+type+length+precision+nn+chk+def+uk+pk+fk+");" 
 			}else{
-				createTable += colName+" "+type+length+nn+chk+def+uk+pk+fk+", " 
+				createTable += colName+" "+type+length+precision+nn+chk+def+uk+pk+fk+", " 
 			}
 
 		}

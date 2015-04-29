@@ -1,16 +1,29 @@
+<link rel="stylesheet" href="public/css/create_view.css" />
 <div class="content_wrapper">
 	<form id="viewForm">
-		<h2>Create view</h2>
-		<ul id = "view">
-			<li><span>Name</span><input type='text' name='name' id="name"/>
-			<label for="dbList">database</label><select id="dbList"></select>
+		<div>
+			<label for="name">VIEW NAME</label>
+			<input type="text" name="name" id="name"/>
+		</div>
+		<ul id="view">
+			<li>
+				<label>DB</label>
+				<select id="dbList"></select>
 			</li>
-			<li><span>Query</span><textarea name='query' id='query'></textarea></li>
-			<li><span>Comment</span><textarea name='comment' id='comment'></textarea></li>
+			<li>
+				<label>QUERY</label>
+				<textarea name='query' id='query'></textarea>
+			</li>
+			<li>
+				<label>COMMENT</label>
+				<textarea name='comment' id='comment'></textarea>
+			</li>
 		</ul>
 	</form>
-	<button id="createBtn">Create</button>
-	<button id="Cancel">Cancel</button>
+	<div id="btnBox">
+		<button id="createBtn">Create</button>
+		<button id="cancelBtn">Cancel</button>
+	</div>
 </div>
 <script>
 $("#dbList").append('<option>Select Database</option>');
@@ -19,9 +32,8 @@ for(var i = 0 ; i < $(".db").length ; i++){
 }
 
 $("#dbList").change(function(){
-	$(".schema, .type").empty();
 	if($(this).find('option:selected').index()>0){
-		socket.emit('set_dbname', {dbname: $(this).find('option:selected').val(), to:'create_view'});
+		socket.emit('set_dbname', $(this).find('option:selected').val());
 	}
 })
 

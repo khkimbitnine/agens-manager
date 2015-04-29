@@ -10,7 +10,9 @@
 			+ '</td>'
 			+ '<td>'
 			+ '<input type="text" name="length" class="length" value="" disabled />'
-			+ '<input type="hidden" name="length2" class="length"/>'
+			+ '</td>'
+			+ '<td>'
+			+ '<input type="text" name="precision" class="precision" value="" disabled />'
 			+ '</td>'
 			+ '<td>'
 			+ '<img class="not_null checkbox" src="public/css/images/chkbox_default.png"/>'
@@ -37,7 +39,7 @@
 			"real", "real[]", "smallint", "smallint[]", "smallserial", "smallserial[]", "serial", "serial[]", "text", "text[]", "tsquery", "tsquery[]",
 			"tsvector", "tsvector[]", "txid_snapshot", "txid_snapshot[]", "uuid", "uuid[]", "xml", "xml[]", "bit", "bit[]", "bit varying", "bit varying[]",
 			"character", "character[]", "character varying", "character varying[]", "interval", "interval[]", "time", "time[]",
-			"time with time zone", "time with time zone[]", "timestamp", "timestamp[]", "timestamp with time zone", "timestamp with time zone[]",
+			"time with time zone", "time with time zone[]", "time without time zone","time without time zone[]","timestamp", "timestamp[]", "timestamp with time zone", "timestamp with time zone[]","timestamp without time zone","timestamp without time zone[]",
 			"numeric", "numeric[]" ];
 
 	function appendColumn() {
@@ -58,19 +60,13 @@
 	}
 	appendColumn();
 
-	$(document).on("click", ".checkbox", function() {
-		if($(this).hasClass("p_key") && !$(this).hasClass('on')){
-			$(".p_key").prop("src", "public/css/images/chkbox_default.png").next().val(0);
-		}
-		if ($(this).hasClass('on')) {
-			$(this).removeClass('on');
-			$(this).next().val(0);
-			$(this).prop("src", "public/css/images/chkbox_default.png");
-		} else {
-			$(this).addClass('on');
-			$(this).next().val(1);
-			$(this).prop("src", "public/css/images/chkbox_btn.png");
-		}
+	$(document).on("click", ".p_key.checkbox", function() {
+	 	$(".p_key.checkbox").click(function(){
+	 		var $this = $(this);
+	 		if(!$this.hasClass('on')){
+				$(".p_key.checkbox").not($this).removeClass('on').prop("src", "public/css/images/chkbox_default.png").next().val(0);
+	 		}
+	 	});
 	});
 
 	var schemaArray = [];
@@ -267,7 +263,10 @@
 			if (!commentPattern.test($columnComment.val())
 					&& !$columnComment.val() == '')
 				notValid($columnComment);
-
+			
+			for(var i = 0 ; i < $(".scale").length ; i ++){
+				console.log(i);
+			}
 		}
 
 		var $comment = $("#comment");
@@ -275,7 +274,7 @@
 			notValid($comment);
 
 		if ($(".notValid").size() == 0) {
-			socket.emit('submit_table', true);
+
 			socket.emit('table_form', $("#tableForm").serializeArray());
 			socket.once('table_success', function(error){
 				if(error==null){
@@ -283,7 +282,6 @@
 				}else{
 					alert(error);
 				}
-				socket.emit('submit_table', false);
 			})
 		}
 
@@ -307,49 +305,48 @@
 		//console.log(trLth);
 	});
 
-	$("#column").on("click", "select.type", function() {
-		
-		var lengthParent = $(this).parent().next();
-		var length = lengthParent.children(".length");
-		var typeInd = $(this).children("option:selected").index();
-		var numericInd = $(".type").find('option').length-2;
-		console.log(typeInd == numericInd);
-		
-		if (typeInd >= 61 && $(this).children("option:selected").is(":even")) {//length로 전송(numeric 외 length가 필요한 경우.)
-			length.parents("#column").width(1400);
-			length.eq(0).prop("disabled", false).css("width", 83);
-			length.eq(1).prop({
-				"type" : "hidden",
-				"disabled" : true
-			});
-			length.closest('td').width(87);
-		} else if (typeInd == numericInd) {//numeric
-			length.parents("#column").width(1430);
-			length.closest('td').width(200);
-			length.prop({
-				"type" : "text",
-				"disabled" : false
-			}).css("width", 83);
-			length.eq(0).css("float", "left");
-			length.eq(1).css("float", "right");
-
-		} else {//length 필요 없는 경우 - length2전송
-			length.parents("#column").width(1400);
-			length.eq(0).prop({
-				"disabled" : true,
-				"value" : ""
-			}).css("width", 83);
-			length.eq(1).prop({
-				"type" : "hidden",
-				"disabled" : false
-			});
-			if (typeInd == 1 && typeInd == 77) {
-				lengthParent.prev().find(".array").prop("disabled", true);
-			}
-			length.closest('td').width(87);
-		}
-
-		$(this).next().children('option:first').prop('selected', true);
-	});
+//	$("#column").on("click", "select.type", function() {
+//		
+//		var lengthParent = $(this).parent().next();
+//		var length = lengthParent.children(".length");
+//		var typeInd = $(this).children("option:selected").index();
+//		var numericInd = $(".type").find('option').length-2;
+//		console.log(typeInd == numericInd)
+//		if (typeInd >= 61 && (typeInd % 2 == 1) && typeInd !== numericInd) {//length
+//			length.parents("#column").width(1400);
+//			length.eq(0).prop("disabled", false).css("width", 83);
+//			$('.scale').prop({
+//				"type" : "hidden",
+//				"disabled" : true
+//			});
+//			length.closest('td').width(87);
+//		} else if (typeInd == numericInd) {//numeric
+//			length.parents("#column").width(1430);
+//			length.closest('td').width(200);
+//			length.prop({
+//				"type" : "text",
+//				"disabled" : false
+//			}).css("width", 83);
+//			length.eq(0).css("float", "left");
+//			$('.scale').css("float", "right");
+//
+//		} else {//length 필요 없는 경우 - length2전송
+//			length.parents("#column").width(1400);
+//			length.eq(0).prop({
+//				"disabled" : true,
+//				"value" : ""
+//			}).css("width", 83);
+//			$('.scale').prop({
+//				"type" : "hidden",
+//				"disabled" : false
+//			});
+//			if (typeInd == 1 && typeInd == 77) {
+//				lengthParent.prev().find(".array").prop("disabled", true);
+//			}
+//			length.closest('td').width(87);
+//		}
+//
+//		$(this).next().children('option:first').prop('selected', true);
+//	});
 
 	

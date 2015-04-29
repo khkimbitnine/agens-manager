@@ -50,7 +50,7 @@ body {
 
 .content_wrapper {
 	margin: auto;
-	background: #fff;
+	background: #eee;
 }
 
 .sidebar {
@@ -113,28 +113,28 @@ body {
 	left:51px;
 }
 .bar_content>ul>li>ul>li:nth-of-type(1):before{
-	top:2px;
+	top:10px;
 	background:url('images/table.png') no-repeat;
 }
 .bar_content>ul>li>ul>li:nth-of-type(2):before{
-	top:42px;
+	top:50px;
 	background:url('images/schema.png') no-repeat;
 }
 .bar_content>ul>li>ul>li:nth-of-type(3):before{
-	top:82px;
-	background:url('images/database.png') no-repeat;
+	top:90px;
+	background:url('images/index.png') no-repeat;
 }
 .bar_content>ul>li>ul>li:nth-of-type(4):before{
-	top:122px;
-	background:url('images/database.png') no-repeat;
+	top:130px;
+	background:url('images/view.png') no-repeat;
 }
 .bar_content>ul>li>ul>li:nth-of-type(5):before{
-	top:162px;
-	background:url('images/database.png') no-repeat;
+	top:170px;
+	background:url('images/fuction.png') no-repeat;
 }
 .bar_content>ul>li>ul>li:nth-of-type(6):before{
-	top:202px;
-	background:url('images/database.png') no-repeat;
+	top:210px;
+	background:url('images/trigger.png') no-repeat;
 }
 
 .object {
@@ -216,90 +216,7 @@ body {
 	cursor: text;
 }
 
-#schemaForm, #viewForm {
-	color: #000;
-	font-size: 15px;
-}
-
-#schema, #view {
-	list-style: none;
-}
-
-#schema span {
-	display: inline-block;
-	width: 100px;
-	height: 40px;
-	margin: 0 15px 5px 0;
-	background: rgb(149, 193, 218);
-	line-height: 40px;
-	text-decoration: underline;
-}
-
-#view span {
-	display: inline-block;
-	width: 100px;
-	height: 40px;
-	margin: 0 15px 5px 0;
-	background: rgb(149, 193, 218);
-	line-height: 40px;
-	text-decoration: underline;
-}
-
-#view li:nth-of-type(2) {
-	width: 420px;
-	height: 110px;
-}
-
-#view li:nth-of-type(3) {
-	width: 420px;
-	height: 50px;
-}
-
-#view li:nth-of-type(2) span {
-	margin: 0;
-	height: 100px;
-	float: left;
-}
-
-#view li:nth-of-type(3) span {
-	margin: 0;
-	height: 50px;
-	float: left;
-}
-
-#view li:nth-of-type(2) textarea {
-	float: right;
-	height: 100px;
-	width: 300px;
-	resize: none;
-}
-
-#view li:nth-of-type(3) textarea {
-	float: right;
-	height: 50px;
-	width: 300px;
-	resize: none;
-}
-
-#schema li:nth-of-type(3) {
-	width: 420px;
-	height: 50px;
-}
-
-#schema li:nth-of-type(3) span {
-	margin: 0;
-	height: 50px;
-	float: left;
-}
-
-#schema li:nth-of-type(3) textarea {
-	float: right;
-	height: 50px;
-	width: 300px;
-	resize: none;
-}
-
-#registerForm, #loginForm{
+#loginForm{
 	width: 600px;
 	height: 100px;
 	position: absolute;
@@ -308,21 +225,24 @@ body {
 	background: #fff;
 }
 
-#registerForm>div>label, #loginForm>div>label {
+#loginForm>div>label {
 	display: inline-block;
 	width: 120px;
 	color: #000;
 }
 
-#registerForm>div>input, #loginForm>div>input {
+#loginForm>div>input {
 	display: inline-block;
 	width: 300px;
 }
 
-#registerForm>#createBtnBox, #loginForm>#loginBtnBox{
+#loginForm>#loginBtnBox{
 	width: 600px;
 }
 
-#registerForm>#createBtnBox>button, #loginForm>#loginBtnBox>button {
+#loginForm>#loginBtnBox>button {
 	float: right;
+}
+.checkbox, button{
+	cursor:pointer;
 }

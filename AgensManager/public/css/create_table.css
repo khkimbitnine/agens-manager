@@ -7,7 +7,7 @@ ul {
 	width:1400px;
 	
 }
-select, .checkbox, button {
+select, button {
 	cursor: pointer;
 }
 
@@ -36,16 +36,16 @@ li:nth-of-type(4)>.field>span {
 }
 
 .column .column_input{
-	width:183px;
+	width:150px;
 	height:35px;
 	padding:0;
 }
 
 .type {
-	width:222px;
+	width:200px;
 	height:39px;
 }
-.length {
+.length, .precision {
 	width:83px;
 	height:35px;
 	padding:0;	
@@ -132,24 +132,44 @@ li:nth-of-type(4)>.field>span {
 	left:71px;
 	top:42px;
 }
-.field.name>div {
-	display:inline-block;
+#table {
 	width:380px;
 	height:40px;
 }
-.field #schema label, .field #table label{
+#table>label{
+	margin-right:30px;
+}
+#database, #schema{
+	display:inline-block;
+	margin: 40px 20px 0 0;
+}
+#database{
+	margin-left:71px;
+}
+
+#database>label, #schema>label{
+	font-size: 14px;
+	font-weight: bold;
+	color:rgb(31,112,175);
+	margin-right:10px;
+}
+#database>select, #schema>select{
+	display:inline-block;
+}
+
+#table label{
 	font-size: 19.42px;
 	font-weight: bold;
 	color:rgb(31,112,175);
 }
-#schemaList, #name{
+#dbList, #schemaList, #name{
 	width: 213px;
 	height:39px;
 	padding:0;
 }
 #tableForm>ul>li:nth-of-type(2){
 	width:100%;
-	min-height:353px;
+	min-height:250px;
 	background:#eee;
 	overflow:auto;
 }
@@ -174,7 +194,7 @@ table#column th{
 	height:240px;
 	position:absolute;
 	left:71px;
-	top:56px;
+	top:26px;
 }
 .field.comment>span{
 	display:block;

@@ -1,47 +1,47 @@
  	var scname;
  	var pattern = /^[a-zA-Z_\d]+$/;
 
- 	$(".checkbox").click(function(){
- 		if($(this).is(':checked')){
-	 		$(this).next().val(1);
- 		}else{
-	 		$(this).next().val(0);
- 		}
- 	});
 	$(".order").click(function(){
 		$(".order").not($(this)).prop('checked', false);
 	});
- 	$("#last").prop('checked', true).next().val(1);
+ 	$("#last").addClass('on').prop("src", "public/css/images/chkbox_btn.png").next().val(1);
+ 	
+ 	$(".order.checkbox").click(function(){
+ 		var $this = $(this);
+ 		if(!$this.hasClass('on')){
+			$(".order.checkbox").not($this).removeClass('on').prop("src", "public/css/images/chkbox_default.png").next().val(0);
+ 		}
+ 	});
  	
 	for(var i = 0 ; i < $(".db").length ; i++){
-		$(".ind.database").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
+		$("#indDatabase").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
 	}
  	
-		$(".ind.database").change(function(){
-	 		$(".ind.schema, .ind.table, .ind.column, .ind.index").empty();
+		$("#indDatabase").change(function(){
+	 		$("#indSchema, #indTable, #indColumn, #indIndex").empty();
  	 		socket.emit('set_dbname', $(this).find('option:selected').val());
  	 		socket.once('scname', function(data){
  	 			for(var i = 0 ; i < data.schema.length ; i++){
- 	 				$(".ind.schema").append("<option value='"+data.schema[i]+"'>"+data.schema[i]+"</option>");
+ 	 				$("#indSchema").append("<option value='"+data.schema[i]+"'>"+data.schema[i]+"</option>");
  	 			}
  	 		});
  		})
- 		$(".ind.schema").change(function(){
- 	 		$(".ind.table, .ind.column, .ind.index").empty();
+ 		$("#indSchema").change(function(){
+ 	 		$("#indTable, #indColumn, #indIndex").empty();
  			socket.emit('set_scname_table', $(this).find("option:selected").val());
  			socket.once('tabname', function(data){
  				for(var i = 0 ; i < data.table.length ; i++){
- 					$(".ind.table").append("<option value='"+data.table[i]+"'>"+data.table[i]+"</option>");
+ 					$("#indTable").append("<option value='"+data.table[i]+"'>"+data.table[i]+"</option>");
  				}
  			});
  		})
  		
- 		$(".ind.table").change(function(){
- 			$(".ind.column, .ind.index").empty();
- 			socket.emit('set_tabname_col', {tabname: $(this).find('option:selected').val(), scname:$(".ind.schema").find('option:selected').val()});
+ 		$("#indTable").change(function(){
+ 			$("#indColumn, #indIndex").empty();
+ 			socket.emit('set_tabname_col', {tabname: $(this).find('option:selected').val(), scname:$("#indSchema").find('option:selected').val()});
  			socket.once('colname', function(data){
  				for(var i = 0 ; i < data.column.length ; i++){
- 					$(".ind.column").append("<option value='"+data.column[i]+"'>"+data.column[i]+"</option>");
+ 					$("#indColumn").append("<option value='"+data.column[i]+"'>"+data.column[i]+"</option>");
  				}
  			});
  		});
@@ -49,26 +49,26 @@
 		
  	$("#btnBox>button").click(function(e){
  		e.preventDefault();
- 		var column = $(".column>option:selected");
+ 		var column = $("#indColumn>option:selected");
+ 		var col = '';
  		if($(this).index()==0){//add
- 			
-	 		var col = column.remove().appendTo(".index").prop('selected', false).text();
+	 		col = column.remove().appendTo("#output").prop('selected', false).text();
 	 		
-	 		if($("#desc").is(":checked")){
+	 		if($("#desc").hasClass('on')){
 	 			col+=" DESC";
 	 		}else{
 	 			col+=" ASC";
 	 		}
-	 		if($(".order:eq(0)").is(":checked")) col+=" NULLS FIRST";
-	 		if($(".order:eq(1)").is(":checked")) col+=" NULLS LAST";
+	 		if($("#first").hasClass('on')) col+=" NULLS FIRST";
+	 		if($("#last").hasClass('on')) col+=" NULLS LAST";
 	 		
 	 		column.text(col).val(col);
 	 		
  		}else{
- 			var index = $(".index>option:selected");
- 			var res = index.text().split(" ");
+ 			var output = $("#output>option:selected");
+ 			var res = output.text().split(" ");
  			
-	 		index.remove().appendTo(".column").prop('selected', false).text(res[0]).val(res[0]);
+	 		output.remove().appendTo("#indColumn").prop('selected', false).text(res[0]).val(res[0]);
  		}
  	});
  	$("#createBtn").click(function(e){
@@ -77,21 +77,19 @@
  		var test = pattern.test(idxVal);
  		var columns = [];
  		
- 		if(( test || idxVal === '' )&& $(".index").has('option').length!==0){
- 			for(var i = 0 ; i < $(".index>option").length ; i++){
- 				columns[i] = $(".index>option").eq(i).val();
+ 		if(( test || idxVal === '' )&& $("#output").has('option').length!==0){
+ 			for(var i = 0 ; i < $("#output>option").length ; i++){
+ 				columns[i] = $("#output>option").eq(i).val();
  			}
  			
  		var formdata = $("#indexForm").serializeArray();
  		socket.emit('index_form', {form: formdata, column: columns});
 		socket.once('index_success', function(error){
-			socket.once('index_success', function(error){
 				if(error==null){
 					alert("Index created.");
 				}else{
 					alert(error);
 				}
-			})
 		})
  			
  		}else if(!test && idxVal !== ''){
