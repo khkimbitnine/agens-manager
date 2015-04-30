@@ -81,39 +81,5 @@ exports.set_tabname_ind = function(socket, client, data){
 //			console.log(arrInd);
 	});
 }
-exports.schema = function(socket, client, schema){//create_function
-	var query = "";
-	if(schema == "Basic datatype") {
-		query = "select typname as t from pg_type, (select oid from pg_namespace where nspname = 'pg_catalog') n where typnamespace = n.oid and typtype <> 'c'";
-	}else{
-		query = "select table_name as t from information_schema.tables where table_schema = '"+schema+"' order by 1";
-	}
-	
-	client.query(query, function(err, rs){
-		if(err){
-			console.log("schema error: "+err);
-		}
-			var types = [];
-			for(var i = 0 ; i < rs.rows.length ; i++){
-				if(rs.rows[i].t){
-					types.push(rs.rows[i].t);
-				}
-			}
-			socket.emit('types', types);
-//			console.log(types);
-	});
-}
-exports.username = function(socket, client, username){//create_trigger
-	client.query("select proname from pg_proc, (select usesysid from pg_user where usename='"+username+"') u where proowner=u.usesysid or prorettype = 2279 order by proname", function(err, rs){
-		if(err){
-			console.log(err);
-		}
-			var proname = [];
-			for(var i = 0 ; i < rs.rows.length ; i++){
-				proname.push(rs.rows[i].proname);
-			}
-			socket.emit('trigger_function', proname);
-//			console.log(proname);
-	});
-}
+
 

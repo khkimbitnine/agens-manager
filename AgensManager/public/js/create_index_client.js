@@ -1,24 +1,14 @@
  	var scname;
  	var pattern = /^[a-zA-Z_\d]+$/;
 
-	$(".order").click(function(){
-		$(".order").not($(this)).prop('checked', false);
-	});
- 	$("#last").addClass('on').prop("src", "public/css/images/chkbox_btn.png").next().val(1);
- 	
- 	$(".order.checkbox").click(function(){
- 		var $this = $(this);
- 		if(!$this.hasClass('on')){
-			$(".order.checkbox").not($this).removeClass('on').prop("src", "public/css/images/chkbox_default.png").next().val(0);
- 		}
- 	});
+ 	$("#last").addClass('on').prop("src", "public/css/images/chkbox_btn.png");
  	
 	for(var i = 0 ; i < $(".db").length ; i++){
 		$("#indDatabase").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
 	}
  	
 		$("#indDatabase").change(function(){
-	 		$("#indSchema, #indTable, #indColumn, #indIndex").empty();
+	 		$("#indSchema, #indTable, #indColumn, #indIndex, #output").empty();
  	 		socket.emit('set_dbname', $(this).find('option:selected').val());
  	 		socket.once('scname', function(data){
  	 			for(var i = 0 ; i < data.schema.length ; i++){
@@ -27,7 +17,7 @@
  	 		});
  		})
  		$("#indSchema").change(function(){
- 	 		$("#indTable, #indColumn, #indIndex").empty();
+ 	 		$("#indTable, #indColumn, #indIndex, #output").empty();
  			socket.emit('set_scname_table', $(this).find("option:selected").val());
  			socket.once('tabname', function(data){
  				for(var i = 0 ; i < data.table.length ; i++){
@@ -37,7 +27,7 @@
  		})
  		
  		$("#indTable").change(function(){
- 			$("#indColumn, #indIndex").empty();
+ 			$("#indColumn, #indIndex, #output").empty();
  			socket.emit('set_tabname_col', {tabname: $(this).find('option:selected').val(), scname:$("#indSchema").find('option:selected').val()});
  			socket.once('colname', function(data){
  				for(var i = 0 ; i < data.column.length ; i++){
@@ -45,7 +35,6 @@
  				}
  			});
  		});
-		
 		
  	$("#btnBox>button").click(function(e){
  		e.preventDefault();
@@ -76,13 +65,13 @@
  		var idxVal = $("#indexName").val();
  		var test = pattern.test(idxVal);
  		var columns = [];
- 		
  		if(( test || idxVal === '' )&& $("#output").has('option').length!==0){
  			for(var i = 0 ; i < $("#output>option").length ; i++){
  				columns[i] = $("#output>option").eq(i).val();
  			}
  			
  		var formdata = $("#indexForm").serializeArray();
+ 		
  		socket.emit('index_form', {form: formdata, column: columns});
 		socket.once('index_success', function(error){
 				if(error==null){
@@ -99,3 +88,28 @@
  		}
  	});
  	
+	$("#desc").click(function() {
+		
+		var $this = $(this);
+		
+		if ($this.hasClass('on')) {
+			$this.removeClass('on');
+			$this.prop("src", "public/css/images/chkbox_default.png");
+			
+		} else {
+			$this.addClass('on');
+			$this.prop("src", "public/css/images/chkbox_btn.png");
+	 		
+		}
+	});
+	
+	$(".order").click(function(){
+		
+		var $this = $(this);
+		
+		if(!$this.hasClass('on')){
+			$this.addClass('on');
+			$this.prop("src", "public/css/images/chkbox_btn.png");
+			$(".order.checkbox").not($this).removeClass('on').prop("src", "public/css/images/chkbox_default.png");
+ 		}
+	});

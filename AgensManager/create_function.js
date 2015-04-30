@@ -1,23 +1,47 @@
-exports.create_function = function(socket, client){
-	var schemas = [];
-	var types = [];
+exports.schema = function(socket, client, schema){
 	
+	var query = "";
+	if(schema == "Basic datatype") {
+		query = "select typname as t from pg_type, (select oid from pg_namespace where nspname = 'pg_catalog') n where typnamespace = n.oid and typtype <> 'c'";
+	}else{
+		query = "select table_name as t from information_schema.tables where table_schema = '"+schema+"' order by 1";
+	}
+	
+	client.query(query, function(err, rs){
+		if(err){
+			console.log("schema error: "+err);
+		}
+			var types = [];
+			for(var i = 0 ; i < rs.rows.length ; i++){
+				if(rs.rows[i].t){
+					types.push(rs.rows[i].t);
+				}
+			}
+			socket.emit('types', types);
+//			console.log(types);
+	});
+}
+
+exports.create_function = function(socket, client){
 	
 		//console.log(formdata);
 		var error;
 		
 		var interval = 4; 
 		//argmode, argname, argschema, argtype
+		
 		var endInd = formdata.length - 1;
 		
 		var name = formdata[0].value;
 		var setof = formdata[1].value;
+		
 		var type;
 		if(formdata[2].value.length == 0){
 			type = formdata[3].value; 
 		}else{
 			type = formdata[2].value+"."+formdata[3].value;
 		}
+		
 		var array = formdata[4].value;
 		var language = formdata[5].value;
 		
@@ -60,6 +84,7 @@ exports.create_function = function(socket, client){
 				functionName += argMode+" "+argName+" "+argSchema+"."+argType+")"
 			}
 		}
+		
 		//rows not applicable when function doesn't return a set
 		if(result_rows.length !== 0){
 			result_rows = " ROWS "+result_rows;

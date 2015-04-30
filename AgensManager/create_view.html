@@ -75,7 +75,6 @@ $("#dbList").change(function(){
 		
 		if($(".notValid").size()==0) {
 			socket.emit('view_form', $("#viewForm").serializeArray());
-			console.log($("#tableForm").serializeArray());
 		}
 		
 	}

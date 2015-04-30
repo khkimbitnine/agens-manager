@@ -33,7 +33,7 @@ exports.create_table = function(socket, client, formdata){
 					row[k++] = column[j];
 			}
 			colName = row[0];
-			type = row[1];
+			type = row[1].split('[]')[0];
 			length = row[2];
 			precision = row[3];
 			nn = row[4];
@@ -45,11 +45,23 @@ exports.create_table = function(socket, client, formdata){
 			cmt = row[10];
 			
 			if(length.length !== 0 && precision.length == 0){
-				length = "("+length+")";
+				if(row[1].split('[]').length == 1){
+					length = "("+length+")";
+				}else{
+					length = "("+length+")[]";
+				}
 			}
+			
 			if(precision.length !==0){
-				length = "("+length+",";
-				precision = precision+")";
+				
+				if(row[1].split('[]').length == 1){
+					length = "("+length+",";
+					precision = precision+")";
+				}else{
+					length = "("+length+",";
+					precision = precision+")[]";
+				}
+				
 			}
 			if(nn == 1) {
 				nn = " NOT NULL";
@@ -101,7 +113,6 @@ exports.create_table = function(socket, client, formdata){
 		if(comment.length !== 0) createTable += "COMMENT ON TABLE "+name+" IS '"+comment+"';"
 		
 		console.log(createTable);
-		//======= create Table end
 
 		client.query(createTable, function(err, rs){
 			if(err){

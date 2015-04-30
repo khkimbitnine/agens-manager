@@ -1,5 +1,6 @@
 exports.create_view = function(socket, client, data){
-	var query;
+	
+		var query;
 
 		var name = data[0].value;
 		var query = data[1].value;

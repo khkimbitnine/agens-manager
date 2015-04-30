@@ -40,7 +40,7 @@ var username = 'postgres'; //임의 유저
 	$("#dbList").change(function(){
 		$("#function").empty();
 		if($(this).find('option:selected').index()>0){
-			socket.emit('set_dbname', {dbname: $(this).find('option:selected').val(), to:'create_trigger'});
+			socket.emit('set_dbname', $(this).find('option:selected').val());
 			socket.emit('username', username);
 			
 			socket.once('trigger_function', function(data){

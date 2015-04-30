@@ -1,9 +1,5 @@
 exports.create_index = function(socket, client, formdata){
 
-		//index_name, access_method, unique, concurrently
-		//database, schema, table, desc
-		//order, first, last, operator_class
-		
 		//CREATE [UNIQUE] INDEX [CONCURRENTLY] [index_name] ON table [USING accessmethod] (column [ops] [DESC/ASC] NULLS FIRST/LAST)
 		//[ALTER TABLE table CLUSTER ON column]
 		var form = formdata.form;

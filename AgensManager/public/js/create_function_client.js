@@ -75,10 +75,10 @@
 	var def = '<label>Definition</label><textarea name="definition" id="definition" cols="30" rows="10"></textarea>';
 	$(".def").append(def);
 	
-	var $row1_3 = $("#row1");
+	var $row1 = $("#row1");
 	var sql = '<div id="language" class="sql"><select name="language"><option value="sql">sql</option><option value="plpgsql">plpgsql</option></select></div>';
-	$row1_3.append(sql);
-	$row1_3.find("#language").css({"display":"inline-block", "width": "19%"});
+	$row1.append(sql);
+	$row1.find("#language").css({"display":"inline-block", "width": "19%"});
 	
 	
 	var $row2Ul = $("#row2>ul")
@@ -110,70 +110,81 @@
 	var types = [];
 	
 	$("#setof").change(function(){
+		
 		var $this = $(this);
 		var $resRows = $("#result_rows");
+		
 		if($this.is(":checked")){
+			
 			$this.next().val("SETOF");
 			$resRows.prop('readonly', false).css('background', '#fff');
+			
 		}else{
+			
 			$this.next().val("");
 			$resRows.prop('readonly', true).css('background', '#ccc');
+			
 		}
 	});
+	
 	$("#array").change(function(){
+		
 		var $this = $(this);
 		if($this.is(':checked')){
+			
 			$this.next().val("[]");
+			
 		}else{
+			
 			$this.next().val("");
 		}
 	});
 	
 	$("#dbList").append('<option>Select Database</option>');
+	
 	for(var i = 0 ; i < $(".db").length ; i++){
 		$("#dbList").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
 	}
 	
 	$("#dbList").change(function(){
+		
 		$(".schema, .type").empty();
+		
 		if($(this).find('option:selected').index()>0){
+			
 			socket.emit('set_dbname', $(this).find('option:selected').val());
+			
 			socket.once('schemas', function(schema){
 				$(".schema").append('<option>').append('<option>Basic datatype</option>');
 				for(var i = 0 ; i < schema.length ; i++){
 					$(".schema").append('<option value = "'+schema[i]+'">'+schema[i]+'</option>');
 				}
 			});
+			
 		}
 	})
 	
 	function row2append(){
+		
 		var $li = $("<li>").appendTo($row2Ul);
 		$li.append(argmode+argname+argtype);
+		
 	}
 	
 	function schemaAppend(argInd){
+		
 			for(var i = 0 ; i < schemas.length ; i++){
 				$(".schema").eq(i).append('<option value = "'+schemas[i]+'">'+schemas[i]+'</option>');
-			}	
+			}
+			
 	}
 	
 	row2append();
 	
-	var $sqlBtn = $("#langBox").find(".language").eq(0);
-	var $internalBtn = $("#langBox").find(".language").eq(1);
-	var $cBtn = $("#langBox").find(".language").eq(2);
-	
-	$sqlBtn.prop('checked', 'checked');
-	
-	
-	var prevOpt = 0;
-	var prevSch = -1;
-	
 	$functionForm.on("change", ".schema", function(){
+		
 		var $this = $(this);
 		var schInd = $(".schema").index($this);
-		console.log("schInd: "+schInd);
 		var $option = $this.find("option:selected");
 		var optionInd = $option.index();
 		var $type = $this.next();
@@ -190,34 +201,51 @@
 	});
 
 	var $row4 = $functionForm.find("#row4");
-	var $lang = $row1_3.find("#language");
 	var $row2 = $functionForm.find("#row2");
-	var $row1 = $functionForm.find("#row1");
+	var $lang = $row1.find("#language");
+	
+	var $sqlBtn = $("#langBox").find(".language").eq(0);
+	var $internalBtn = $("#langBox").find(".language").eq(1);
+	var $cBtn = $("#langBox").find(".language").eq(2);
+	
+	$sqlBtn.prop('checked', 'checked');
 	
 	$sqlBtn.click(function(){
+		
 		if(!$row4.hasClass("def")){
+			
 			$row4.addClass("def").empty().append(def);
+			
 		}
+		
 		if(!$lang.hasClass("sql")){
+			
 			$lang.empty().removeClass("internal c").addClass("sql").append(sql);
 		}
 	});
+	
 	$internalBtn.click(function(){//link symbol
+		
 		$row2.children("ul").children("li").remove();
 		row2append();
 		$row4.removeClass("def").empty().append('<label>Link Symbol</label><input type="text" name="link_symbol" id="linkSymbol">').find("#linkSymbol").width("100%");//definition
 		$lang.empty().removeClass("sql c").addClass("internal").append('<div><span>internal</span><input type="hidden" name="language" value="internal"/></div>');
 		
 	});
+	
 	$cBtn.click(function(){//object file, link symbol
+		
 		$row2.children("ul").children("li").remove();
 		row2append();
 		$row4.removeClass("def").empty().append('<div id="objectFile"><label>Object File</label><input type="text" name="object_file"></div><div id="objectFile"><label>Link Symbol</label><input type="text" name="link_symbol" id="linkSymbol"></div>').find('div').css({"width": "50%", "display":"inline-block"}).children("input").width("100%");//definition
 		$lang.empty().removeClass("sql internal").addClass("c").append('<div><span>c</span><input type ="hidden" name="language" value="c" /></div>');
+		
 	});
 	
 	$(".language").click(function(){
+		
 		$(".language").not($(this)).prop('checked', false);
+		
 	});
 	
 	var $add = $("#add");
@@ -226,8 +254,11 @@
 		e.preventDefault();
 		
 		if($("#dbList").find('option:selected').index() == 0){
-			alert("Select databse.")
+			
+			alert("Select databse.");
+			
 		}else{
+			
 			$("#row2>ul").append("<li>"+$("#row2>ul>li:eq(0)").html()+"</li>").children('li').last().find('.schema>option:eq(0)').prop('selected', true).parent().next().empty();
 			
 		}
@@ -235,33 +266,43 @@
 		
 	});
 	
-	var $down = $(".down");//below index exchange
+	var $down = $(".down");
 	var $remove = $(".remove");
 	
-	$functionForm.on("click", ".up", function(e){// above index exchange
+	$functionForm.on("click", ".up", function(e){
 		e.preventDefault();
+		
 		var argInd = $(".up").index($(this));	//Arguments row index
 		var $li = $row2Ul.find('li');
 		
 		if(argInd == 0){
+			
 			alert("It is is the 1st row.");
+			
 		}else{
+			
 			$li.eq(argInd - 1).insertAfter($li.eq(argInd));
 		}
 	});
-	$functionForm.on("click", ".down", function(e){// below index exchange
+	
+	$functionForm.on("click", ".down", function(e){
 		e.preventDefault();
-		var argInd = $(".down").index($(this));	//Arguments row index
+		
+		var argInd = $(".down").index($(this));	
 		var lastInd = $(".down").length - 1;
 		
 		var $li = $row2Ul.find('li');
 		
 		if(argInd == lastInd){
+			
 			alert("It is is the last row.");
+			
 		}else{
+			
 			$li.eq(argInd + 1).after($li.eq(argInd));
 		}
 	});
+	
 	$functionForm.on("click", ".remove", function(e){
 		e.preventDefault();
 		var argInd = $(".remove").index($(this));
@@ -275,12 +316,16 @@
 	
 	$("#createBtn").click(function(e){
 		e.preventDefault();
-		//console.log($("#functionForm").serializeArray());
+		
 		socket.emit("function_form", $("#functionForm").serializeArray());
 		socket.once('function_success', function(error){
+			
 			if(error == null){
+				
 				alert("Function created.");
+				
 			}else{
+				
 				alert(error);
 			}
 		});

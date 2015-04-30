@@ -1,5 +1,4 @@
 exports.create_schema = function(socket, client, data){
- //select rolname from pg_authid
 
 			var name = data[0].value;
 			var owner = data[1].value;
