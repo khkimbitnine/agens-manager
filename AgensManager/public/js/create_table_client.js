@@ -54,6 +54,7 @@
 		}
 		
 	}
+	
 	appendColumn();
 
 	$(document).on("click", ".p_key.checkbox", function() {
@@ -68,13 +69,12 @@
 	 	});
 	});
 
-	
-
 		for(var i = 0 ; i < $(".db").length ; i++){
 			$("#dbList").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
 		}
 		var table = [];
 		var varType = [];
+		
 		$("#dbList").change(function(){
 			
 			if($(this).find('option:selected').index() > 0){
@@ -280,6 +280,7 @@
 			notValid($("#schemaList"));
 			
 		}
+		
 		if(namePat.test($name.val()) || onePat.test($name.val())){
 			
 			for(var i = 0 ; i < table.length ; i++){
@@ -340,7 +341,7 @@
 
 	var trLth;
 
-	$("#column").on("click", ".remove", function(e) {//첫번째 컬럼 줄에는 remove가 없어야 함.
+	$("#column").on("click", ".remove", function(e) {
 		e.preventDefault();
 		$(this).parent().parent().remove();
 		trLth = $("#column tr").length - 1;

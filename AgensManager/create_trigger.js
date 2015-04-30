@@ -8,6 +8,5 @@ exports.username = function(socket, client, username){
 				proname.push(rs.rows[i].proname);
 			}
 			socket.emit('trigger_function', proname);
-//			console.log(proname);
 	});
 }

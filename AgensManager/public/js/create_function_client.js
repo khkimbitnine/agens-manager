@@ -155,10 +155,12 @@
 			socket.emit('set_dbname', $(this).find('option:selected').val());
 			
 			socket.once('schemas', function(schema){
+				
 				$(".schema").append('<option>').append('<option>Basic datatype</option>');
 				for(var i = 0 ; i < schema.length ; i++){
 					$(".schema").append('<option value = "'+schema[i]+'">'+schema[i]+'</option>');
 				}
+				
 			});
 			
 		}
@@ -191,12 +193,14 @@
 		$type.empty();
 
 		if(optionInd > 0){
+			
 			socket.emit('schema', $option.text());
 			socket.once('types', function(type){
 					for(var i = 0 ; i < type.length ; i++){
 						$type.append('<option value = "'+type[i]+'">'+type[i]+'</option>');
 					}					
-			});					
+			});
+			
 		}
 	});
 

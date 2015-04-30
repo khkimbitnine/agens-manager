@@ -1,12 +1,11 @@
 
-		$(document).ready(function() {//preventDefault 옵션
+		$(document).ready(function() {
     		$('#tab-container').easytabs({animationSpeed: 'fast', updateHash: false});
 		});
 		
 		//tab z-index
 		var zInd;
 		
-		//tab클릭preventdefault 
 		$(".tab").click(function() {
 			zInd = parseInt($(this).css("z-index")) + 1;
 			
@@ -15,7 +14,7 @@
 		});
 
 
-		//bar 자식요소 생성
+		//sidebar
 		$(".bar").each(function() {
 
 			var bar, barWrapper;
@@ -74,8 +73,6 @@
 					+ create[i] + "</a></li>");
 		}
 		
-
-
 		//hide createMenu's sub <ul>
 		$createSubUl.hide();
 
@@ -216,8 +213,10 @@
 			$this.prev().removeClass().addClass(collHit);
 			$this.parent().removeClass().addClass(coll);
 		}
+		
 		//db -> schema
 		$browser.on("click", ".db", function() {
+			
 			var $this = $(this);
 			var dbname = $this.text();
 			socket.emit('set_dbname', dbname);
@@ -312,6 +311,7 @@
 
 		//view -> viewname     
 		$browser.on("click", ".schemaView", function() {
+			
 			var $this = $(this);
 			var $parent = $this.parent();
 			var scname = $parent.parent().prev().text();
@@ -390,8 +390,10 @@
 							socket.emit('set_dbname', dbname);
 
 							if ($this.parent().hasClass("collapsable")) {
+								
 								$this.next().remove();
 								expand($this);
+								
 							} else {
 								
 								collapse($this);
@@ -452,7 +454,6 @@
 				});
 
 				socket.once('colname', function(data) {
-					console.log(data);
 					if (data.column.length !== 0) {
 
 						$("<ul style='display: block;' class='col'>").appendTo($parent);
@@ -509,12 +510,12 @@
 
 		//index -> indname
 		$browser.on("click", ".tableIndex", function() {
+			
 			var $this = $(this);
 			var $parent = $this.parent();
 			var tabname = $parent.parent().prev().text();
 			var scname = $this.closest('.sch').find('.schema').text();
 			
-
 			var dbname = $this.closest(".sch").prev().text();
 			socket.emit('set_dbname', dbname);
 			
@@ -536,8 +537,7 @@
 				socket.once('indname', function(data) {
 					if (data.index.length !== 0) {
 
-						$("<ul style='display: block;' class='ind'>").appendTo(
-								$parent);
+						$("<ul style='display: block;' class='ind'>").appendTo($parent);
 
 						for (var i = 0; i < data.index.length; i++) {
 							$("<li class='last'><span class='ind'>"

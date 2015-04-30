@@ -18,13 +18,11 @@ exports.schema = function(socket, client, schema){
 				}
 			}
 			socket.emit('types', types);
-//			console.log(types);
 	});
 }
 
 exports.create_function = function(socket, client){
 	
-		//console.log(formdata);
 		var error;
 		
 		var interval = 4; 
