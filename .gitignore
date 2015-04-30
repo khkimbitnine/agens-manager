@@ -1,2 +1,6 @@
 # eclipse
+.jshintrc
 .metadata
+.project
+.settings
+.tern-project
