@@ -88,7 +88,7 @@
  		}
  	});
  	
-	$("#desc").click(function() {
+	$("#desc, #unique, #concurrently").click(function() {
 		
 		var $this = $(this);
 		
