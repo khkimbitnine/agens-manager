@@ -433,7 +433,7 @@
 			var $this = $(this);
 			var $parent = $this.parent();
 			var tabname = $parent.parent().prev().text();
-			var scname = $this.closest('.sch').find('.schema').text();
+			var scname = $this.parents('ul').siblings('.schema').text();
 
 			var dbname = $this.closest(".sch").prev().text();
 			socket.emit('set_dbname', dbname);
@@ -452,7 +452,7 @@
 				});
 
 				socket.once('colname', function(data) {
-
+					console.log(data);
 					if (data.column.length !== 0) {
 
 						$("<ul style='display: block;' class='col'>").appendTo($parent);
