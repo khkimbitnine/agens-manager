@@ -130,7 +130,7 @@ body {
 }
 .bar_content>ul>li>ul>li:nth-of-type(5):before{
 	top:170px;
-	background:url('images/fuction.png') no-repeat;
+	background:url('images/function.png') no-repeat;
 }
 .bar_content>ul>li>ul>li:nth-of-type(6):before{
 	top:210px;
@@ -246,3 +246,118 @@ body {
 .checkbox, button{
 	cursor:pointer;
 }
+.db::before{
+	content:'';
+	display:inline-block;
+	width:17px;
+	height:15px;
+	background:url('images/databaseName.png') no-repeat;	
+	background-size:15px 15px;
+	vertical-align:-2px;
+}
+.schema::before{
+	content:'';
+	display:inline-block;
+	width:11px;
+	height:15px;
+	background:url('images/schemaName.png') no-repeat;	
+	background-size:7px 15px;
+	vertical-align:-2px;
+}
+.schemaTable::before{
+	content:'';
+	display:inline-block;
+	width:20px;
+	height:16px;
+	background:url('images/table.png') no-repeat;	
+	background-size:16px 16px;
+	vertical-align:-2px;
+}
+.table::before{
+	content:'';
+	display:inline-block;
+	width:19px;
+	height:16px;
+	background:url('images/tableName.png') no-repeat;	
+	background-size:15px 15px;
+	vertical-align:-2px;
+}
+.tableColumn::before, .viewColumn::before{
+	content:'';
+	display:inline-block;
+	width:12px;
+	height:18px;
+	background:url('images/column.png') no-repeat;	
+	background-size:18px 18px;
+	background-position-x:-4px;
+	vertical-align:-3px;
+}
+.col .column::before{
+	content:'';
+	display:inline-block;
+	width:11px;
+	height:18px;
+	background:url('images/columnName.png') no-repeat;	
+	background-size:18px 18px;
+	background-position-x:-4px;
+	vertical-align:-3px;
+	
+}
+.tableIndex::before{
+	content:'';
+	display:inline-block;
+	width:19px;
+	height:17px;
+	background:url('images/index.png') no-repeat;	
+	background-size:14px 16px;
+	vertical-align:-3px;
+}
+span.ind::before{
+	content:'';
+	display:inline-block;
+	width:15px;
+	height:17px;
+	background:url('images/indexName.png') no-repeat;	
+	background-size:11px 16px;
+	vertical-align:-3px;
+}
+.schemaView::before{
+	content:'';
+	display:inline-block;
+	width:20px;
+	height:17px;
+	background:url('images/view.png') no-repeat;	
+	background-size:16px 16px;
+	vertical-align:-2px;
+}
+.view::before{
+	content:'';
+	display:inline-block;
+	width:19px;
+	height:16px;
+	background:url('images/viewName.png') no-repeat;	
+	background-size:15px 15px;
+	vertical-align:-2px;
+}
+
+.schemaFunc::before{
+	content:'';
+	display:inline-block;
+	width:22px;
+	height:18px;
+	background:url('images/function.png') no-repeat;	
+	background-size:18px 18px;
+	vertical-align:-2px;
+}
+span.func::before{
+	content:'';
+	display:inline-block;
+	width:18px;
+	height:15px;
+	background:url('images/functionName.png') no-repeat;	
+	background-size:14px 14px;
+	vertical-align:-2px;
+}
+
+
+

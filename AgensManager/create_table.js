@@ -3,7 +3,6 @@ exports.create_table = function(socket, client, formdata){
 		var interval = 10	
 		//interval : column_name, type, length, precision, not_null
 		//primary, unique, default, foreign, check
-		
 		var name = formdata[0].value;
 		var schema = formdata[1].value;
 		var comment = formdata[formdata.length-1].value;

@@ -3,7 +3,7 @@
 			+ '<td>'
 			+ '<input type="text" name="column" class="column_input" />'
 			+ '</td>'
-			+ '<td>'
+			+ '<td class="typebox">'
 			+ '<select name="type" class="type">'
 			+ '<option value="" />'
 			+ '</select>'
@@ -48,7 +48,7 @@
 			var $opt = $("#column tr").eq(1).find('.type>option');
 			
 			for(var i = 1 ; i < $opt.length ; i ++){
-				$tr.find('.type').append('<option value = "'+$opt.eq(i).val()+'">'+$opt.eq(i).val()+'</option>');
+				$('<option>').text($opt.eq(i).val()).val($opt.eq(i).val()).appendTo($tr.find('.type'));
 			}
 			
 		}
@@ -92,8 +92,8 @@
 					
 					for(i = 0 ; i < rs.length ; i ++){
 						
-						$('<option>').text(rs[i]).val(rs[i]).addClass('typeOption').appendTo($type);
-						$('<option>').text(rs[i]+'[]').val(rs[i]+'[]').addClass('typeOption').appendTo($type);
+						$('<option>').text(rs[i]).val(rs[i]).appendTo($type);
+						$('<option>').text(rs[i]+'[]').val(rs[i]+'[]').appendTo($type);
 						
 					}
 				});
@@ -323,7 +323,6 @@
 			notValid($comment);
 
 		if ($(".notValid").size() == 0) {
-
 			socket.emit('table_form', $("#tableForm").serializeArray());
 			socket.once('table_success', function(error){
 				if(error==null){

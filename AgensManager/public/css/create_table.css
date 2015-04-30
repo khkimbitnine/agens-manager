@@ -130,7 +130,7 @@ li:nth-of-type(4)>.field>span {
 	width:800px;
 	height:40px;
 	left:71px;
-	top:42px;
+	top:45px;
 }
 #table {
 	width:380px;
@@ -146,7 +146,6 @@ li:nth-of-type(4)>.field>span {
 #database{
 	margin-left:71px;
 }
-
 #database>label, #schema>label{
 	font-size: 14px;
 	font-weight: bold;
