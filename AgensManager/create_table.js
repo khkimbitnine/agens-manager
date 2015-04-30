@@ -1,7 +1,5 @@
 exports.create_table = function(socket, client, formdata){
 	
-		var error;
-		
 		var interval = 10	
 		//interval : column_name, type, length, precision, not_null
 		//primary, unique, default, foreign, check
@@ -114,8 +112,9 @@ exports.create_table = function(socket, client, formdata){
 		if(comment.length !== 0) createTable += "COMMENT ON TABLE "+name+" IS '"+comment+"';"
 		
 		console.log(createTable);
-
+		
 		client.query(createTable, function(err, rs){
+			var error;
 			if(err){
 				error = err.toString();
 			}else{

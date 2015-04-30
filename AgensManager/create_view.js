@@ -6,18 +6,22 @@ exports.create_view = function(socket, client, data){
 		var query = data[1].value;
 		var comment = data[2].value;
 		
-		query = 'CREATE VIEW '+name+' AS '+query+";";
+		query = 'CREATE VIEW '+name+' AS '+query;
 		
 		if(comment.length!==0){
 			query += "COMMENT ON VIEW "+name+" IS '"+comment+"';";
 		}
+		
+		console.log(query);
+		
 		client.query(query, function(err, rs){
-			console.log(query);
+			var error;
 			if(err){
-				console.log(err)
+				error = err.toString();
 			}else{
 				console.log("View created.");
 			}
+			socket.emit('view_success', error);
 		});
 
 }

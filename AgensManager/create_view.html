@@ -47,7 +47,7 @@ $("#dbList").change(function(){
 	var $comment = $("#comment");
 	
 	
-	var pattern = /^[a-zA-Z_\d\s\''\.\*]+$/;
+	var pattern = /^[a-zA-Z_\d\s\''\.\*\;]+$/;
 	
 	var namePattern = /^[a-zA-Z_][a-zA-Z_\d]+$/;
 	var onePattern = /^[a-zA-Z_]+$/;//one character
@@ -75,6 +75,16 @@ $("#dbList").change(function(){
 		
 		if($(".notValid").size()==0) {
 			socket.emit('view_form', $("#viewForm").serializeArray());
+			socket.once('view_success', function(error){
+				if(error==null){
+					
+					alert("View created.");
+					
+				}else{
+					
+					alert(error);
+				}
+			})
 		}
 		
 	}

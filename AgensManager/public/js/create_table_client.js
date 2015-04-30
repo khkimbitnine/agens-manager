@@ -92,9 +92,8 @@
 					
 					for(i = 0 ; i < rs.length ; i ++){
 						
-						$type.append("<option class='typeOption' value='"+rs[i]+"'>"
-								+ rs[i] + "</option>").append("<option class='typeOption' value='"+rs[i]+"[]'>"
-								+ rs[i] +'[]'+ "</option>");
+						$('<option>').text(rs[i]).val(rs[i]).addClass('typeOption').appendTo($type);
+						$('<option>').text(rs[i]+'[]').val(rs[i]+'[]').addClass('typeOption').appendTo($type);
 						
 					}
 				});
@@ -354,8 +353,8 @@
 
 	$(document).on("change", "select.type",function(){
 		
-		var $length = $(this).closest('td').next().find('.length').prop('disabled', true);
-		var $precision = $(this).closest('td').next().next().find('.precision').prop('disabled', true);
+		var $length = $(this).closest('td').next().find('.length').prop('disabled', true).val('');
+		var $precision = $(this).closest('td').next().next().find('.precision').prop('disabled', true).val('');
 		var optionSel = $(this).find('option:selected').val();
 		
 		for(var i = 0 ; i < varType.length; i ++){

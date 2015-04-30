@@ -26,7 +26,7 @@ li:nth-of-type(4)>.field>span {
 #column td {
 	padding:0;
 }
-#column td:nth-of-type(4),#column td:nth-of-type(5),#column td:nth-of-type(6){
+#column td:nth-of-type(5),#column td:nth-of-type(6),#column td:nth-of-type(7){
 	text-align:center;
 }
 #comment {
