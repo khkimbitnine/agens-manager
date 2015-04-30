@@ -136,7 +136,7 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 		socket.on('table_form', function(formdata){
 			create_table.create_table(socket, client, formdata);
 		});
-		socket.once('index_form', function(formdata){
+		socket.on('index_form', function(formdata){
 			create_index.create_index(socket, client, formdata);
 		});
 		socket.on('schema_form', function(data){
