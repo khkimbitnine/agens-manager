@@ -60,8 +60,8 @@
 	border: none;
 }
 #createBtn{
-	background:url('images/create_btn.png');
+	background:url('/static/images/create_btn.png');
 }
 #cancelBtn{
-	background: url('images/cancel_btn.png');
+	background: url('/static/images/cancel_btn.png');
 }

@@ -53,7 +53,7 @@ li:nth-of-type(4)>.field>span {
 .checkbox{
 	width:24px;
 	height:24px;
-	background:url('images/chkbox_default.png');
+	background:url('/static/images/chkbox_default.png');
 }
 .constraint_box, .constraint_box>.c{
 	width: 100px;
@@ -94,7 +94,7 @@ li:nth-of-type(4)>.field>span {
 	height:20px;
 	border-radius:10px 10px;
 	box-shadow:none;
-	background: url("images/plus_btn.png") no-repeat;
+	background: url("/static/images/plus_btn.png") no-repeat;
 	background-size:20px 20px;
 }
 
@@ -103,7 +103,7 @@ li:nth-of-type(4)>.field>span {
 	height:20px;
 	border-radius:10px 10px;
 	box-shadow:none;
-	background: url("images/minus_btn.png") no-repeat;
+	background: url("/static/images/minus_btn.png") no-repeat;
 	background-size:20px 20px;
 }
 .content_wrapper{
@@ -220,10 +220,10 @@ textarea#comment{
 	border:none;
 }
 .field#btnBox>button:nth-of-type(1){
-	background:url('images/create_btn.png');
+	background:url('/static/images/create_btn.png');
 }
 .field#btnBox>button:nth-of-type(2){
-	background:url('images/cancel_btn.png');
+	background:url('/static/images/cancel_btn.png');
 }
 .f_key{
 	cursor:pointer;
@@ -232,7 +232,7 @@ textarea#comment{
 #fKeyPop{
 	width:605px;
 	height:330px;
-	background:url('images/popup_board.png');
+	background:url('/static/images/popup_board.png');
 	position:absolute;
 	top:214px;
 	right:300px;
@@ -303,7 +303,7 @@ textarea#comment{
 	top:0;
 	right:0;
 	opacity:.8;
-	background:url('images/popup_BG.png');
+	background:url('/static/images/popup_BG.png');
 	border-radius:10px;
 	z-index:1;
 	display:none;

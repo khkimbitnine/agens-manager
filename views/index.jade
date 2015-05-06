@@ -1,5 +1,21 @@
 extends layout
 
-block content
-  h1= title
-  p Welcome to #{title}
+block stylesheets
+  link(href='/static/stylesheets/index.css', rel='stylesheet')
+
+block javascripts
+  script(src='/socket.io/socket.io.js')
+
+block contents
+  #navi
+    ul#tab
+      li.tab-btn
+        a Object Browser
+      li.tab-btn
+        a Tool Menu
+    #objectBrowser.bar
+      .title Databases
+      #tree
+        ul#browser.filetree.treeview
+    #toolMenu.bar
+  #content
