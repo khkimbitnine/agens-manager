@@ -91,7 +91,7 @@ app.get('/', function(req, res) {
   res.render('index');
 });
  */
-//var fpath = '/path/to/agens-manager/';
+//var fpath = 'path/to/your/agens-manager/';
 console.log("fpath=%s", fpath);
 app.get('/', function(req, res) {
   fs.readFile(fpath + 'app.html', function(error, data) {

@@ -1,7 +1,7 @@
  	var scname;
  	var pattern = /^[a-zA-Z_\d]+$/;
 
- 	$("#last").addClass('on').prop("src", "public/css/images/chkbox_btn.png");
+ 	$("#last").addClass('on').prop("src", "/static/images/chkbox_btn.png");
  	
 	for(var i = 0 ; i < $(".db").length ; i++){
 		
@@ -109,12 +109,12 @@
 		if ($this.hasClass('on')) {
 			
 			$this.removeClass('on');
-			$this.prop("src", "public/css/images/chkbox_default.png");
+			$this.prop("src", "/static/images/chkbox_default.png");
 			
 		} else {
 			
 			$this.addClass('on');
-			$this.prop("src", "public/css/images/chkbox_btn.png");
+			$this.prop("src", "/static/images/chkbox_btn.png");
 	 		
 		}
 	});
@@ -125,7 +125,7 @@
 		
 		if(!$this.hasClass('on')){
 			$this.addClass('on');
-			$this.prop("src", "public/css/images/chkbox_btn.png");
-			$(".order.checkbox").not($this).removeClass('on').prop("src", "public/css/images/chkbox_default.png");
+			$this.prop("src", "/static/images/chkbox_btn.png");
+			$(".order.checkbox").not($this).removeClass('on').prop("src", "/static/images/chkbox_default.png");
  		}
 	});

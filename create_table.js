@@ -79,12 +79,12 @@ exports.create_table = function(socket, client, formdata){
 				uk = '';
 			}
 			
-			if(def.length !== 0 && typeName=="character"){
+			if(def.length !== 0 && (type=="character" || type == "character varying" || type == '"char"')){
 				def = " DEFAULT '"+def+"'";
 			}
 			if(def.length == 0) def = "";
 			
-			if(def.length !== 0 && typeName !== "character"){
+			if(def.length !== 0 && (type!=="character" || type !== "character varying" || type !== '"char"')){
 				def = " DEFAULT "+def;
 			}
 			

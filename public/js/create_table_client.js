@@ -17,15 +17,15 @@
 			+ '<input type="hidden" name="precision" value=""/>'
 			+ '</td>'
 			+ '<td>'
-			+ '<img class="not_null checkbox" src="public/css/images/chkbox_default.png"/>'
+			+ '<img class="not_null checkbox" src="/static/images/chkbox_default.png"/>'
 			+ '<input type="hidden" name="not_null" value="0" />'
 			+ '</td>'
 			+ '<td>'
-			+ '<img class="p_key checkbox" src="public/css/images/chkbox_default.png"/>'
+			+ '<img class="p_key checkbox" src="/static/images/chkbox_default.png"/>'
 			+ '<input type="hidden" name="p_key" value="0" />'
 			+ '</td>'
 			+ '<td>'
-			+ '<img class="u_key checkbox" src="public/css/images/chkbox_default.png"/>'
+			+ '<img class="u_key checkbox" src="/static/images/chkbox_default.png"/>'
 			+ '<input type="hidden" name="u_key" value="0" />'
 			+ '</td>'
 			+ '<td><input type="text" name="de_fault" class="default" /></td>'
@@ -64,7 +64,7 @@
 	 		var $this = $(this);
 	 		
 	 		if(!$this.hasClass('on')){
-				$(".p_key.checkbox").not($this).removeClass('on').prop("src", "public/css/images/chkbox_default.png").next().val(0);
+				$(".p_key.checkbox").not($this).removeClass('on').prop("src", "/static/images/chkbox_default.png").next().val(0);
 	 		}
 	 	});
 	});
@@ -381,13 +381,13 @@
 				
 				$(this).removeClass('on');
 				$(this).next().val(0);
-				$(this).prop("src", "public/css/images/chkbox_default.png");
+				$(this).prop("src", "/static/images/chkbox_default.png");
 				
 			} else {
 				
 				$(this).addClass('on');
 				$(this).next().val(1);
-				$(this).prop("src", "public/css/images/chkbox_btn.png");
+				$(this).prop("src", "/static/images/chkbox_btn.png");
 				
 			}
 	});

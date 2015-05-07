@@ -1,9 +1,0 @@
-select * from pg_database;
-
-select * from information_schema.schemata where schema_name not like 'pg_%' and schema_name <> 'information_schema';
-
-select * from pg_tables where schemaname = 'public';
-
-select * from pg_views where schemaname = 'public';
-
-select * from information_schema.columns where table_schema='public' and table_name='work';
