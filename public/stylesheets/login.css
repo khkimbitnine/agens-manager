@@ -1,0 +1,29 @@
+@charset "utf-8";
+
+#loginForm{
+  width: 600px;
+  height: 100px;
+  position: absolute;
+  left: 100px;
+  top: 100px;
+  background: #fff;
+}
+
+#loginForm>div>label {
+  display: inline-block;
+  width: 120px;
+  color: #000;
+}
+
+#loginForm>div>input {
+  display: inline-block;
+  width: 300px;
+}
+
+#loginForm>#loginBtnBox{
+  width: 600px;
+}
+
+#loginForm>#loginBtnBox>button {
+  float: right;
+}

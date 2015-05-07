@@ -1,0 +1,26 @@
+@charset "utf-8";
+
+body {
+  border: none;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+#header {
+  background: url("/static/images/header.png") no-repeat;
+  height: 104px;
+}
+
+#login-btn {
+  float: right;
+  line-height: 104px;
+  margin-right: 50px;
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+#login-btn:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}

@@ -1,0 +1,72 @@
+@CHARSET "UTF-8";
+#schemaForm>div:nth-of-type(1){
+	width: 100%;
+	height: 123px;
+	background: #ddd;
+	overflow:auto;
+}
+#schemaForm>div:nth-of-type(1)>label{
+	font-size: 19.42px;
+	font-weight: bold;
+	color: rgb(31,112,175);
+	display:inline-block;
+	margin:54px 30px 0 71px;
+}
+#schemaForm #name{
+	width: 213px;
+	height: 39px;
+	padding: 0;
+}
+#schema{
+	padding:0;
+	margin:0;
+	list-style:none;
+}
+#schema>li:nth-of-type(1){
+	margin-top:40px;
+}
+#schema>li:nth-of-type(1), #schema>li:nth-of-type(2){
+	margin-bottom:70px;
+	width:260px;
+	margin-left:71px;
+}
+#schema>li:nth-of-type(3){
+	margin-left:71px;
+}
+#schema>li>label{
+	font-size: 14px;
+	font-weight: bold;
+	color: rgb(31,112,175);
+	display:inline-block;
+	margin-top:10px;
+}
+#schema>li:nth-of-type(3)>label{
+	display:block;
+	margin-bottom:20px;
+}
+#comment{
+	width:335px;
+	height:120px;
+	resize:none;
+}
+#dbList, #owner{
+	width:190px;
+	height:40px;
+	float:right;
+}
+#btnBox{
+	margin-left:71px;
+	margin-top:85px;
+}
+#btnBox>button{
+	width: 129px;
+	height: 44px;
+	text-indent: -9999px;
+	border: none;
+}
+#createBtn{
+	background:url('/static/images/create_btn.png');
+}
+#cancelBtn{
+	background:url('/static/images/cancel_btn.png');
+}

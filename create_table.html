@@ -1,0 +1,80 @@
+<link rel="stylesheet" href="/static/css/create_table.css" />
+<div class="content_wrapper">
+	<form id="tableForm">
+		<ul>
+			<li>
+				<div class="field name">
+					<div id="table">
+						<label for="name">TABLE NAME</label><input type="text" name="name"
+							id="name" />
+					</div>
+				</div>
+			</li>
+			<li>
+				<div id="database" >
+					<label for="dbList">DATABASE NAME</label>
+					<select id="dbList">
+						<option value="">Select Database</option>
+					</select>
+				</div>
+				<div id="schema">
+					<label for="schemaList">SCHEMA NAME</label> 
+					<select name="schema" id="schemaList">
+					</select>
+				</div>
+				<div class="field column">
+					<table id="column">
+						<tr>
+							<th>COLUMN</th>
+							<th>TYPE</th>
+							<th>LENGTH</th>
+							<th>PRECISION</th>
+							<th>NOT NULL</th>
+							<th>PRIMARY KEY</th>
+							<th>UNIQUE KEY</th>
+							<th>DEFAULT</th>
+							<th>FOREIGN KEY</th>
+							<th>CHECK</th>
+							<th><button class="add button">add</button></th>
+						</tr>
+					</table>
+				</div>
+			</li>
+			<li>
+				<div class="field comment">
+					<span>COMMENT</span>
+					<textarea name="comment" id="comment"></textarea>
+				</div>
+				<div id="btnBox" class="field">
+					<button type="submit" id="submitBtn">Create</button>
+					<button>Cancel</button>
+				</div>
+			</li>
+		</ul>
+		<div id="fKeyPop">
+			<span id="fTitle">FOREIGN KEY</span> 
+			<span id="selectedCol"></span>
+			<span id="fKeyInd" style="display:none"></span>
+			<div>
+				<label for="fSchema">Schema</label> <select id="fSchema" class="pop">
+				</select>
+			</div>
+			<div>
+				<label for="fTable">Table</label> <select id="fTable" class="pop">
+				</select>
+			</div>
+			<div>
+				<label for="fColumn">Column</label> <select id="fColumn" class="pop">
+				</select>
+			</div>
+			<div id="fBtnBox">
+				<button>Ok</button>
+				<button>Cancel</button>
+			</div>
+		</div>
+	</form>
+	<div id="popupBG"></div>
+</div>
+<script src="/static/js/create_table_client.js"></script>
+
+

@@ -1,0 +1,82 @@
+<link rel="stylesheet" href="/static/css/create_schema.css" />
+<div class="content_wrapper">
+	<form id="schemaForm">
+		<div>
+			<label for="name">SCHEMA NAME</label>
+			<input type="text" name="name" id="name" />
+		</div>
+		<ul id="schema">
+			<li>
+				<label>DB</label>
+				<select id="dbList"></select>
+			</li>
+			<li>
+				<label>OWNER</label>
+				<select name="owner" id="owner"></select>
+			</li>
+			<li>
+				<label>COMMENT</label>
+				<textarea name="comment" id="comment"></textarea>
+			</li>
+		</ul>
+	</form>
+	<div id="btnBox">
+		<button id="createBtn">Create</button>
+		<button id="cancelBtn">Cancel</button>
+	</div>
+</div>
+<script>
+
+	$("#dbList").append('<option>Select Database</option>');
+	for(var i = 0 ; i < $(".db").length ; i++){
+		$("#dbList").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
+	}
+	
+	$("#dbList").change(function(){
+		$("#owner").empty();
+		if($(this).find('option:selected').index()>0){
+			socket.emit('set_dbname',$(this).find('option:selected').val());
+			socket.once("get_role", function(data) {
+				for (var i = data.length - 1; i >= 0; i--) {
+					$("#owner").append(
+							'<option class="role" value="'+data[i]+'">' + data[i]
+									+ '</option>');
+				}
+			});
+		}
+	})
+
+	var namePattern = /^[a-zA-Z_][a-zA-Z_\d]+$/;
+	var onePattern = /^[a-zA-Z_]+$/;//one character
+
+	var colPattern = /^[a-zA-Z_\d]+$/;
+	var lengthPattern = /^[\d]+$/;
+	var commentPattern = /^[a-zA-Z_\d\s\''\.]+$/;
+
+	var $name = $("#name");
+	var $comment = $("#comment");
+
+	function notValid(notValid) {
+		notValid.css("border", "2px solid red").addClass("notValid");
+	}
+
+	function validCheck() {
+		$(".notValid").removeClass("notValid").css({
+			"border" : "1px solid #aaa"
+		});//temp default border
+		if (!namePattern.test($name.val()) && !onePattern.test($name.val()))
+			notValid($name);
+		if (!commentPattern.test($comment.val()) && $comment.val() !== '')
+			notValid($comment);
+
+		if ($(".notValid").size() == 0) {
+			socket.emit('schema_form', $("#schemaForm").serializeArray());
+		}
+
+	}
+
+	$("#createBtn").click(function(e) {
+		e.preventDefault();
+		validCheck();
+	});
+</script>
