@@ -125,19 +125,17 @@ io.on('connection', function(socket) {
     return;
   }
 
-  function simpleQuery(queryText, callback, dbname) {
+  function simpleQuery(queryText, callback) {
     pg.connect(sess.dbURL, function(err, client, done) {
       if (err) {
         stderr(err);
         return;
       }
 
-      function callbackWrapper(err, result) {
+      client.query(queryText, function(err, result) {
         done();
         callback(err, result);
-      }
-
-      client.query(queryText, callbackWrapper);
+      });
     });
   }
 
