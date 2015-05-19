@@ -261,8 +261,7 @@
 			} else {
 				
 				collapse($this);
-
-				$("<ul>").insertAfter($this).append(
+				$("<ul class='sc'>").insertAfter($this).append(
 						"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='schemaTable'>"
 								+ "table" + "</span></li>").append(
 						"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='schemaView'>"
@@ -473,7 +472,7 @@
 			var $this = $(this);
 			var $parent = $this.parent();
 			var tabname = $parent.parent().prev().text();
-			var scname = $this.closest('.sch').find('.schema').text();
+			var scname = $this.closest('.sc').prev().text();
 
 			var dbname = $this.closest(".sch").prev().text();
 			socket.emit('set_dbname', dbname);
@@ -514,8 +513,8 @@
 			var $this = $(this);
 			var $parent = $this.parent();
 			var tabname = $parent.parent().prev().text();
-			var scname = $this.closest('.sch').find('.schema').text();
-			
+			var scname = $this.closest('.sc').prev().text();
+			console.log(scname)
 			var dbname = $this.closest(".sch").prev().text();
 			socket.emit('set_dbname', dbname);
 			

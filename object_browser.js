@@ -73,7 +73,6 @@ exports.set_tabname_cons = function(socket, client, data){
 	
 }
 exports.set_tabname_ind = function(socket, client, data){
-	
 	//get index list
 	client.query('select relname from pg_class c, pg_index i, (select distinct(relfilenode) from pg_class, (select oid from pg_namespace where nspname = \''+data.scname+'\') s where relname = \''+data.tabname+'\' and relnamespace=s.oid) t where c.relkind = \'i\' and i.indexrelid = c.oid and i.indrelid = t.relfilenode and c.oid NOT IN (select conindid from pg_constraint);', function(err, irs){
 		if(err){
@@ -83,6 +82,7 @@ exports.set_tabname_ind = function(socket, client, data){
 			for(var l=0; l < irs.rows.length; l++){
 				arrInd.push(irs.rows[l].relname);
 			}
+			
 			socket.emit('indname', {index: arrInd});
 	});
 	

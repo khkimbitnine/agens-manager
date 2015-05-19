@@ -315,12 +315,32 @@ body {
 span.ind::before{
 	content:'';
 	display:inline-block;
+	float:left;
 	width:15px;
 	height:17px;
 	background:url('/static/images/indexName.png') no-repeat;	
 	background-size:11px 16px;
 	vertical-align:-3px;
 }
+.tableConstraint::before{
+	content:'';
+	display:inline-block;
+	width:16px;
+	height:16px;
+	background:url('/static/images/constraint.png') no-repeat;	
+	background-size:14px 16px;
+	vertical-align:-3px;
+}
+span.cons::before{
+	content:'';
+	display:inline-block;
+	width:16px;
+	height:16px;
+	background:url('/static/images/constraintName.png') no-repeat;	
+	background-size:11px 16px;
+	vertical-align:-3px;
+}
+
 .schemaView::before{
 	content:'';
 	display:inline-block;

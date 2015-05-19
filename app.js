@@ -22,7 +22,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // static files
-app.use('/static', express.static('public'));
+app.use('/static', express.static('../public'));
 
 // parse post data of the body
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -91,7 +91,7 @@ app.get('/', function(req, res) {
   res.render('index');
 });
  */
-//var fpath = 'path/to/your/agens-manager/';
+var fpath = '/Users/Johnahkim/git/agensmanager/';
 console.log("fpath=%s", fpath);
 app.get('/', function(req, res) {
   fs.readFile(fpath + 'app.html', function(error, data) {
