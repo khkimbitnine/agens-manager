@@ -26,56 +26,81 @@
 	</div>
 </div>
 <script>
-$("#dbList").append('<option>Select Database</option>');
-for(var i = 0 ; i < $(".db").length ; i++){
-	$("#dbList").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
-}
 
-$("#dbList").change(function(){
-	if($(this).find('option:selected').index()>0){
-		socket.emit('set_dbname', $(this).find('option:selected').val());
+	$("#dbList").append('<option>Select Database</option>');
+	
+	for(var i = 0 ; i < $(".db").length ; i++){
+		
+		$("#dbList")
+		.append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>");
+		
 	}
-})
+	
+	$("#dbList").change(function(){
+		
+		if($(this).find('option:selected').index()){
+			
+			socket.emit('set_dbname', $(this).find('option:selected').val());
+		}
+		
+	});
 
 	$("#createBtn").click(function(e){
+		
 		e.preventDefault();
 		validCheck();
 		
 	});
+	
 	var $name = $("#name");
 	var $query = $("#query");
 	var $comment = $("#comment");
 	
-	
-	var pattern = /^[a-zA-Z_\d\s\''\.\*\;]+$/;
+	var pattern = /^[a-zA-Z_\d\s]+$/;
 	
 	var namePattern = /^[a-zA-Z_][a-zA-Z_\d]+$/;
 	var onePattern = /^[a-zA-Z_]+$/;//one character
 	
 	
 	function notValid(notValid){
-		notValid.css("border", "2px solid red").addClass("notValid");
+		
+		notValid
+		.css("border", "2px solid red")
+		.addClass("notValid");
+		
 	}
 
 	
 	function validCheck(){
 		
-		$(".notValid").removeClass("notValid").css({"border": "1px solid #aaa"});//default border
+		$(".notValid")
+		.removeClass("notValid")
+		.css({"border": "1px solid #aaa"});//default border
 		
 		if(!namePattern.test($name.val()) && !onePattern.test($name.val())){
+			
 			notValid($name);
+			
 		}
-		if(!pattern.test($query.val()) || $query.val()==''){
+		
+		if(!pattern.test($query.val()) || !$query.val()){
+			
 			notValid($query);
+			
 		}
 		
-		if(!pattern.test($comment.val()) && $comment.val()!==''){
+		if(!pattern.test($comment.val()) && $comment.val()){
+			
 			notValid($comment);
+			
 		}
 		
-		if($(".notValid").size()==0) {
+		if(!$(".notValid").size()) {
+			
 			socket.emit('view_form', $("#viewForm").serializeArray());
+			
 			socket.once('view_success', function(error){
+				
 				if(error==null){
 					
 					alert("View created.");
@@ -84,7 +109,7 @@ $("#dbList").change(function(){
 					
 					alert(error);
 				}
-			})
+			});
 		}
 		
 	}

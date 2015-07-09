@@ -51,7 +51,7 @@
 
 	var colPattern = /^[a-zA-Z_\d]+$/;
 	var lengthPattern = /^[\d]+$/;
-	var commentPattern = /^[a-zA-Z_\d\s\''\.]+$/;
+	var commentPattern = /^[a-zA-Z_\d\s]+$/;
 
 	var $name = $("#name");
 	var $comment = $("#comment");
@@ -71,6 +71,16 @@
 
 		if ($(".notValid").size() == 0) {
 			socket.emit('schema_form', $("#schemaForm").serializeArray());
+			socket.once('schema_success', function(error){
+				if(error==null){
+					
+					alert("Schema created.");
+					
+				}else{
+					
+					alert(error);
+				}
+			});
 		}
 
 	}

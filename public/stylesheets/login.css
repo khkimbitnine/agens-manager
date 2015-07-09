@@ -1,11 +1,9 @@
 @charset "utf-8";
 
 #loginForm{
-  width: 600px;
+  width: 430px;
   height: 100px;
-  position: absolute;
-  left: 100px;
-  top: 100px;
+  margin: 50px 0 0 300px;
   background: #fff;
 }
 
@@ -21,9 +19,13 @@
 }
 
 #loginForm>#loginBtnBox{
-  width: 600px;
+  width: 430px;
 }
 
-#loginForm>#loginBtnBox>button {
-  float: right;
+#loginForm>#loginBtnBox>input {
+  float:right;
+  width:120px;
+}
+#logout{
+	display:none;
 }

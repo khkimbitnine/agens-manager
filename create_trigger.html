@@ -1,11 +1,24 @@
 <link rel="stylesheet" href="/static/css/create_trigger.css" />
 <div class="content_wrapper">
 <form id="triggerForm">
+		<div class="field name">
+			<div>
+				<label for="name">Name</label><input type="text" name="name" id="name"/>
+			</div>
+			<div>
+				<label for="dbList">Database</label><select id="dbList"></select>
+			</div>
+			<div>
+				<label for="scList">Schema</label><select id="scList"></select>
+			</div>
+		</div>
 	<ul>
-		<li><label for="name">Name</label><input type="text" name="name" id="name"/></li><!-- 
-	 --><li><label for="when">When</label><select name="when" id="when">
+	 	<li><label for="when">When</label><select name="when" id="when">
 			<option value="BEFORE">BEFORE</option>
 			<option value="AFTER">AFTER</option>
+		</select></li><!-- 
+	 --><li><input type="hidden" name="schema" value="" id="schema" />
+	 <label for="tabList">Table</label><select name="table" id="tabList">
 		</select></li><!-- 
 	 --><li><label for="event">Event</label><select name="event" id="event">
 		<option value="INSERT">INSERT</option>
@@ -21,34 +34,169 @@
 		<option value="ROW">ROW</option>
 		<option value="STATEMENT">STATEMENT</option>
 		</select></li><!-- 
-	 --><li><label for="database">Database</label><select id="dbList"></select><label for="function">Function</label><select name="function" id="function"></select>
-		</li><!-- 
-	 --><li><label for="arguments">Arguments</label>(<input type="text" name="arguments" id="arguments"/>)</li>
+	 --><li><label for="function">Function</label><select name="function" id="function"></select><!-- 
+	 --></li><!-- 
+	 --><li><label for="arguments">Arguments</label><input type="text" name="arguments" id="arguments"/></li>
 	</ul>
-	<button id="createBtn">Create</button>
-	<button id="cancelBtn">Cancel</button>
+	<div id="btnBox">
+		<button id="createBtn">Create</button>
+		<button id="cancelBtn">Cancel</button>
+	</div>
 </form>
 </div>
 <script>
-var username = 'postgres'; //임의 유저
-	
-	$("#dbList").append('<option>Select Database</option>');
-	for(var i = 0 ; i < $(".db").length ; i++){
-		$("#dbList").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
-	}
-	
-	$("#dbList").change(function(){
-		$("#function").empty();
-		if($(this).find('option:selected').index()>0){
-			socket.emit('set_dbname', $(this).find('option:selected').val());
-			socket.emit('username', username);
-			
-			socket.once('trigger_function', function(data){
-				for(var i = 0 ; i < data.length ; i ++){
-					$("#function").append('<option value="'+data[i]+'">'+data[i]+'</option>');
-				}
-			});	
-		}
-	})
 
+		var username = 'postgres'; //임의 유저
+		var namePat = /^[a-zA-Z_][a-zA-Z_\d]+$/;
+		var argPat = /^[a-zA-Z_\d\s\'\"\.\(\)\,]+$/;
+			
+		function notValid(notValid) {
+			
+			notValid
+			.css("border", "2px solid red")
+			.addClass("notValid");
+			
+		}
+		
+		function validCheck(trigger) {
+			
+			$(".notValid").removeClass("notValid").css({
+				
+				"border" : "1px solid #aaa"
+				
+			});
+		
+			var $name = $("#name");
+			var $arg = $("#arguments");
+			
+			if (!namePat.test($name.val()) || !$name.val()){
+				
+				notValid($name);
+				
+			}
+			
+			if(!$("#dbList").find('option:selected').index()){
+				
+				notValid($("#dbList"));
+				
+			}
+			
+			if(!$("#scList").find('option:selected').index()){
+				
+				notValid($("#scList"));
+				
+			}
+			
+			if(!$("#tabList").find('option:selected').index()){
+				
+				notValid($("#tabList"));
+				
+			}
+			
+			if(!argPat.test($arg.val()) && $arg.val()){
+				
+				notValid($arg);
+				
+			}
+		
+			if (!$(".notValid").size()) {
+				
+				socket.emit("trigger_form", trigger);
+				
+				socket.once('trigger_success', function(error){
+					
+					if(error == null){
+						
+						alert("Trigger created.");
+						
+					}else{
+						
+						alert(error);
+						
+					}
+				});
+			}
+		}
+			
+			$("#dbList").append('<option>Select Database</option>');
+			
+			for(var i = 0 ; i < $(".db").length ; i++){
+				
+				$("#dbList")
+				.append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>");
+				
+			}
+			
+			$("#dbList").change(function(){
+				
+				$("#function").empty();
+				
+				$("#scList").empty();
+				
+				if($(this).find('option:selected').index()){
+					
+					socket.emit('set_dbname', $(this).find('option:selected').val());
+					
+					socket.emit('username', username);
+					
+					socket.once('trigger_function', function(data){
+						
+						for(var i = 0 ; i < data.length ; i ++){
+							
+							$("#function")
+							.append('<option value="'+data[i]+'">'+data[i]+'</option>');
+							
+						}
+					});
+					
+					$("#scList").append('<option>');
+					
+					socket.once('scname', function(data){
+						
+						for(var i = 0 ; i <data.schema.length ; i++){
+							
+							$("#scList")
+							.append('<option value ="'+data.schema[i]+'">'+data.schema[i]+'</option>');
+							
+						}
+					});
+				}
+			});
+			
+			$("#scList").change(function(){
+				
+				$("#tabList").empty();
+				
+				if($(this).find('option:selected').index()){
+					
+					$("#schema").val($(this).find('option:selected').val());
+					
+					socket.emit('set_scname_table', $(this).find('option:selected').val());
+					
+					$("#tabList").append('<option>');
+					
+					socket.once('tabname', function(data){
+						
+						console.log(data);
+						
+						for(var i = 0 ; i <data.table.length ; i++){
+							
+							$("#tabList")
+							.append('<option value ="'+data.table[i]+'">'+data.table[i]+'</option>');
+							
+						}
+					});
+					
+				}
+				
+			});
+			
+			$("#createBtn").click(function(e){
+				
+				e.preventDefault();
+				
+				validCheck($("#triggerForm").serializeArray());
+				
+			});
+		
 </script>

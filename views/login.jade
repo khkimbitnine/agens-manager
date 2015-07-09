@@ -4,8 +4,10 @@ block stylesheets
   link(href='/static/stylesheets/login.css', rel='stylesheet')
 
 block javascripts
+  script(src='https://cdn.socket.io/socket.io-1.3.5.js')
+  script(src='//code.jquery.com/jquery-1.11.3.min.js')
   script.
-    var $loginBtn = $("#loginBtnBox").find("button").eq(1);
+    var $loginBtn = $("#loginBtnBox input");
     function notValid($not){
       $not.css("border", "2px solid red").addClass("notValid");
     }
@@ -55,6 +57,7 @@ block javascripts
     $loginBtn.click(function(e){
       e.preventDefault();
       validCheck();
+      console.log("-");
     });
 
 block contents
@@ -67,3 +70,4 @@ block contents
       input(type='password', name='password')
     #loginBtnBox
       input(type='submit', name='submit', value='Login')
+  div#errMsg
