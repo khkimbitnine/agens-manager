@@ -143,6 +143,10 @@ li:nth-of-type(4)>.field>span {
 	display:inline-block;
 	margin: 40px 20px 0 0;
 }
+#schema.alter{
+	display:block;
+	margin-left:71px;
+}
 #database{
 	margin-left:71px;
 }
@@ -161,7 +165,7 @@ li:nth-of-type(4)>.field>span {
 	font-weight: bold;
 	color:rgb(31,112,175);
 }
-#dbList, #schemaList, #name{
+#dbList, #schemaList, #name, #ownerList{
 	width: 213px;
 	height:39px;
 	padding:0;
@@ -171,6 +175,9 @@ li:nth-of-type(4)>.field>span {
 	min-height:250px;
 	background:#eee;
 	overflow:auto;
+}
+#tableForm>ul>li:nth-of-type(2).alter{
+	min-height:200px;
 }
 .field.column{
 	width:1400px;

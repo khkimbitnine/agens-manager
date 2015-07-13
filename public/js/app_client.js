@@ -10,9 +10,17 @@
 			
 			$(".tab").click(function() {
 				
-				zInd = parseInt($(this).css("z-index")) + 1;
+				var $this = $(this);
+				
+				zInd = parseInt($this.css("z-index")) + 1;
+				
+				if($this.index() == 0) {
+					
+					$(".db").click();
 			
-				$(this).css("z-index", zInd);
+				}
+					
+			$this.css("z-index", zInd);
 			
 			});
 			
@@ -304,6 +312,22 @@
 			
 			var $browser = $("#browser");
 			
+			$browser.on("click", "span", function(){
+				
+				var $this = $(this);
+				
+				$this
+				.css("color", "skyblue")
+				.addClass("on");
+				
+				$("#browser")
+				.find("span")
+				.not($this)
+				.css("color", "#fff")
+				.removeClass("on");
+				
+			})
+			
 			//hitarea
 			var expHit = "hitarea expandable-hitarea lastExpandable-hitarea";
 			var exp = "expandable lastExpandable";
@@ -340,7 +364,6 @@
 			
 			//db -> schema
 			$browser.on("click", ".db", function() {
-			
 				var $this = $(this);
 				var dbname = $this.text();
 				socket.emit('set_dbname', dbname);
@@ -372,37 +395,15 @@
 					
 				}
 				
-				socket.emit('set_dbname_schema', dbname);
-				
-				socket.once('get_dbname_schema', function(data){
+				$.ajax({
 					
-					var schema_property = JSON.parse(data);
-					
-					var $content = $(".content").empty();
-					
-					$.ajax({
-						
-						url:"db_content.html",
-						success:function(data){
-							
-							$content.html(data);
-							
-							for(var i = 0 ; i < schema_property.length ; i ++){
-								
-								var tr = $('<tr>').appendTo("#schemaProperty");
-								
-								$('<td>').text(schema_property[i].schema_name).appendTo(tr);
-								
-								$('<td>').text(schema_property[i].schema_owner).appendTo(tr);
-								
-								$('<td>').text(schema_property[i].description).appendTo(tr);
-								
-							}
-							
-						} 
-					
-					}); 
+					url:"db_content.html",
+					success:function(data){
+						$(".content").empty().html(data);
+						socket.emit('set_dbname_schema', dbname);
+					}
 				});
+				
 			});
 			
 			
@@ -434,6 +435,17 @@
 											+ "function" + "</span></li>");
 					
 				}
+				
+				$.ajax({
+					
+					url:"schema_content.html",
+					success:function(data){
+						
+						$(".content").empty().html(data);
+						socket.emit('set_schema_table', $this.text());
+						
+					}
+				});
 			});
 			
 			//table -> tabname      
@@ -627,8 +639,10 @@
 					collapse($this);
 					
 					socket.emit('set_tabname_col', {
+						
 						tabname : tabname,
 						scname : scname
+						
 					});
 			
 					socket.once('colname', function(data) {
@@ -763,4 +777,4 @@
 			
 			});
 			
-			
+

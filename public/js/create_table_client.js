@@ -91,8 +91,6 @@
 					
 				}
 				
-				var table = [];
-				
 				var varType = [];
 				
 				$("#dbList").change(function(){
@@ -134,15 +132,6 @@
 								varType[2*i] = rs[i];
 								
 								varType[2*i+1] = rs[i]+'[]';
-				
-							}
-						});
-				
-						socket.once('table', function(rs){
-				
-							for(var i = 0 ; i < rs.length ; i ++){
-				
-								table[i] = rs[i];
 				
 							}
 						});
@@ -280,7 +269,7 @@
 					
 					console.log($("#tableForm").serializeArray());
 					
-					validCheck(table);
+					validCheck();
 					
 				});
 				
@@ -305,7 +294,7 @@
 					
 				}
 				
-				function validCheck(table) {
+				function validCheck() {
 				
 					$(".notValid").removeClass("notValid").css({
 						
@@ -323,7 +312,6 @@
 						notValid($name);
 				
 					}
-					var dup = false;
 				
 					if(!$("#dbList").find('option:selected').index() ){
 				
@@ -335,26 +323,6 @@
 				
 						notValid($("#schemaList"));
 				
-					}
-				
-					if(namePat.test($name.val()) || onePat.test($name.val())){
-				
-						for(var i = 0 ; i < table.length ; i++){
-							
-							if(table[i]== $name.val()){
-								
-								dup = true;
-								
-							}
-						}
-				
-						if(dup){
-							
-							alert("Table name duplicated");
-							
-							notValid($name);
-							
-						}
 					}
 				
 					if (!$schema.children("option:selected").index() ) {
@@ -384,7 +352,7 @@
 							
 						}
 						
-						if (!lengthPat.test($length.val()) && $length){
+						if (!lengthPat.test($length.val()) && $length.val()){
 							
 							notValid($length);
 							

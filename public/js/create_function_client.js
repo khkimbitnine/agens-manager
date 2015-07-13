@@ -457,24 +457,24 @@
 						}
 					}
 				
-					if(!defPat.test($cmt.val()) && $cmt){
+					if(!defPat.test($cmt.val()) && $cmt.val()){
 				
 						notValid($cmt);
 				
 					}
-					if(!costPat.test($exeCst.val()) && $exeCst){
+					if(!costPat.test($exeCst.val()) && $exeCst.val()){
 				
 						notValid($exeCst);
 				
 					}
 				
-					if(!costPat.test($resRow.val()) && $resRow){
+					if(!costPat.test($resRow.val()) && $resRow.val()){
 				
 						notValid($resRow);
 				
 					}
 				
-					if(!$typeBox.find('.schema').find('option:selected').index() && !$typeBox.find('.type').find('option:selected').index()){
+					if($typeBox.find('.schema').find('option:selected').index() && !$typeBox.find('.type').find('option:selected').index()){
 				
 						notValid($typeBox.find('.type'));
 						

@@ -23,6 +23,7 @@ app.set('view engine', 'jade');
 
 // static files
 app.use('/static', express.static('/home/bitnine/source_code_dir/agens-manager/agensmanager/public'));
+//app.use('/static', express.static('/Users/Johnahkim/git/agensmanager/public'));
 
 // parse post data of the body
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -111,6 +112,7 @@ app.get('/', function(req, res) {
 });
  */
 var fpath = '/home/bitnine/source_code_dir/agens-manager/agensmanager/';// FIXME: admin must be able to set this value
+//var fpath = '/Users/Johnahkim/git/agensmanager/';// FIXME: admin must be able to set this value
 console.log("fpath=%s", fpath);
 app.get('/', function(req, res) {
   fs.readFile(fpath + 'app.html', function(error, data) {
@@ -126,7 +128,7 @@ app.get('/', function(req, res) {
  */
 
 var fs = require('fs');
-var create_table = require('./create_table');
+var table_ddl = require('./table_ddl');
 var object_browser = require('./object_browser');
 var create_index = require('./create_index');
 var create_schema = require('./create_schema');
@@ -307,8 +309,18 @@ io.on('connection', function(socket) {
   // form
   socket.on('table_form', function(formdata) {
     getPgClient(function(client) {
-      create_table.create_table(socket, client, formdata);
+      table_ddl.create_table(socket, client, formdata);
     });
+  });
+  socket.on('update_table', function(formdata){
+  	getPgClient(function(client){
+  		table_ddl.alter_table(socket, client, formdata);
+  	});
+  });
+  socket.on('drop_table', function(sctb){
+  	getPgClient(function(client){
+  		table_ddl.drop_table(socket, client, sctb);
+  	});
   });
   socket.on('index_form', function(formdata) {
     getPgClient(function(client) {
@@ -374,6 +386,16 @@ io.on('connection', function(socket) {
   		object_browser.set_dbname_schema(socket, client, data);
   	});
   });
+  socket.on('set_schema_table', function(data){
+  	getPgClient(function(client){
+  		object_browser.set_schema_table(socket, client, data);
+  	});
+  });
+  socket.on('set_schema_view', function(data){
+  	getPgClient(function(client){
+  		object_browser.set_schema_view(socket, client, data);
+  	});
+  });
 
   // create function
   socket.on('schema', function(schema) {
@@ -434,6 +456,18 @@ app.get('/login_user.html', function (req, res) {
 });
 app.get('/db_content.html', function (req, res) {
 	fs.readFile(fpath + 'db_content.html', function(error, data) {
+		res.writeHead(200, { 'Content-Type': 'text/html' });
+		res.end(data);
+	});
+});
+app.get('/schema_content.html', function (req, res) {
+	fs.readFile(fpath + 'schema_content.html', function(error, data) {
+		res.writeHead(200, { 'Content-Type': 'text/html' });
+		res.end(data);
+	});
+});
+app.get('/alter_table.html', function (req, res) {
+	fs.readFile(fpath + 'alter_table.html', function(error, data) {
 		res.writeHead(200, { 'Content-Type': 'text/html' });
 		res.end(data);
 	});

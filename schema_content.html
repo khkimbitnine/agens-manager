@@ -1,0 +1,261 @@
+<style>
+#tabs>div{
+	width:100px;
+	height:50px;
+	color:#000;
+	display:inline-block;
+	cursor:pointer;
+	line-height:50px;
+	text-align:center;
+}
+
+#tabs>div:nth-of-type(1){
+	
+	background:red;
+
+}
+#tabs>div:nth-of-type(2){
+
+	background:green;
+}
+#tabs>div:nth-of-type(3){
+
+	background:blue;
+}
+#btnBox>button{
+	
+	width:100px;
+	height:30px;
+	
+}
+#infoBox table, #infoBox th, #infoBox td{
+	color:#000;
+	border:1px solid #000;
+	border-collapse:collapse;
+	padding:5px;
+}
+</style>
+<div id="btnBox">
+	<button>Alter</button>
+	<button>Drop</button>
+</div>
+<div id="tabs">
+	<div id="table">Table</div>
+	<div id="view">View</div>
+	<div id="function">Function</div>
+</div>
+<div id="infoBox">
+
+</div>
+<script>
+
+	var $infoBox = $("#infoBox");
+	
+	function table_info(){
+		
+		socket.once('get_schema_table', function(data){
+			
+			var table_info = JSON.parse(data);
+			
+			$infoBox.empty();
+			
+			$infoBox.append("<table id='tableBox'>"+
+								"<tr>"+
+									"<th></th>"+
+									"<th>Table</th>"+
+									"<th>Owner</th>"+
+									"<th>Tablespace</th>"+
+									"<th>Estimated row count</th>"+
+									"<th>Comment</th>"+
+								"</tr>"+
+							"</table>");		
+			
+			for(var i = 0 ; i < table_info.length ; i ++){
+				
+				var tr = $("<tr>").appendTo($infoBox.find("table"));
+				
+				if(i == 0 ){
+					
+					$("<td>").append("<input type='checkbox' class='checkbox' checked/>"+
+					 "<input type='hidden' name='table' value='1'/>").appendTo(tr);
+					
+				}else{
+					
+					$("<td>").append("<input type='checkbox' class='checkbox'/>"+
+					 "<input type='hidden' name='table' value='0'/>").appendTo(tr);
+					
+				}
+
+				
+				$("<td class='tabname'>").text(table_info[i].table).appendTo(tr);
+				
+				$("<td class='tabowner'>").text(table_info[i].owner).appendTo(tr);
+				
+				$("<td>").text(table_info[i].tablespace).appendTo(tr);
+				
+				$("<td>").text(table_info[i].row).appendTo(tr);
+				
+				$("<td class='tabcomment'>").text(table_info[i].comment).appendTo(tr);
+				
+			}
+			
+		});
+		
+	}
+	
+	function view_info(){
+		
+		socket.once('get_schema_view', function(data){
+			
+			var view_info = JSON.parse(data);
+			
+			$infoBox.empty();
+			
+			$infoBox.append("<table id='viewBox'>"+
+								"<tr>"+
+									"<th></th>"+
+									"<th>View</th>"+
+									"<th>Owner</th>"+
+									"<th>Comment</th>"+
+								"</tr>"+
+							"</table>");		
+			
+			for(var i = 0 ; i < view_info.length ; i ++){
+				
+				var tr = $("<tr>").appendTo($infoBox.find("table"));
+				
+				if(i == 0 ){
+					
+					$("<td>").append("<input type='checkbox' class='checkbox' checked/>"+
+					 "<input type='hidden' name='table' value='1'/>").appendTo(tr);
+					
+				}else{
+					
+					$("<td>").append("<input type='checkbox' class='checkbox'/>"+
+					 "<input type='hidden' name='table' value='0'/>").appendTo(tr);
+					
+				}
+
+				
+				$("<td class='viewname'>").text(view_info[i].view).appendTo(tr);
+				
+				$("<td class='viewowner'>").text(view_info[i].owner).appendTo(tr);
+				
+				$("<td class='viewcomment'>").text(view_info[i].comment).appendTo(tr);
+				
+			}
+		});
+	}
+	
+	table_info();
+	
+	$("#table").click(function(){
+		
+		socket.emit('set_schema_table', $("#browser span.on").text());
+		
+		table_info();
+		
+	});
+	
+	$("#view").click(function(){
+		
+		socket.emit('set_schema_view', $("#browser span.on").text());
+		
+		view_info();
+		
+	});
+	
+	$("#infoBox").on("click", ".checkbox", function(){
+		var $this = $(this);
+		
+		$(".checkbox").not(this).prop('checked', false).next().val(0);
+		
+		$this.next().val(1);
+		
+		
+	});	
+	
+	$("#btnBox>button:eq(0)").click(function(){
+		
+		if($("#infoBox>table").is("#tableBox")){
+			
+			$.ajax({
+				url: "alter_table.html",
+				success:function(data){
+					
+					var $content = $(".content");
+					var tabname = $(".checkbox:checked").parent().siblings(".tabname").text();
+					var schema = $(".schema.on").text();
+					var owner = $(".checkbox:checked").parent().siblings(".tabowner").text();
+					var comment = $(".checkbox:checked").parent().siblings(".tabcomment").text();
+					
+					$content.empty().html(data);
+					$content.find("#oldName").val(tabname);
+					$content.find("#name").val(tabname);
+					
+					var $schema = $content.find("#schemaList");
+					var $oldSchema = $content.find("#oldSchema");
+					
+					var $owner = $content.find("#ownerList");
+					var $oldOwner = $content.find("#oldOwner");
+					
+					var $comment = $content.find("#comment");
+					var $oldCmt = $content.find("#oldCmt");
+					
+					$schema.empty();
+
+					socket.emit('set_dbname', $(".schema.on").closest(".db").text());
+
+					socket.once('scname',function(data) {
+						
+						$schema.append('<option>');
+
+						for(var i = 0 ; i < data.schema.length ; i++){
+							
+							$schema.append("<option value='"+data.schema[i]+"'>"+ data.schema[i]+ "</option>");
+							
+						}
+						
+						$schema.val(schema);//option selected
+						$oldSchema.val(schema);
+					});
+					
+					socket.once('get_role', function(data){
+						
+						$owner.append('<option>');
+						
+						for (var i = data.length - 1; i >= 0; i--) {
+							$owner.append(
+									'<option class="role" value="'+data[i]+'">' + data[i]
+											+ '</option>');
+						}
+						
+						$owner.val(owner);
+						$oldOwner.val(owner);
+					});
+					
+					$comment.val(comment);
+					$oldCmt.val(comment);
+				}
+			})
+			
+		}
+
+		
+	});
+	
+	$("#btnBox>button:eq(1)").click(function(){
+		var tabname = $(".checkbox:checked").parent().siblings(".tabname").text();
+		socket.emit('drop_table', {schema: $(".schema.on").text(), table: tabname});
+		socket.once('table_success', function(error){
+			if(error==null){
+				
+				alert("Table dropped.");
+				location.reload();
+			}else{
+				
+				alert(error);
+			}
+		});
+	});
+</script>

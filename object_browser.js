@@ -201,3 +201,56 @@
 					});
 				}
 				
+				exports.set_schema_table = function(socket, client, scname){
+					
+					client.query("SELECT tablename AS table, tableowner AS owner, tablespace, n_live_tup AS row, obj_description(oid, tablename) AS comment"+
+											" FROM pg_tables t, pg_stat_user_tables p, pg_class c"+
+											" WHERE t.tablename = p.relname"+
+											" AND c.relname = p.relname"+
+											" AND t.schemaname = '"+scname+"'", function(err, rs){
+						
+						if(err){
+							
+							console.log("set_schema_table err: "+err);
+							
+						}
+						
+						var arr = [];
+						
+						for(var k=0; k < rs.rows.length; k++){
+							
+								arr.push(rs.rows[k]);
+							
+						}
+						
+						socket.emit('get_schema_table', JSON.stringify(arr));
+						console.log(JSON.stringify(arr))
+					});
+			}
+				
+				exports.set_schema_view = function(socket, client, scname){
+					
+					client.query("SELECT viewname AS view, viewowner AS owner, obj_description(oid, viewname) AS comment"+
+											" FROM pg_catalog.pg_views p, pg_class c"+ 
+											" WHERE c.relname = p.viewname" +
+											" AND schemaname='"+scname+"'", function(err, rs){
+						
+						if(err){
+							
+							console.log("set_schema_view err: "+err);
+						}
+						
+						var arr = [];
+						
+						for(var i = 0 ; i < rs.rows.length ; i++){
+							
+							arr.push(rs.rows[i]);
+						}
+						
+						socket.emit('get_schema_view', JSON.stringify(arr));
+					
+					});
+					
+					
+				}
+			
