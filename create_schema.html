@@ -70,7 +70,7 @@
 			notValid($comment);
 
 		if ($(".notValid").size() == 0) {
-			socket.emit('schema_form', $("#schemaForm").serializeArray());
+			socket.emit('create_schema', $("#schemaForm").serializeArray());
 			socket.once('schema_success', function(error){
 				if(error==null){
 					

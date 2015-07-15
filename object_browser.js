@@ -203,7 +203,7 @@
 				
 				exports.set_schema_table = function(socket, client, scname){
 					
-					client.query("SELECT tablename AS table, tableowner AS owner, tablespace, n_live_tup AS row, obj_description(oid, tablename) AS comment"+
+					client.query("SELECT tablename AS table, tableowner AS owner, tablespace, n_live_tup AS row, obj_description(oid) AS comment"+
 											" FROM pg_tables t, pg_stat_user_tables p, pg_class c"+
 											" WHERE t.tablename = p.relname"+
 											" AND c.relname = p.relname"+
@@ -224,13 +224,12 @@
 						}
 						
 						socket.emit('get_schema_table', JSON.stringify(arr));
-						console.log(JSON.stringify(arr))
 					});
 			}
 				
 				exports.set_schema_view = function(socket, client, scname){
 					
-					client.query("SELECT viewname AS view, viewowner AS owner, obj_description(oid, viewname) AS comment"+
+					client.query("SELECT viewname AS view, viewowner AS owner, obj_description(oid) AS comment, definition AS query"+
 											" FROM pg_catalog.pg_views p, pg_class c"+ 
 											" WHERE c.relname = p.viewname" +
 											" AND schemaname='"+scname+"'", function(err, rs){
@@ -252,5 +251,54 @@
 					});
 					
 					
+				}
+				
+				exports.set_schema_proc = function(socket, client, scname){
+					
+					client.query("SELECT proname, prosrc AS definition, procost AS execution_cost, prorows AS result_rows, provolatile AS immutable, " +
+							 							 " proisstrict AS null_call, prosecdef AS definer, routine_name AS proc, data_type AS returns, rolname AS owner, " +
+							 							 " external_language AS language, obj_description(p.oid) AS comment"+
+							 				" FROM pg_proc p, information_schema.routines r, pg_authid a"+
+							 				" WHERE p.proname = r.routine_name"+
+							 				" AND a.oid = p.proowner"+
+							 				" AND r.routine_schema = '"+scname+"'", function(err, rs){
+						
+						if(err){
+							
+							console.log("set_schema_proc err: "+err);
+						}
+						
+						var arr = [];
+						
+						for(var i = 0 ; i < rs.rows.length ; i++){
+							
+							arr.push(rs.rows[i]);
+						}
+						socket.emit('get_schema_proc', JSON.stringify(arr));
+					
+					});
+					
+					
+				}
+				
+				exports.set_proc_arg = function(socket, client, proc){
+					
+					client.query("SELECT pg_get_function_arguments(p.oid) AS arg"+
+											" FROM (SELECT oid FROM pg_proc WHERE proname='"+proc+"') p;", function(err, rs){
+						
+						if(err){
+							console.log("set_proc_arg err:"+err);
+						}
+						
+						var arr = [];
+						
+						for(var i = 0 ; i < rs.rows.length; i++){
+							
+							arr.push(rs.rows[i]);
+						}
+						
+						socket.emit('get_proc_arg', rs.rows[0].arg);
+						
+					});
 				}
 			

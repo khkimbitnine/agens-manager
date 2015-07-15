@@ -176,11 +176,24 @@
 				
 				$("#dbList").change(function(){
 				
+					var $schema = $("#schemaList");
+					
 					$(".schema, .type").empty().append('<option>');
+					
+					$schema.empty().append('<option>');
 				
 					if($(this).find('option:selected').index()){
 				
 						socket.emit('set_dbname', $(this).find('option:selected').val());
+						
+						socket.once('scname',function(data) {
+							
+							for(var i = 0 ; i < data.schema.length ; i++){
+								
+								$schema.append("<option value='"+data.schema[i]+"'>"+ data.schema[i]+ "</option>");
+								
+							}
+						});
 				
 						socket.once('schemas', function(schema){
 				
@@ -331,7 +344,7 @@
 					
 					$("#dbList").find('option').eq(0).prop('selected', true);
 					
-					$(".schema, .type").empty();
+					$("#functionForm .schema, #functionForm .type").empty();
 				
 				});
 				
@@ -365,7 +378,7 @@
 				var $remove = $(".remove");
 				
 				var namePat = /^[a-zA-Z_][a-zA-Z_\d]+$/;
-				var defPat = /^[a-zA-Z_\d\s]+$/;
+				var defPat = /^[a-zA-Z_-\d\s\.\%\/\*\+\=\(\)\"\'\!\<\>\,\:\$]+$/;
 				var costPat = /^[\d]+$/;
 				
 				function notValid(notValid) {
@@ -484,7 +497,7 @@
 						
 						console.log($("#functionForm").serializeArray());
 						
-						socket.emit("function_form", $("#functionForm").serializeArray());
+						socket.emit("create_function", $("#functionForm").serializeArray());
 						
 						socket.once('function_success', function(error){
 				

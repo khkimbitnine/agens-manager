@@ -29,19 +29,23 @@
 	color: rgb(31,112,175);
 }
 
-#view>li:nth-of-type(1){
+#view>li:nth-of-type(1), #view>li:nth-of-type(2){
 	margin-bottom:60px;
 }
-#view>li:nth-of-type(2){
+#view>li:nth-of-type(3){
 	margin-bottom:40px;
 }
-#dbList{
+#dbList, #schemaList{
 	width:190px;
 	height:40px;
 	margin-left:50px;
 }
 
-#view>li:nth-of-type(2)>label,#view>li:nth-of-type(3)>label{
+#view>li:nth-of-type(3)>label,#view>li:nth-of-type(4)>label{
+	display:block;
+	margin-bottom:20px;
+}
+.alter:nth-of-type(1)>label,.alter:nth-of-type(2)>label{
 	display:block;
 	margin-bottom:20px;
 }

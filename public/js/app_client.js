@@ -14,12 +14,6 @@
 				
 				zInd = parseInt($this.css("z-index")) + 1;
 				
-				if($this.index() == 0) {
-					
-					$(".db").click();
-			
-				}
-					
 			$this.css("z-index", zInd);
 			
 			});

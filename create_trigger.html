@@ -101,7 +101,7 @@
 		
 			if (!$(".notValid").size()) {
 				
-				socket.emit("trigger_form", trigger);
+				socket.emit("create_trigger", trigger);
 				
 				socket.once('trigger_success', function(error){
 					

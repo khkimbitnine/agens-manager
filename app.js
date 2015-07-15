@@ -22,8 +22,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // static files
-app.use('/static', express.static('/home/bitnine/source_code_dir/agens-manager/agensmanager/public'));
-//app.use('/static', express.static('/Users/Johnahkim/git/agensmanager/public'));
+//app.use('/static', express.static('/home/bitnine/source_code_dir/agens-manager/agensmanager/public'));
+app.use('/static', express.static('/Users/Johnahkim/git/agensmanager/public'));
 
 // parse post data of the body
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -111,8 +111,8 @@ app.get('/', function(req, res) {
   res.render('index');
 });
  */
-var fpath = '/home/bitnine/source_code_dir/agens-manager/agensmanager/';// FIXME: admin must be able to set this value
-//var fpath = '/Users/Johnahkim/git/agensmanager/';// FIXME: admin must be able to set this value
+//var fpath = '/home/bitnine/source_code_dir/agens-manager/agensmanager/';// FIXME: admin must be able to set this value
+var fpath = '/Users/Johnahkim/git/agensmanager/';// FIXME: admin must be able to set this value
 console.log("fpath=%s", fpath);
 app.get('/', function(req, res) {
   fs.readFile(fpath + 'app.html', function(error, data) {
@@ -132,8 +132,8 @@ var table_ddl = require('./table_ddl');
 var object_browser = require('./object_browser');
 var create_index = require('./create_index');
 var create_schema = require('./create_schema');
-var create_view = require('./create_view');
-var create_function = require('./create_function');
+var view_ddl = require('./view_ddl');
+var proc_ddl = require('./proc_ddl');
 var create_trigger = require('./create_trigger');
 
 io.on('connection', function(socket) {
@@ -306,13 +306,13 @@ io.on('connection', function(socket) {
     });
   }
 
-  // form
-  socket.on('table_form', function(formdata) {
+  // ddl - table
+  socket.on('create_table', function(formdata) {
     getPgClient(function(client) {
       table_ddl.create_table(socket, client, formdata);
     });
   });
-  socket.on('update_table', function(formdata){
+  socket.on('alter_table', function(formdata){
   	getPgClient(function(client){
   		table_ddl.alter_table(socket, client, formdata);
   	});
@@ -322,27 +322,57 @@ io.on('connection', function(socket) {
   		table_ddl.drop_table(socket, client, sctb);
   	});
   });
-  socket.on('index_form', function(formdata) {
+  
+  // ddl - view
+  socket.on('create_view', function(data) {
+    getPgClient(function(client) {
+      view_ddl.create_view(socket, client, data);
+    });
+  });
+  socket.on('alter_view', function(formdata){
+  	getPgClient(function(client){
+  		view_ddl.alter_view(socket, client, formdata);
+  	});
+  });
+  socket.on('drop_view', function(scv){
+  	getPgClient(function(client){
+  		view_ddl.drop_view(socket, client, scv);
+  	});
+  });
+  
+  // ddl - proc
+  socket.on('create_function', function(formdata) {
+    getPgClient(function(client) {
+      proc_ddl.create_proc(socket, client, formdata);
+    });
+  });
+  socket.on('schema', function(schema) {
+    getPgClient(function(client) {
+      proc_ddl.schema(socket, client, schema);
+    });
+  });
+  socket.on('alter_proc', function(schema) {
+  	getPgClient(function(client) {
+  		proc_ddl.alter_proc(socket, client, schema);
+  	});
+  });
+  
+  // create - index
+  socket.on('create_index', function(formdata) {
     getPgClient(function(client) {
       create_index.create_index(socket, client, formdata);
     });
   });
-  socket.on('schema_form', function(data) {
+  
+  // create - schema
+  socket.on('create_schema', function(data) {
     getPgClient(function(client) {
       create_schema.create_schema(socket, client, data);
     });
   });
-  socket.on('view_form', function(data) {
-    getPgClient(function(client) {
-      create_view.create_view(socket, client, data);
-    });
-  });
-  socket.on('function_form', function(formdata) {
-    getPgClient(function(client) {
-      create_function.create_function(socket, client, formdata);
-    });
-  });
-  socket.on('trigger_form', function(formdata) {
+  
+  // create - trigger
+  socket.on('create_trigger', function(formdata) {
   	getPgClient(function(client) {
   		create_trigger.create_trigger(socket, client, formdata);
   	});
@@ -396,13 +426,18 @@ io.on('connection', function(socket) {
   		object_browser.set_schema_view(socket, client, data);
   	});
   });
-
-  // create function
-  socket.on('schema', function(schema) {
-    getPgClient(function(client) {
-      create_function.schema(socket, client, schema);
-    });
+  socket.on('set_schema_proc', function(data){
+  	getPgClient(function(client){
+  		object_browser.set_schema_proc(socket, client, data);
+  	});
   });
+  socket.on('set_proc_arg', function(data){
+  	getPgClient(function(client){
+  		object_browser.set_proc_arg(socket, client, data);
+  	});
+  });
+
+
 
   // create trigger
   socket.on('username', function(username) {
@@ -468,6 +503,18 @@ app.get('/schema_content.html', function (req, res) {
 });
 app.get('/alter_table.html', function (req, res) {
 	fs.readFile(fpath + 'alter_table.html', function(error, data) {
+		res.writeHead(200, { 'Content-Type': 'text/html' });
+		res.end(data);
+	});
+});
+app.get('/alter_view.html', function (req, res) {
+	fs.readFile(fpath + 'alter_view.html', function(error, data) {
+		res.writeHead(200, { 'Content-Type': 'text/html' });
+		res.end(data);
+	});
+});
+app.get('/alter_proc.html', function (req, res) {
+	fs.readFile(fpath + 'alter_proc.html', function(error, data) {
 		res.writeHead(200, { 'Content-Type': 'text/html' });
 		res.end(data);
 	});

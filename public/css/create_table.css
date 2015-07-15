@@ -226,7 +226,7 @@ textarea#comment{
 	text-indent:-9999px;
 	border:none;
 }
-.field#btnBox>button:nth-of-type(1){
+.field#btnBox>#submitBtn{
 	background:url('/static/images/create2.png');
 }
 .field#btnBox>button:nth-of-type(2){

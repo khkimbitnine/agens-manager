@@ -145,7 +145,7 @@
 				
 						var formdata = $("#indexForm").serializeArray();
 				
-						socket.emit('index_form', {form: formdata, column: columns});
+						socket.emit('create_index', {form: formdata, column: columns});
 						
 						socket.once('index_success', function(error){
 							

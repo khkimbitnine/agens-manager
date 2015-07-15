@@ -33,7 +33,7 @@
 				</div>
 				<div id="btnBox" class="field">
 					<button type="submit" id="alterBtn">Alter</button>
-					<button>Cancel</button>
+					<button id="cancelBtn">Cancel</button>
 				</div>
 			</li>
 		</ul>
@@ -92,7 +92,7 @@ function validCheck() {
 
 	if (!$(".notValid").size()) {
 		
-		socket.emit('update_table', $("#tableForm").serializeArray());
+		socket.emit('alter_table', $("#tableForm").serializeArray());
 		
 		socket.once('table_success', function(error){
 			
@@ -120,6 +120,22 @@ function validCheck() {
 	$("#alterBtn").click(function(e){
 		e.preventDefault();
 		validCheck();
-	})
+	});
+	
+	$("#cancelBtn").click(function(e){
+		
+		e.preventDefault();
+		
+		$.ajax({
+			
+			url:"schema_content.html",
+			success:function(data){
+				
+				$(".content").empty().html(data);
+				socket.emit('set_schema_table', $(".schema.on").text());
+				
+			}
+		});
+	});
 </script>
 

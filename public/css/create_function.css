@@ -44,6 +44,19 @@
 #row1>span:nth-of-type(3){
 	width:40%;
 }
+.alter #returns, .alter #language, .alter #arguments{
+	display:inline-block;
+	color:#000;
+}
+.alter #returns{
+	width:10%;
+}
+.alter #language{
+	width: 10%;
+}
+.alter #arguments{
+	width:20%;
+}
 #returns>*{
 	display:inline-block;
 	vertical-align:middle;
@@ -92,7 +105,7 @@
 img.array{
 	margin:0 90px 0 10px;
 }
-#row2>span, #row4 label, #row5>label, #row6>span, #row7>span{
+#row2>span, #row4 label, #row5>label, #row6>span, #row7>span, .alter .def>label, .alter #row3>label, .alter #row4>span, .alter #row5>span{
 	display:block;
 	font-weight:bold;
 	font-size:14px;
@@ -145,6 +158,11 @@ img.array{
 	height:36px;
 	padding:0;
 }
+.alter #row4 input{
+	margin:0;
+	height:36px;
+	padding:0;
+}
 .objectFile{
 	margin-right:10px;
 }
@@ -190,31 +208,31 @@ img.array{
 #row5>label{
 	margin-bottom:20px;
 }
-#row6>span{
+#row6>span, .alter #row4>span{
 	margin:40px 0 20px 0;
 }
-#row6>ul{
+#row6>ul, .alter #row4>ul{
 	list-style:none;
 	padding:0;
 }
-#row6>ul>li{
+#row6>ul>li, .alter #row4>ul>li{
 	display:inline-block;
 }
-#row6>ul>li>label{
+#row6>ul>li>label, .alter #row4>ul>li>label{
 	display:block;
 	margin-bottom:20px;
 	font-weight:bold;
 	font-size:14px;
 	color:rgb(110,110,110);
 }
-#row7{
+#row7, .alter #row5{
 	margin: 40px 0 40px 0;
 }
-#row7>span{
+#row7>span, .alter #row5>span{
 	display:block;
 	margin-bottom:20px;
 }
-#row7>select{
+#row7>select, .alter #row5>select{
 	display:block;
 	width:250px;
 	height:40px;
@@ -238,10 +256,11 @@ img.array{
 	display:inline-block;
 	font-size:14px;
 }
-#dbBox{
+#dbBox, #schema{
 	display:inline-block;
+	margin-right:50px;
 }
-#dbList{
+#dbList, #schemaList{
 	width:222px;
 	height:40px;
 }

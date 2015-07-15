@@ -382,7 +382,7 @@
 				
 					if (!$(".notValid").size()) {
 						
-						socket.emit('table_form', $("#tableForm").serializeArray());
+						socket.emit('create_table', $("#tableForm").serializeArray());
 						
 						socket.once('table_success', function(error){
 							
