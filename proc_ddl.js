@@ -1,3 +1,5 @@
+				
+				// Select Postgresql data types for return type and argument type
 				exports.schema = function(socket, client, schema){
 					
 					var query = "";
@@ -44,9 +46,12 @@
 					
 						var error;
 						
+						// interval: argument properties - argmode, argname, argschema, argtype, argarray (repeatable by 5 properties)
 						var interval = 5; 
-						//argmode, argname, argschema, argtype, argarray
-						var endInd = formdata.length - 1;
+						// Number of non-argument properties: 13 (fixed)
+						// 6 + (interval)*n + 7
+						
+						var finalInd = formdata.length - 1;
 						
 						var scname = formdata[0].value;
 						var name = formdata[1].value;
@@ -89,9 +94,9 @@
 						
 						var language = formdata[6].value;
 						
-						var definition = formdata[endInd-6].value;
-						var comment = formdata[endInd-5].value;
-						var execution_cost = formdata[endInd-4].value;
+						var definition = formdata[finalInd-6].value;
+						var comment = formdata[finalInd-5].value;
+						var execution_cost = formdata[finalInd-4].value;
 						
 						if(execution_cost){
 							
@@ -99,7 +104,7 @@
 							
 						}
 						
-						var result_rows = formdata[endInd-3].value;
+						var result_rows = formdata[finalInd-3].value;
 						
 						if(result_rows){
 							
@@ -107,14 +112,14 @@
 							
 						}
 						
-						var behavior = formdata[endInd-2].value;
-						var strict = formdata[endInd-1].value;
-						var security = formdata[endInd].value;
+						var behavior = formdata[finalInd-2].value;
+						var strict = formdata[finalInd-1].value;
+						var security = formdata[finalInd].value;
 						
-						
+						// arg: array of all arguments' properties
 						var arg = [];
 						
-						for(var i = 7 ; i < endInd-6; i++){
+						for(var i = 7 ; i < finalInd-6; i++){
 							
 							arg[i-7] = formdata[i].value;
 							
@@ -134,6 +139,7 @@
 							functionName = name+"(";
 						}
 						
+						// Divide arg by interval and put each chunk in the argRow[i]
 						for(var i = 0 ; i <(arg.length)/interval ; i++){
 							
 							var argMode = "";
@@ -160,7 +166,7 @@
 								
 								functionName += argMode+" ";
 								
-								if(argRow[2] !== '0'){//Basic datatype
+								if(argRow[2] !== '0'){// '0' is Basic datatype 
 									
 									argType = argRow[2]+"."+argType;
 									
@@ -204,8 +210,8 @@
 							}
 						}
 						
-						//rows not applicable when function doesn't return a set
 						if(result_rows){
+							
 							result_rows = " ROWS "+result_rows;
 						}
 						
@@ -242,6 +248,7 @@
 
 				exports.alter_proc = function(socket, client, formdata){
 					
+					// To check if input values are different, there are old values hidden
 					var o_scname = formdata[0].value;
 					var scname = formdata[1].value;
 					var o_name = formdata[2].value;
@@ -274,14 +281,14 @@
 					var strictQ = "";
 					var secQ = "";
 					
-					var procName = o_scname+"."+name+"("+arg+")";
+					var procName = scname+"."+name+"("+arg+")";
 					
 					if(o_name !== name){
 						nameQ = "ALTER FUNCTION "+o_scname+"."+o_name+"("+arg+")"+" RENAME TO "+name+";";
 					}
 					
 					if(o_scname !== scname){
-						scQ = "ALTER FUNCTION "+procName+" SET SCHEMA "+scname+";";
+						scQ = "ALTER FUNCTION "+o_scname+"."+name+"("+arg+")"+" SET SCHEMA "+scname+";";
 					}
 					
 					if(o_def !== def){
@@ -300,15 +307,15 @@
 						rowsQ = "ALTER FUNCTION "+procName+" ROWS "+rows+";";
 					}
 					
-					if(o_behav !== behav){
+					if(o_behav !== behav && behav){
 						behavQ = "ALTER FUNCTION "+procName+" "+behav+";";
 					}
 					
-					if(o_strict !== strict){
+					if(o_strict !== strict && strict){
 						strictQ = "ALTER FUNCTION "+procName+" "+strict+";";
 					}
 					
-					if(o_sec !== sec){
+					if(o_sec !== sec && sec){
 						secQ = "ALTER FUNCTION "+procName+" "+sec+";";
 					}
 					
@@ -332,11 +339,11 @@
 					});
 				}
 				
-				exports.drop_proc = function(socket, client, sctb){
+				exports.drop_proc = function(socket, client, scp){
 					
-					console.log("DROP FUNCTION \""+sctb.schema+"\"."+sctb.table+";");
+					console.log("DROP FUNCTION "+scp.schema+"."+scp.proc+";");
 					
-					client.query("DROP FUNCTION \""+sctb.schema+"\"."+sctb.table+";", function(err, rs){
+					client.query("DROP FUNCTION "+scp.schema+"."+scp.proc+";", function(err, rs){
 						
 						var error;
 						if(err){
@@ -344,10 +351,10 @@
 							error = err.toString();
 						}else{
 							
-							console.log("Table dropped.");
+							console.log("Function dropped.");
 							
 						}
-						socket.emit('table_success', error);
+						socket.emit('function_success', error);
 					});
 					
 				}

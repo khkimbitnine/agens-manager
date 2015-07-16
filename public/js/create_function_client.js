@@ -133,6 +133,7 @@
 				var schemas = [];
 				var types = [];
 				
+				// Return set of type
 				$("#setof").click(function(){
 				
 					var $this = $(this);
@@ -152,6 +153,7 @@
 					}
 				});
 				
+				// If array is checked, then "[]" is added next to the type
 				$("#array").change(function(){
 				
 					var $this = $(this);
@@ -168,17 +170,19 @@
 				
 				$("#dbList").append('<option>Select Database</option>');
 				
+				// Database list names
 				for(var i = 0 ; i < $(".db").length ; i++){
 				
 					$("#dbList").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>");
 				
 				}
 				
+				// If database is selected, schema list appears
 				$("#dbList").change(function(){
 				
 					var $schema = $("#schemaList");
 					
-					$(".schema, .type").empty().append('<option>');
+					$("#functionForm .schema, #functionForm .type").empty().append('<option>');
 					
 					$schema.empty().append('<option>');
 				
@@ -195,13 +199,14 @@
 							}
 						});
 				
+						// Basic datatypes such as int, char, float, etx
 						socket.once('schemas', function(schema){
 				
-							$(".schema").append('<option value="0">Basic datatype</option>');
+							$("#functionForm .schema").append('<option value="0">Basic datatype</option>');
 				
 							for(var i = 0 ; i < schema.length ; i++){
 				
-								$(".schema").append('<option value = "'+schema[i]+'">'+schema[i]+'</option>');
+								$("#functionForm .schema").append('<option value = "'+schema[i]+'">'+schema[i]+'</option>');
 				
 							}
 				
@@ -222,7 +227,7 @@
 				
 					for(var i = 0 ; i < schemas.length ; i++){
 				
-						$(".schema").eq(i).append('<option value = "'+schemas[i]+'">'+schemas[i]+'</option>');
+						$("#functionForm .schema").eq(i).append('<option value = "'+schemas[i]+'">'+schemas[i]+'</option>');
 				
 					}
 				
@@ -230,10 +235,11 @@
 				
 				row2append();
 				
+				// If schema is selected, data type list appears
 				$functionForm.on("change", ".schema", function(){
 				
 					var $this = $(this);
-					var schInd = $(".schema").index($this);
+					var schInd = $("#functionForm .schema").index($this);
 					var $option = $this.find("option:selected");
 					var optionInd = $option.index();
 					var $type = $this.next();
@@ -266,6 +272,7 @@
 				
 				$sqlBtn.prop('checked', 'checked');
 				
+				// language selection : sql, internal, c
 				$sqlBtn.click(function(){
 				
 					if(!$row4.hasClass("def")){
@@ -280,7 +287,7 @@
 					}
 				});
 				
-				$internalBtn.click(function(){//link symbol
+				$internalBtn.click(function(){
 				
 					$row2.children("ul").children("li").remove();
 					
@@ -327,6 +334,7 @@
 								"display":"inline-block"})
 					.children("input")
 					.width("480px");
+					
 					$lang
 					.empty()
 					.removeClass("sql internal")
@@ -338,6 +346,7 @@
 				
 				});
 				
+				// If language is selected, database list, schema list, type list are initialized
 				$(".language").click(function(){
 				
 					$(".language").not($(this)).prop('checked', false);
@@ -350,6 +359,7 @@
 				
 				var $add = $("#add");
 				
+				// Add an argument
 				$add.click(function(e){
 					
 					e.preventDefault();
@@ -374,13 +384,13 @@
 				
 				});
 				
-				var $down = $(".down");
-				var $remove = $(".remove");
+
 				
 				var namePat = /^[a-zA-Z_][a-zA-Z_\d]+$/;
 				var defPat = /^[a-zA-Z_-\d\s\.\%\/\*\+\=\(\)\"\'\!\<\>\,\:\$]+$/;
 				var costPat = /^[\d]+$/;
 				
+				// notValid when failed Regular expression test
 				function notValid(notValid) {
 					
 					notValid
@@ -389,6 +399,7 @@
 					
 				}
 				
+				// Regular expression test function
 				function validCheck(func) {
 					
 					$(".notValid").removeClass("notValid").css({
@@ -404,8 +415,6 @@
 					var $cmt = $("#comment");
 					var $exeCst = $("#execution_cost");
 					var $resRow = $("#result_rows");
-					
-					console.log($name.size());
 					
 					if (!namePat.test($name.val()) || !$name.val()){
 						
@@ -492,7 +501,7 @@
 						notValid($typeBox.find('.type'));
 						
 					}
-				
+					
 					if (!$(".notValid").size()) {
 						
 						console.log($("#functionForm").serializeArray());
@@ -514,6 +523,7 @@
 				
 				}
 				
+				// Increase the order of the argument
 				$functionForm.on("click", ".up", function(e){
 					
 					e.preventDefault();
@@ -531,6 +541,7 @@
 					}
 				});
 				
+				// Lower the order of the argument
 				$functionForm.on("click", ".down", function(e){
 					
 					e.preventDefault();
@@ -551,6 +562,7 @@
 					}
 				});
 				
+				// Remove the argument
 				$functionForm.on("click", ".remove", function(e){
 					
 					e.preventDefault();
@@ -578,6 +590,7 @@
 					
 				});
 				
+				// Checkbox image change
 				$("#functionForm").on("click", ".checkbox", function() {
 				
 					var $this = $(this);

@@ -12,6 +12,7 @@
 				
 				}
 				
+				// Select database
 				$("#indDatabase").change(function(){
 				
 					$("#indSchema, #indTable, #indColumn, #indIndex, #output").empty();
@@ -30,6 +31,7 @@
 				
 				});
 				
+				// Select schema
 				$("#indSchema").change(function(){
 				
 					$("#indTable, #indColumn, #indIndex, #output").empty();
@@ -48,6 +50,7 @@
 					});
 				});
 				
+				// Select table
 				$("#indTable").change(function(){
 				
 					$("#indColumn, #indIndex, #output").empty();
@@ -69,6 +72,7 @@
 					});
 				});
 				
+			// Adds selected column to the index list
 				$("#btnBox>button").click(function(e){
 				
 					e.preventDefault();
@@ -77,7 +81,7 @@
 					
 					var col = '';
 				
-					if(!$(this).index()){//add
+					if(!$(this).index() == 0){ // Add button(index:0)
 						
 						col = column
 						.remove()
@@ -109,13 +113,13 @@
 				
 						column.text(col).val(col);
 				
-					}else{
+					}else{ // Remove button(index:1)
 						
-						var output = $("#output>option:selected");
+						var $output = $("#output>option:selected");
 						
-						var res = output.text().split(" ");
+						var res = $output.text().split(" ");
 				
-						output
+						$output
 						.remove()
 						.appendTo("#indColumn")
 						.prop('selected', false)
@@ -134,8 +138,11 @@
 					var test = pattern.test(idxVal);
 					
 					var columns = [];
-				
-					if(( test || !idxVal)&& $("#output").has('option').length){
+					
+					// if condition
+					// 	1. Index name string either should exist and pass regular test OR should not exist at all.
+					// 	2. There should be entries existing in the output select box. 
+					if(( test || !idxVal) && $("#output").has('option').length){
 						
 						for(var i = 0 ; i < $("#output>option").length ; i++){
 							
@@ -172,6 +179,7 @@
 				
 				});
 				
+				// Checkbox image change
 				$("#desc, #unique, #concurrently").click(function() {
 				
 					var $this = $(this);
@@ -191,6 +199,7 @@
 					}
 				});
 				
+				// Checkbox image change nulls first, nulls last 
 				$(".order").click(function(){
 				
 					var $this = $(this);

@@ -1,27 +1,29 @@
 				exports.create_table = function(socket, client, formdata){
 				
+					// interval: column properties - column_name, type, length, precision, not_null (repeatable by 5 properties)
 					var interval = 10;
-				
-					//interval : column_name, type, length, precision, not_null
-					//primary, unique, default, foreign, check
-				
+					// Number of non-column properties: 4 (fixed)
+					// 2 + (interval)*n + 2
+					
 					var name = formdata[0].value;
 				
 					var schema = formdata[1].value;
 				
 					var comment = formdata[formdata.length-1].value;
-				
-					var column = [];//all column values
+					
+					// column : array of all columns' properties
+					var column = [];
 				
 					for(var i = 2 ; i < formdata.length-1; i++){
 				
 						column[i-2] = formdata[i].value;
 				
 					}
-					//create Table
+					
 					var createTable = 'CREATE TABLE "'+schema+'".'+name+'(';
 				
-					for(var i = 0 ; i < (column.length)/interval ; i++){// row index
+					// Divide column by interval and put each chunk in the row[i]
+					for(var i = 0 ; i < (column.length)/interval ; i++){
 				
 						var colName = '';
 						var type = '';
@@ -34,7 +36,7 @@
 						var fk = '';
 						var chk = '';
 				
-						var row = [];//column values per row
+						var row = [];
 						var k = 0;
 				
 						for(var j = (interval*i) ; j < interval*(i+1) ; j++){// per row
@@ -202,6 +204,7 @@
 				
 				exports.alter_table = function(socket, client, formdata){
 					
+					// To check if input values are different, there are old values hidden
 					var oldName = formdata[0].value;
 					var name = formdata[1].value;
 					var oldSchema = formdata[2].value;

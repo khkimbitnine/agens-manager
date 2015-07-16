@@ -28,26 +28,36 @@
 <script>
 
 	$("#dbList").append('<option>Select Database</option>');
+	
 	for(var i = 0 ; i < $(".db").length ; i++){
-		$("#dbList").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>")
+		
+		$("#dbList").append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>");
+		
 	}
 	
 	$("#dbList").change(function(){
+		
 		$("#owner").empty();
+		
 		if($(this).find('option:selected').index()>0){
+			
 			socket.emit('set_dbname',$(this).find('option:selected').val());
+			
 			socket.once("get_role", function(data) {
+				
 				for (var i = data.length - 1; i >= 0; i--) {
+					
 					$("#owner").append(
 							'<option class="role" value="'+data[i]+'">' + data[i]
 									+ '</option>');
+					
 				}
 			});
 		}
 	})
 
 	var namePattern = /^[a-zA-Z_][a-zA-Z_\d]+$/;
-	var onePattern = /^[a-zA-Z_]+$/;//one character
+	var onePattern = /^[a-zA-Z_]+$/;	//In case name is one character
 
 	var colPattern = /^[a-zA-Z_\d]+$/;
 	var lengthPattern = /^[\d]+$/;
@@ -57,21 +67,34 @@
 	var $comment = $("#comment");
 
 	function notValid(notValid) {
+		
 		notValid.css("border", "2px solid red").addClass("notValid");
 	}
-
+	
+	// Regular expression test & empty value test
 	function validCheck() {
+		
 		$(".notValid").removeClass("notValid").css({
+			
 			"border" : "1px solid #aaa"
-		});//temp default border
-		if (!namePattern.test($name.val()) && !onePattern.test($name.val()))
+		});
+		
+		if (!namePattern.test($name.val()) && !onePattern.test($name.val())){
+			
 			notValid($name);
-		if (!commentPattern.test($comment.val()) && $comment.val() !== '')
+		}
+			
+		if (!commentPattern.test($comment.val()) && $comment.val() !== ''){
+			
 			notValid($comment);
+		}
 
 		if ($(".notValid").size() == 0) {
+			
 			socket.emit('create_schema', $("#schemaForm").serializeArray());
+			
 			socket.once('schema_success', function(error){
+				
 				if(error==null){
 					
 					alert("Schema created.");
@@ -86,6 +109,7 @@
 	}
 
 	$("#createBtn").click(function(e) {
+		
 		e.preventDefault();
 		validCheck();
 	});

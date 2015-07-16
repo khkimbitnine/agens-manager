@@ -56,10 +56,12 @@ process.on('uncaughtException', function (err) {
 	});
 
 var err;
+var username;
+
 app.post('/login', function(req, res) {
   var hostname = 'localhost';
   var database = 'postgres';
-  var username = req.body.username;
+  username = req.body.username;
   var password = req.body.password;
 
   // FIXME: check username and password
@@ -95,6 +97,8 @@ app.get('/login_error', function(req, res){
 		req.session.destroy();
 	}
 })
+
+// Checks if session exists after log-in form submitted
 app.get('/session', function(req, res){
 	if(req.session.loggedIn){
 		res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -192,7 +196,6 @@ io.on('connection', function(socket) {
       var schemas = [];
       for (var i = 0; i < result.rows.length; i++)
         schemas.push(result.rows[i].schema_name);
-
 //      console.log('emit: scname');
       socket.emit('scname', { schema: schemas });
     });
@@ -293,6 +296,32 @@ io.on('connection', function(socket) {
 //      console.log('emit: get_role');
       socket.emit("get_role", roles);
     });
+    
+    // create trigger (for function list)
+    query = "SELECT proname " +
+				 		"FROM pg_proc, (SELECT usesysid " +
+				 									 "FROM pg_user " +
+				 									 "WHERE usename='"+username+"') u " +
+				 		"WHERE proowner = u.usesysid OR prorettype = 2279 " +
+				 		"ORDER BY proname;";
+    simpleQuery(query, function(err, rs){
+
+			if(err){
+			
+			console.log(err);
+			
+			}
+			
+			var proname = [];
+			
+			for(var i = 0 ; i < rs.rows.length ; i++){
+				
+				proname.push(rs.rows[i].proname);
+				
+			}
+			socket.emit('trigger_function', proname);
+			
+		});
   });
 
   function getPgClient(callback) {
@@ -354,6 +383,11 @@ io.on('connection', function(socket) {
   socket.on('alter_proc', function(schema) {
   	getPgClient(function(client) {
   		proc_ddl.alter_proc(socket, client, schema);
+  	});
+  });
+  socket.on('drop_proc', function(scp) {
+  	getPgClient(function(client) {
+  		proc_ddl.drop_proc(socket, client, scp);
   	});
   });
   
@@ -430,20 +464,6 @@ io.on('connection', function(socket) {
   	getPgClient(function(client){
   		object_browser.set_schema_proc(socket, client, data);
   	});
-  });
-  socket.on('set_proc_arg', function(data){
-  	getPgClient(function(client){
-  		object_browser.set_proc_arg(socket, client, data);
-  	});
-  });
-
-
-
-  // create trigger
-  socket.on('username', function(username) {
-    getPgClient(function(client) {
-      create_trigger.username(socket, client, username);
-    });
   });
 });
 

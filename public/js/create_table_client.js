@@ -35,7 +35,7 @@
 					+ '<td><input type="text" name="check" class="check" /></td>'
 					+ '</tr>';
 				
-				
+				// Append table's column
 				function appendColumn() {
 				
 					if ($("#column tr").length == 1) {
@@ -81,6 +81,7 @@
 					}
 				});
 				
+				// Select database
 				for(var i = 0 ; i < $(".db").length ; i++){
 					
 					$("#dbList")
@@ -92,6 +93,7 @@
 				}
 				
 				var varType = [];
+				
 				
 				$("#dbList").change(function(){
 				
@@ -105,7 +107,8 @@
 						$type.empty();
 				
 						socket.emit('set_dbname', $(this).find('option:selected').val());
-				
+						
+						// Column's data type list
 						socket.once('type', function(rs){
 							
 							$type.append('<option>');
@@ -124,18 +127,8 @@
 				
 							}
 						});
-				
-						socket.once('var_type', function(rs){
-				
-							for(i = 0 ; i < rs.length ; i++){
-				
-								varType[2*i] = rs[i];
-								
-								varType[2*i+1] = rs[i]+'[]';
-				
-							}
-						});
-				
+						
+						// Schema list
 						socket.once('scname',function(data) {
 							
 							$schema.append('<option>');
@@ -146,10 +139,27 @@
 								
 							}
 						});
+						
+						// Column's data type which has length (length input is enabled for this type)
+						socket.once('var_type', function(rs){
 				
+							for(i = 0 ; i < rs.length ; i++){
+				
+								varType[2*i] = rs[i];
+								
+								varType[2*i+1] = rs[i]+'[]';
+				
+							}
+						});
+					}else{
+						
+						$("#tableForm .type, #schemaList").empty();
+						
 					}
+					
 				});
 				
+				// Select reference key
 				$("#column").on("click", ".f_key",function(){
 				
 					var trInd = $(this).closest('tr').index(); 
@@ -162,13 +172,8 @@
 				
 					}
 				
-					if($("#dbList").find('option:selected').index() == 0){
-				
-						alert('Please select database.');
-				
-					}
-
-					if($("tr").eq(trInd).find('.type>option:selected').index() && $("#dbList").find('option:selected').index()){
+					// If the column's data type is selected
+					if($("tr").eq(trInd).find('.type>option:selected').index()){
 				
 						$(".pop").empty();
 						$("#fKeyPop, #popupBG").fadeIn();
@@ -181,12 +186,14 @@
 							$fSchema.append("<option value = '"+$("#schemaList").find("option").eq(i).val()+"'>"+$("#schemaList").find('option').eq(i).val()+"</option>");
 							
 						}
-				
+						
+						// Show selected foreign key
 						$("#selectedCol").text($(this).val());
 				
 					}
 				});
 				
+				// If foreign key schema is selected, table list appears
 				$("#fSchema").change(function(){
 				
 					if($(this).find('option:selected').index() >= 0){
@@ -207,6 +214,7 @@
 					}
 				});
 				
+				// If foreign key table is selected, column list appears
 				$("#fTable").change(function(){
 				
 					if($(this).find('option:selected').index()){
@@ -254,7 +262,6 @@
 				});
 				
 				
-				
 				$("#fBtnBox button:eq(1)").click(function(e){
 					
 					e.preventDefault();
@@ -282,7 +289,7 @@
 				});
 				
 				var namePat = /^[a-zA-Z_][a-zA-Z_\d]+$/;
-				var onePat = /^[a-zA-Z_]+$/;	//one character
+				var onePat = /^[a-zA-Z_]+$/;	//In case name is one character
 				
 				var colPat = /^[a-zA-Z_\d]+$/;
 				var lengthPat = /^[\d]+$/;
@@ -294,6 +301,8 @@
 					
 				}
 				
+				// Regular expression test against each input
+				// Check if any input is empty
 				function validCheck() {
 				
 					$(".notValid").removeClass("notValid").css({
@@ -416,6 +425,7 @@
 				
 				});
 				
+				// Check if the data type has length (to enable length input)
 				$(document).on("change", "select.type",function(){
 				
 					var $length = $(this).closest('td').next().find('.length').prop('disabled', true).val('');
@@ -438,6 +448,7 @@
 					}
 				});
 				
+				// input(hidden) exists for keeping the form values' order
 				$(".length, .precision").change(function(){
 					
 					var $this = $(this);

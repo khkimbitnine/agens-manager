@@ -33,7 +33,7 @@
 				</div>
 				<div id="btnBox" class="field">
 					<button type="submit" id="alterBtn">Alter</button>
-					<button id="cancelBtn">Cancel</button>
+					<button id="backBtn">Back</button>
 				</div>
 			</li>
 		</ul>
@@ -42,100 +42,102 @@
 </div>
 <script>
 
-var namePat = /^[a-zA-Z_][a-zA-Z_\d]+$/;
-var onePat = /^[a-zA-Z_]+$/;	//one character
-var txtPat = /^[a-zA-Z_\d\s]+$/;
-
-function notValid(notValid) {
-	
-	notValid.css("border", "2px solid red").addClass("notValid");
-	
-}
-
-function validCheck() {
-	
-	$(".notValid").removeClass("notValid").css({
+		var namePat = /^[a-zA-Z_][a-zA-Z_\d]+$/;
+		var onePat = /^[a-zA-Z_]+$/;	//In case name is one character
+		var txtPat = /^[a-zA-Z_\d\s]+$/;
 		
-		"border" : "1px solid #aaa"
+		function notValid(notValid) {
 			
-	});
-
-	var $schema = $("#schema");
-	var $name = $("#name");
-
-	if (!namePat.test($name.val()) && !onePat.test($name.val())){
-
-		notValid($name);
-
-	}
-
-	if(!$("#schemaList").find('option:selected').index() ){
-
-		notValid($("#schemaList"));
-
-	}
-
-	if (!$schema.children("option:selected").index() ) {
-		
-		notValid($schema);
-		
-	}
-
-
-	var $comment = $("#comment");
-
-	if (!txtPat.test($comment.val()) && $comment.val()){
-		
-		notValid($comment);
-		
-	}
-
-	if (!$(".notValid").size()) {
-		
-		socket.emit('alter_table', $("#tableForm").serializeArray());
-		
-		socket.once('table_success', function(error){
+			notValid.css("border", "2px solid red").addClass("notValid");
 			
-			if(error==null){
-
-				alert("Table altered.");
-				$.ajax({
+		}
+		
+		// Regular expression test & empty value test
+		function validCheck() {
+			
+			$(".notValid").removeClass("notValid").css({
+				
+				"border" : "1px solid #aaa"
 					
-					url:"schema_content.html",
-					success:function(data){
-						
-						$(".content").empty().html(data);
-						socket.emit('set_schema_table', $(".schema.on").text());
-						
+			});
+		
+			var $schema = $("#schema");
+			var $name = $("#name");
+		
+			if (!namePat.test($name.val()) && !onePat.test($name.val())){
+		
+				notValid($name);
+		
+			}
+		
+			if(!$("#schemaList").find('option:selected').index() ){
+		
+				notValid($("#schemaList"));
+		
+			}
+		
+			if (!$schema.children("option:selected").index() ) {
+				
+				notValid($schema);
+				
+			}
+		
+		
+			var $comment = $("#comment");
+		
+			if (!txtPat.test($comment.val()) && $comment.val()){
+				
+				notValid($comment);
+				
+			}
+		
+			if (!$(".notValid").size()) {
+				
+				socket.emit('alter_table', $("#tableForm").serializeArray());
+				
+				socket.once('table_success', function(error){
+					
+					if(error==null){
+		
+						alert("Table altered.");
+						$.ajax({
+							
+							url:"schema_content.html",
+							success:function(data){
+								
+								$(".content").empty().html(data);
+								socket.emit('set_schema_table', $(".schema.on").text());
+								
+							}
+						});
+		
+					}else{
+		
+						alert(error);
 					}
 				});
-
-			}else{
-
-				alert(error);
 			}
+		}
+		
+		$("#alterBtn").click(function(e){
+			e.preventDefault();
+			validCheck();
 		});
-	}
-}
-	$("#alterBtn").click(function(e){
-		e.preventDefault();
-		validCheck();
-	});
-	
-	$("#cancelBtn").click(function(e){
-		
-		e.preventDefault();
-		
-		$.ajax({
 			
-			url:"schema_content.html",
-			success:function(data){
+		$("#backBtn").click(function(e){
+			
+			e.preventDefault();
+			
+			$.ajax({
 				
-				$(".content").empty().html(data);
-				socket.emit('set_schema_table', $(".schema.on").text());
-				
-			}
+				url:"schema_content.html",
+				success:function(data){
+					
+					$(".content").empty().html(data);
+					socket.emit('set_schema_table', $(".schema.on").text());
+					
+				}
+			});
 		});
-	});
-</script>
-
+		</script>
+		

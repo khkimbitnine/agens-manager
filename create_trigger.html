@@ -46,7 +46,7 @@
 </div>
 <script>
 
-		var username = 'postgres'; //임의 유저
+		var username = 'postgres'; 
 		var namePat = /^[a-zA-Z_][a-zA-Z_\d]+$/;
 		var argPat = /^[a-zA-Z_\d\s\"\.\(\)\,]+$/;
 			
@@ -58,6 +58,7 @@
 			
 		}
 		
+		// Regular expression test & empty value test
 		function validCheck(trigger) {
 			
 			$(".notValid").removeClass("notValid").css({
@@ -118,85 +119,86 @@
 			}
 		}
 			
-			$("#dbList").append('<option>Select Database</option>');
+		$("#dbList").append('<option>Select Database</option>');
+		
+		for(var i = 0 ; i < $(".db").length ; i++){
 			
-			for(var i = 0 ; i < $(".db").length ; i++){
+			$("#dbList")
+			.append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>");
+			
+		}
+		
+		// When database changes, function list and schema list are changed
+		$("#dbList").change(function(){
+			
+			$("#function").empty();
+			
+			$("#scList").empty();
+			
+			if($(this).find('option:selected').index()){
 				
-				$("#dbList")
-				.append("<option value='"+$(".db").eq(i).text()+"'>"+ $(".db").eq(i).text()+ "</option>");
+				socket.emit('set_dbname', $(this).find('option:selected').val());
+				
+				// Calls function list
+				socket.once('trigger_function', function(data){
+					
+					for(var i = 0 ; i < data.length ; i ++){
+						
+						$("#function")
+						.append('<option value="'+data[i]+'">'+data[i]+'</option>');
+						
+					}
+				});
+				
+				$("#scList").append('<option>');
+				
+				// Creates schema list
+				socket.once('scname', function(data){
+					
+					for(var i = 0 ; i <data.schema.length ; i++){
+						
+						$("#scList")
+						.append('<option value ="'+data.schema[i]+'">'+data.schema[i]+'</option>');
+						
+					}
+				});
+			}
+		});
+		
+		// When schema changes, table list changes
+		$("#scList").change(function(){
+			
+			var $this = $(this);
+			$("#tabList").empty();
+			
+			if($(this).find('option:selected').index()){
+				
+				$("#schema").val($this.find('option:selected').val());
+				
+				socket.emit('set_scname_table', $this.find('option:selected').val());
+				
+				$("#tabList").append('<option>');
+				
+				socket.once('tabname', function(data){
+					
+					for(var i = 0 ; i <data.table.length ; i++){
+						
+						$("#tabList")
+						.append('<option value ="'+data.table[i]+'">'+data.table[i]+'</option>');
+						
+					}
+				});
 				
 			}
 			
-			$("#dbList").change(function(){
-				
-				$("#function").empty();
-				
-				$("#scList").empty();
-				
-				if($(this).find('option:selected').index()){
-					
-					socket.emit('set_dbname', $(this).find('option:selected').val());
-					
-					socket.emit('username', username);
-					
-					socket.once('trigger_function', function(data){
-						
-						for(var i = 0 ; i < data.length ; i ++){
-							
-							$("#function")
-							.append('<option value="'+data[i]+'">'+data[i]+'</option>');
-							
-						}
-					});
-					
-					$("#scList").append('<option>');
-					
-					socket.once('scname', function(data){
-						
-						for(var i = 0 ; i <data.schema.length ; i++){
-							
-							$("#scList")
-							.append('<option value ="'+data.schema[i]+'">'+data.schema[i]+'</option>');
-							
-						}
-					});
-				}
-			});
+		});
+		
+		$("#createBtn").click(function(e){
 			
-			$("#scList").change(function(){
-				
-				$("#tabList").empty();
-				
-				if($(this).find('option:selected').index()){
-					
-					$("#schema").val($(this).find('option:selected').val());
-					
-					socket.emit('set_scname_table', $(this).find('option:selected').val());
-					
-					$("#tabList").append('<option>');
-					
-					socket.once('tabname', function(data){
-						
-						console.log(data);
-						
-						for(var i = 0 ; i <data.table.length ; i++){
-							
-							$("#tabList")
-							.append('<option value ="'+data.table[i]+'">'+data.table[i]+'</option>');
-							
-						}
-					});
-					
-				}
-				
-			});
+			e.preventDefault();
 			
-			$("#createBtn").click(function(e){
-				
-				e.preventDefault();
-				
-				validCheck($("#triggerForm").serializeArray());
-				
-			});
+			validCheck($("#triggerForm").serializeArray());
+			
+		});
 		
 </script>

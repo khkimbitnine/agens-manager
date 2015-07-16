@@ -1,3 +1,4 @@
+
 				exports.set_scname_table = function(socket, client, scname){
 					
 						//get table list
@@ -26,8 +27,10 @@
 						});
 						
 				}
+				
 				exports.set_scname_view = function(socket, client, scname){
 					
+					//get view list
 					client.query("SELECT DISTINCT(table_name) " +
 											 "FROM information_schema.views " +
 											 "WHERE table_schema = '"+scname+"' " +
@@ -52,6 +55,7 @@
 					});
 					
 				}
+				
 				exports.set_scname_func = function(socket, client, scname){
 					
 					//get function list
@@ -79,6 +83,7 @@
 					});
 					
 				}
+				
 				exports.set_tabname_col = function(socket, client, data){
 					
 					//get column list
@@ -106,6 +111,7 @@
 					});
 					
 				}
+				
 				exports.set_tabname_cons = function(socket, client, data){
 					
 					//get constraint list
@@ -134,6 +140,7 @@
 					});
 					
 				}
+				
 				exports.set_tabname_ind = function(socket, client, data){
 					
 					//get index list
@@ -169,6 +176,7 @@
 					});
 					
 				}
+				
 				query = "SELECT schema_name, schema_owner, description"+
 							 " FROM pg_description, (SELECT oid, schema_name, schema_owner"+
 																		 " FROM pg_namespace, (SELECT schema_name, schema_owner"+
@@ -178,6 +186,7 @@
 																	   " WHERE nspname = s.schema_name) o"+
 							 " WHERE objoid = o.oid";
 				
+				// Schema information of the database selected in the object browser
 				exports.set_dbname_schema = function(socket, client, data){
 					
 					client.query(query, function(err, rs){
@@ -201,6 +210,7 @@
 					});
 				}
 				
+				// Table information of the schema selected in the object browser
 				exports.set_schema_table = function(socket, client, scname){
 					
 					client.query("SELECT tablename AS table, tableowner AS owner, tablespace, n_live_tup AS row, obj_description(oid) AS comment"+
@@ -225,8 +235,9 @@
 						
 						socket.emit('get_schema_table', JSON.stringify(arr));
 					});
-			}
+				}
 				
+				// View information of the schema selected in the object browser
 				exports.set_schema_view = function(socket, client, scname){
 					
 					client.query("SELECT viewname AS view, viewowner AS owner, obj_description(oid) AS comment, definition AS query"+
@@ -253,15 +264,17 @@
 					
 				}
 				
+				// Function information of the schema selected in the object browser
 				exports.set_schema_proc = function(socket, client, scname){
 					
-					client.query("SELECT proname, prosrc AS definition, procost AS execution_cost, prorows AS result_rows, provolatile AS immutable, " +
-							 							 " proisstrict AS null_call, prosecdef AS definer, routine_name AS proc, data_type AS returns, rolname AS owner, " +
-							 							 " external_language AS language, obj_description(p.oid) AS comment"+
-							 				" FROM pg_proc p, information_schema.routines r, pg_authid a"+
-							 				" WHERE p.proname = r.routine_name"+
-							 				" AND a.oid = p.proowner"+
-							 				" AND r.routine_schema = '"+scname+"'", function(err, rs){
+					client.query("SELECT pg_get_function_arguments(p.oid) AS arg, proname, prosrc AS definition, procost AS execution_cost" +
+														", prorows AS result_rows, provolatile AS immutable,proisstrict AS null_call"+
+														", prosecdef AS definer, rolname AS owner, obj_description(p.oid) AS comment, l.lanname AS language, t.typname AS returns"+
+										  " FROM pg_proc p, pg_authid a, (SELECT oid, nspname FROM pg_namespace WHERE nspname='"+scname+"') n, pg_language l, pg_type t"+
+										  " WHERE p.pronamespace = n.oid"+
+										  " AND a.oid = p.proowner"+
+										  " AND p.prolang = l.oid"+
+										  " AND p.prorettype = t.oid", function(err, rs){
 						
 						if(err){
 							
@@ -274,31 +287,9 @@
 							
 							arr.push(rs.rows[i]);
 						}
+						
 						socket.emit('get_schema_proc', JSON.stringify(arr));
 					
 					});
-					
-					
-				}
+			 }
 				
-				exports.set_proc_arg = function(socket, client, proc){
-					
-					client.query("SELECT pg_get_function_arguments(p.oid) AS arg"+
-											" FROM (SELECT oid FROM pg_proc WHERE proname='"+proc+"') p;", function(err, rs){
-						
-						if(err){
-							console.log("set_proc_arg err:"+err);
-						}
-						
-						var arr = [];
-						
-						for(var i = 0 ; i < rs.rows.length; i++){
-							
-							arr.push(rs.rows[i]);
-						}
-						
-						socket.emit('get_proc_arg', rs.rows[0].arg);
-						
-					});
-				}
-			

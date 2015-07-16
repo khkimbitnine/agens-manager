@@ -34,8 +34,10 @@
 						});
 				
 				}
+				
 				exports.alter_view = function(socket, client, formdata){
 					
+					// To check if input values are different, there are old values hidden
 					var oldName = formdata[0].value;
 					var name = formdata[1].value;
 					var oldQuery = formdata[2].value;

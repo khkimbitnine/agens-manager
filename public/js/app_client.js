@@ -1,20 +1,17 @@
 			
-			$(document).ready(function() {
-				
-				$('#tab-container')
-				.easytabs({animationSpeed: 'fast', updateHash: false});
+			$('#tab-container').easytabs({animationSpeed: 'fast', updateHash: false});
 			
-			});
-			//tab z-index
+			// tab z-index
 			var zInd;
 			
+			// .etabs's tab
 			$(".tab").click(function() {
 				
 				var $this = $(this);
 				
 				zInd = parseInt($this.css("z-index")) + 1;
 				
-			$this.css("z-index", zInd);
+				$this.css("z-index", zInd);
 			
 			});
 			
@@ -39,52 +36,20 @@
 				c.wrapInner(bar_content);
 			
 			});
-			//hide loginForm
-			console.log("browser: "+$("#browser").children().length);
 			
+			// Tool Menu
+			var toolMenu = $("<ul>").appendTo($("#toolMenu .bar_content"));
 			
-			//toolMenu text
-			var toolMenuLabelText = [ 
-			                         "Create", 
-			                         "SQL", 
-			                         "History", 
-			                         "Model",
-			                         "Server config", 
-			                         "Analyze", 
-			                         "Privilege" 
-			                         ];
+			toolMenu
+			.append("<li id='create'><a href='' class='label'>Create</a></li>")
+			.append("<li id='sql'><a href='' class='label'>SQL</a></li>")
+			.append("<li id='history'><a href='' class='label'>History</a></li>")
+			.append("<li id='model'><a href='' class='label'>Model</a></li>")
+			.append("<li id='serverConfig'><a href='' class='label'>Server config</a></li>")
+			.append("<li id='analyze'><a href='' class='label'>Analyze</a></li>")
+			.append("<li id='privilege'><a href='' class='label'>Privilege</a></li>")
 			
-			var create = [ 
-			              "table", 
-			              "schema", 
-			              "index", 
-			              "view", 
-			              "function", 
-			              "trigger"
-			              ];
-			
-			var toolMenuSubUl = $("<ul>").appendTo($("#toolMenu .bar_content"));
-			
-			//toolMenu's sub <ul>
-			toolMenuSubUl
-			.append("<li id='create'>")
-			.append("<li id='sql'>")
-			.append("<li id='history'>")
-			.append("<li id='model'>")
-			.append("<li id='serverConfig'>")
-			.append("<li id='analyze'>")
-			.append("<li id='privilege'>")
-			
-			for (var i = 0; i < toolMenuLabelText.length; i++) {
-				
-				toolMenuSubUl
-				.children("li:eq(" + i + ")")
-				.append("<a href='' class='label'>" + 
-						toolMenuLabelText[i] + 
-				"</a>");
-				
-			}
-			
+			// Tool Menu's list labels
 			$(".label").click(function(e){
 			
 				e.preventDefault();
@@ -133,27 +98,35 @@
 				}
 			})
 			
-			//createMenu's sub <ul>
-			var createLi = $("#create");
-			
-			var $createSubUl = $("<ul>")
-			.appendTo(createLi)
+			// "Create"
+			var $createUl = $("<ul>")
+			.appendTo("#create")
 			.css("background", "rgb(36,39,45)");
+			
+			// "Create"'s sub-menu's text array
+			var create = [ 
+			              "table", 
+			              "schema", 
+			              "index", 
+			              "view", 
+			              "function", 
+			              "trigger"
+			              ];
 			
 			for (var i = 0; i < create.length; i++) {
 			
-				$createSubUl
+				$createUl
 				.append("<li class='object_li'>"+
 						"<a class='object'>"+
 						create[i] + "</a></li>");
 			
 			}
 			
-			//hide createMenu's sub <ul>
-			$createSubUl.hide();
+			// Hide "Create" by default
+			$createUl.hide();
 			
-			//createLabel click event
-			toolMenuSubUl.on("click", ".label:eq(0)", function(e) {
+			// "Create" label
+			toolMenu.on("click", ".label:eq(0)", function(e) {
 			
 				$(this).next().slideToggle();
 			
@@ -161,16 +134,7 @@
 			
 			var $content = $(".content");
 			
-			$("#logout").show();
-			
-			$("#logout").click(function(e){
-			
-				e.preventDefault();
-				location.href='/logout';
-			
-			});
-			
-			toolMenuSubUl.on("click", ".object", function(e){
+			toolMenu.on("click", ".object", function(e){
 			
 				e.preventDefault();
 			
@@ -195,14 +159,15 @@
 				}
 			});
 			
-			//create
-			toolMenuSubUl.on("click", ".object_li>.object", function() {
+			// "Create"'s list labels
+			toolMenu.on("click", ".object_li>.object", function() {
 				
 				var $content = $(".content");
 				
 				var flag = false;
 				
-				if($(".db").text().length){
+				// Can check if user is logged in by checking if .db is loaded
+				if($(".db").text()){
 					
 					flag = true;
 					
@@ -422,11 +387,11 @@
 					
 					$("<ul class='sc'>").insertAfter($this).append(
 							"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='schemaTable'>"
-							+ "table" + "</span></li>").append(
+							+ "table</span></li>").append(
 									"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='schemaView'>"
-									+ "view" + "</span></li>").append(
+									+ "view</span></li>").append(
 											"<li class='"+exp+"'><div class='"+expHit+"'></div><span class='schemaFunc'>"
-											+ "function" + "</span></li>");
+											+ "function</span></li>");
 					
 				}
 				
@@ -578,11 +543,9 @@
 					collapse($this);
 			
 					$("<ul>").insertAfter($this).append("<li class='"+exp+"'><div class='"+expHit+"'></div><span class='tableColumn'>"
-							+ "column"
-							+ "</span></li>").append("<li class='"+exp+"'><div class='"+expHit+"'></div><span class='tableIndex'>"
-									+ "index"+ "</span></li>").append("<li class='"+exp+"'><div class='"+expHit+"'></div><span class='tableConstraint'>"
-											+ "constraint"
-											+ "</span></li>");
+							+ "column</span></li>").append("<li class='"+exp+"'><div class='"+expHit+"'></div><span class='tableIndex'>"
+									+ "index</span></li>").append("<li class='"+exp+"'><div class='"+expHit+"'></div><span class='tableConstraint'>"
+											+ "constraint</span></li>");
 				}
 			});
 			
@@ -749,17 +712,20 @@
 				}
 			});
 			
+			// Checks if session exists after log-in form submitted
 			$.ajax({
 				
 				url:"/session",
 				success:function(data){
 					if(data){
 						$('.content').empty();
+						$("#logout").show();
 					}
 				} 
 			
 			});
 			
+			// Checks if login succeeded after log-in form submitted
 			$.ajax({
 				
 				url:"/login_error",
@@ -768,6 +734,13 @@
 						alert(data);
 					}
 				}
+			
+			});
+			
+			$("#logout").click(function(e){
+				
+				e.preventDefault();
+				location.href='/logout';
 			
 			});
 			
