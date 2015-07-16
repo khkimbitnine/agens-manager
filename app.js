@@ -135,7 +135,7 @@ var fs = require('fs');
 var table_ddl = require('./table_ddl');
 var object_browser = require('./object_browser');
 var create_index = require('./create_index');
-var create_schema = require('./create_schema');
+var schema_ddl = require('./schema_ddl');
 var view_ddl = require('./view_ddl');
 var proc_ddl = require('./proc_ddl');
 var create_trigger = require('./create_trigger');
@@ -398,11 +398,21 @@ io.on('connection', function(socket) {
     });
   });
   
-  // create - schema
+  // ddl - schema
   socket.on('create_schema', function(data) {
     getPgClient(function(client) {
-      create_schema.create_schema(socket, client, data);
+      schema_ddl.create_schema(socket, client, data);
     });
+  });
+  socket.on('alter_schema', function(data) {
+  	getPgClient(function(client) {
+  		schema_ddl.alter_schema(socket, client, data);
+  	});
+  });
+  socket.on('drop_schema', function(data) {
+  	getPgClient(function(client) {
+  		schema_ddl.drop_schema(socket, client, schema);
+  	});
   });
   
   // create - trigger
@@ -535,6 +545,12 @@ app.get('/alter_view.html', function (req, res) {
 });
 app.get('/alter_proc.html', function (req, res) {
 	fs.readFile(fpath + 'alter_proc.html', function(error, data) {
+		res.writeHead(200, { 'Content-Type': 'text/html' });
+		res.end(data);
+	});
+});
+app.get('/alter_schema.html', function (req, res) {
+	fs.readFile(fpath + 'alter_schema.html', function(error, data) {
 		res.writeHead(200, { 'Content-Type': 'text/html' });
 		res.end(data);
 	});
