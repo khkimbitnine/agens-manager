@@ -409,7 +409,7 @@ io.on('connection', function(socket) {
   		schema_ddl.alter_schema(socket, client, data);
   	});
   });
-  socket.on('drop_schema', function(data) {
+  socket.on('drop_schema', function(schema) {
   	getPgClient(function(client) {
   		schema_ddl.drop_schema(socket, client, schema);
   	});

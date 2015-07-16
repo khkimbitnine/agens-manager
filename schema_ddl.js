@@ -83,7 +83,7 @@
 					
 				}
 				
-				exports.drop_table = function(socket, client, schema){
+				exports.drop_schema = function(socket, client, schema){
 					
 					console.log("DROP SCHEMA "+schema+" CASCADE;")
 					client.query("DROP SCHEMA "+schema+" CASCADE;", function(err, rs){
