@@ -2,10 +2,3 @@
 node_modules
 npm-debug.log
 sessions
-
-# Eclipse
-.jshintrc
-.metadata
-.project
-.settings
-.tern-project
