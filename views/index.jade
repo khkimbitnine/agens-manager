@@ -1,5 +1,19 @@
 extends layout
 
+//block content
+//  h1= title
+//  p Welcome to #{title}
+
 block content
-  h1= title
-  p Welcome to #{title}
+  .container
+    form(class='form-signin')
+      h2(class='form-signin-heading')= title
+      label(for='inputID', class='sr-only') ID
+      input(type='text', id='inputID' class='form-control', placeholder='ID', required, autofocus)
+      label(for='inputPassword', class='sr-only') PassWord
+      input(type='password', id='inputPassword', class='form-control', placeholder='Password' required)
+      .checkbox
+        label
+          input(type='checkbox', value='remember-me')
+          p Remember me
+      button(id='signin_btn',class='btn btn-lg btn-primary btn-block', type='button') Sign in
