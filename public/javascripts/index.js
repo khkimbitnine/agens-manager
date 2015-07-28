@@ -30,12 +30,6 @@ $(function(){
     });
 
     socket.on('auth_success', function (data) {
-       	$.ajax({
-    		url: "/main",
-    		type: "GET",
-    		success:function(data){
-				$("html").html(data);
-    		}
-    	});
+       	window.location = '/main';
 	});
 });
