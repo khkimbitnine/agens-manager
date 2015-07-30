@@ -14,9 +14,18 @@ html
 
     //Bootstrap core CSS
     link(href='/lib/bootstrap-3.3.2/css/bootstrap.min.css', rel='stylesheet')
+    //Bootstrap tree view CSS
+    link(href='/lib/bootstrap-treeview/css/bootstrap-treeview.css')
     //Custom styles for this template
     link(rel='stylesheet', href='/stylesheets/main.css')
+    //scripts core JS
     script(src='/lib/jquery-2.1.4/jquery-2.1.4.min.js')
+    script(src='/socket.io/socket.io.js')
+    //Bootstrap core JS
     script(src='/lib/bootstrap-3.3.2/js/bootstrap.min.js')
+    //Bootstrap tree view JS
+    script(src='/lib/bootstrap-treeview/js/bootstrap-treeview.js')
+    //Custom scripts for this template
+    script(src='/javascripts/main.js')
   body
     block content

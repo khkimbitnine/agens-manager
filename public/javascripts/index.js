@@ -1,6 +1,6 @@
 /*#############################################################################################
 #	1. 프로그램명 : index.jade에서 PostgreSQL 로그인 client-side
-#   2. 파일명     : signin_C.js
+#   2. 파일명     : index.js
 #   3. 프로그램 설명 :
 #            3.1  파리미터
 #        
@@ -26,9 +26,10 @@ $(function(){
 		var id = $("#inputID").val();
 		var pw = $("#inputPassword").val();
 
+		//TO-DO 인증 신청 로직포함해서 보내기
 		socket.emit('signin');
     });
-
+	//TO-DO 쿼리스트링으로 GET으로 보내기
     socket.on('auth_success', function (data) {
        	window.location = '/main';
 	});

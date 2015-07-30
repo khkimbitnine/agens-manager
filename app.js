@@ -17,8 +17,6 @@ var io = socketIO();
 app.io = io;
 
 io.on('connection', function (socket) {
-  console.log('a connection estabilished');
-
   backend.backend_events(socket);
 });
 
