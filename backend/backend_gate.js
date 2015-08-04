@@ -16,7 +16,8 @@
 ###############################################################################################*/
 
 var signinJS = require('./signin');
-var obloadJS = require('./obload');
+var ddloadJS = require('./ddload');
+var tvloadJS = require('./tvload');
 
 exports.backend_events = function(socket) {
 	// index.js에서 signin 요청시 처리
@@ -24,8 +25,18 @@ exports.backend_events = function(socket) {
 		signinJS.signin(socket);
 	});
 
+	// main.js에서 dropdown_req 요청시 처리
+	socket.on('ddload_req', function (data) {
+		ddloadJS.ddload(socket, data);
+	});
+
+	socket.on('tvload_req', function (data) {
+		tvloadJS.tvload(socket, data);
+	});
+/* object browser 만들기
 	// main.js에서 obload 요청시 처리
 	socket.on('obload_req', function (data) {
 		obloadJS.obload(socket);
 	});
+*/
 }
