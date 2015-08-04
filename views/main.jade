@@ -33,7 +33,19 @@ block content
           input.form-control(type='text', placeholder='Search...')
   .container-fluid
     .row
-      .col-sm-3.col-md-2.sidebar.obtreeview   
+      .col-sm-3.col-md-2.sidebar
+        .row
+          .row
+            .col-md-12.db_title
+              h2 Database
+          .row
+            .col-md-12.db_dropdown
+              .btn-group
+                button.btn.btn-primary.dropdown-toggle(type='button', data-toggle='dropdown', aria-expanded='false')   Select Your Database 
+                  span.caret
+                ul.dropdown-menu(role='menu')
+        .row
+          .col-md-12.obtreeview
       .col-sm-9.col-sm-offset-3.col-md-10.col-md-offset-2.main
         h1.page-header Performance Overview
         |       
