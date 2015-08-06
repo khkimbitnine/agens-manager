@@ -18,6 +18,7 @@
 var signinJS = require('./signin');
 var ddloadJS = require('./ddload');
 var tvloadJS = require('./tvload');
+var tvactionJS = require('./tvaction');
 
 exports.backend_events = function(socket) {
 	// index.js에서 signin 요청시 처리
@@ -30,13 +31,48 @@ exports.backend_events = function(socket) {
 		ddloadJS.ddload(socket, data);
 	});
 
+	// DB를 선택하여 tree view를 로드하는 요청시 처리
 	socket.on('tvload_req', function (data) {
 		tvloadJS.tvload(socket, data);
 	});
-/* object browser 만들기
-	// main.js에서 obload 요청시 처리
-	socket.on('obload_req', function (data) {
-		obloadJS.obload(socket);
+
+	// Tree View에서 SCHEMA를 클릭하였을시 처리
+	socket.on('tvactionSchemaSummary_req', function (data) {
+		tvactionJS.descSchemaSummary(socket, data);
 	});
-*/
+
+	// Tree View에서 TABLE을 클릭하였을시 처리
+	socket.on('tvactionTableSummary_req', function (data) {
+		tvactionJS.descTableSummary(socket, data);
+	});
+
+	// Tree View에서 VIEW를 클릭하였을시 처리
+	socket.on('tvactionViewSummary_req', function (data) {
+		tvactionJS.descViewSummary(socket, data);
+	});
+
+	// Tree View에서 FUNCTION을 클릭하였을시 처리
+	socket.on('tvactionFuncSummary_req', function (data) {
+		tvactionJS.descFuncSummary(socket, data);
+	});
+
+	// Tree View에서 Schema 명을 클릭하였을시 처리
+	socket.on('tvactionSchemaDetail_req', function (data) {
+		tvactionJS.descSchemaDetail(socket, data);
+	});
+
+	// Tree View에서 Table 명을 클릭하였을시 처리
+	socket.on('tvactionTableDetail_req', function (data) {
+		tvactionJS.descTableDetail(socket, data);
+	});
+
+	// Tree View에서 View 명을 클릭하였을시 처리
+	socket.on('tvactionViewDetail_req', function (data) {
+		tvactionJS.descViewDetail(socket, data);
+	});
+
+	// Tree View에서 Function 명을 클릭하였을시 처리
+	socket.on('tvactionFuncDetail_req', function (data) {
+		tvactionJS.descFuncDetail(socket, data);
+	});
 }

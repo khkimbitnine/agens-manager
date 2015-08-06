@@ -33,20 +33,6 @@ $(function(){
 
 	appendDropdownList(socket);
 
-	/*Treeview 구성
-	socket.emit('obload_req', {uid: 'postgres'});
-
-	socket.on('obload_res', function (data) {
-		$('.obtreeview').treeview({
-			color: "#428bca",
-			showTags: true,
-			showBorder: false,
-			backColor: '#f5f5f5',
-			levels: 1,
-			data: data.obload_data
-		});
-	});
-	*/
 });
 
 //로그인한 유저의 DB 목록을 가져오서 Dropdown 메뉴를 구성한다.
@@ -61,6 +47,7 @@ function appendDropdownList (socket) {
 	socket.emit('ddload_req', jConnInfo);
 	
 	socket.on('ddload_res', function (data) {
+		//JSON -> object
 		var result = JSON.parse(data);
 		
 		$.each(result, function (index, obj) {
@@ -89,11 +76,93 @@ function getDBTreeView (socket, connDB) {
 			showTags: true,
 			showBorder: false,
 			backColor: '#f5f5f5',
-			data: treeViewData
+			data: treeViewData,
+			onNodeSelected: function(event, node) {
+
+				switch (node.text) {					
+					case 'SCHEMA' : 
+						getSchemaSummary(); 
+						break;
+					case 'TABLE' : 
+						getTableSummary();
+						break;
+					case 'VIEW' : 
+						getViewSummary();
+						break;
+					case 'FUNCTION' : 
+						getFuncSummary();
+						break;
+					default : 
+						break;
+				}
+
+				switch ($(this).treeview('getParent', node).text) {
+					case 'SCHEMA' :
+						getSchemaDetail();
+						break;
+					case 'TABLE' :
+						getTableDetail();
+						break;
+					case 'VIEW' :
+						getViewDetail();
+						break;
+					case 'FUNCTION' :
+						getFuncDetail();
+						break;
+					default :
+						break;
+				}
+				
+			},
+			onNodeUnselected: function(event, node) {
+
+			}
 		});
 	});
-
 }
+
+function getSchemaSummary() {
+	console.log("schema summary");
+}
+
+function getTableSummary() {
+	console.log("table summary");
+}
+
+function getViewSummary() {
+	console.log("view summary");
+}
+
+function getFuncSummary() {
+	console.log("func summary");
+}
+
+function getSchemaDetail() {
+	console.log("schema detail");
+}
+
+function getTableDetail() {
+	console.log("table detail");
+}
+
+function getViewDetail() {
+	console.log("view detail");
+}
+
+function getFuncDetail() {
+	console.log("func detail");
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 

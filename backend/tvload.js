@@ -81,8 +81,7 @@ function makeTableList (dbURL, socket, tvload_data, username) {
 			stderr(err);
 			return;
 		}
-//console.log(tvload_data[0].nodes[0].text); //public
-//console.log(tvload_data[0].nodes[1].text); //schema1
+
 		if (result.rowCount != 0) {
 			var endIndex = tvload_data[0].nodes.length;
 			for (var i = 0; i < endIndex; i++) {
@@ -168,7 +167,7 @@ function makeFuncList (dbURL, socket, tvload_data, username) {
 
 		if (result.rowCount != 0) {
 			var endIndex = tvload_data[0].nodes.length;
-			for(var i = 0; i < endIndex; i++) {
+			for (var i = 0; i < endIndex; i++) {
 				tvload_data[0].nodes[i].nodes.push({'text' : 'FUNCTION'});
 				tvload_data[0].nodes[i].nodes[2].tags = [];	// FUNCTION의 위치는 2
 				tvload_data[0].nodes[i].nodes[2].nodes = [];
