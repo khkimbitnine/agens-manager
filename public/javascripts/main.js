@@ -125,7 +125,6 @@ function getSchemaSummary() {
 	console.log("schema summary");
 	$('.main').empty();
 	$('.main').append('<iframe width = "100%" height = "100%" src = "/mainSchemaSummary"></iframe>');
-	aaa
 }
 
 function getTableSummary() {
