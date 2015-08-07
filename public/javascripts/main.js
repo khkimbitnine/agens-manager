@@ -112,7 +112,7 @@ function getDBTreeView (socket, connDB) {
 					default :
 						break;
 				}
-				
+
 			},
 			onNodeUnselected: function(event, node) {
 
@@ -123,6 +123,8 @@ function getDBTreeView (socket, connDB) {
 
 function getSchemaSummary() {
 	console.log("schema summary");
+	$('.main').empty();
+	$('.main').append('<iframe width = "100%" height = "100%" src = "/mainSchemaSummary"></iframe>');
 }
 
 function getTableSummary() {
