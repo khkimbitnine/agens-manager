@@ -27,4 +27,8 @@ router.get('/main', function(req, res) {
 	res.render('main');
 });
 
+router.get('/mainSchemaSummary', function(req, res) {
+	res.render('mainSchemaSummary');
+});
+
 module.exports = router;
