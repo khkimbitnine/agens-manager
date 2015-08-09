@@ -1,6 +1,6 @@
 /*#############################################################################################
 #	1. 프로그램명 :  라우트 모듈. 페이지를 rendering, redirect 하는 등의 view의 컨트롤러 역할
-#   2. 파일명     : backend_gate.js
+#   2. 파일명     : index.js
 #   3. 프로그램 설명 :
 #            3.1  파리미터
 #        
@@ -25,10 +25,6 @@ router.get('/', function(req, res) {
 
 router.get('/main', function(req, res) {
 	res.render('main');
-});
-
-router.get('/mainSchemaSummary', function(req, res) {
-	res.render('mainSchemaSummary');
 });
 
 module.exports = router;

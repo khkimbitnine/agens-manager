@@ -122,37 +122,44 @@ function getDBTreeView (socket, connDB) {
 }
 
 function getSchemaSummary() {
+	//TO-DO 뭘 표시해야 할까 pg_namespace에 별게 없다...
 	console.log("schema summary");
 	$('.main').empty();
-	$('.main').append('<iframe width = "100%" height = "100%" src = "/mainSchemaSummary"></iframe>');
 }
 
 function getTableSummary() {
 	console.log("table summary");
+	$('.main').empty();
 }
 
 function getViewSummary() {
 	console.log("view summary");
+	$('.main').empty();
 }
 
 function getFuncSummary() {
 	console.log("func summary");
+	$('.main').empty();
 }
 
 function getSchemaDetail() {
 	console.log("schema detail");
+	$('.main').empty();
 }
 
 function getTableDetail() {
 	console.log("table detail");
+	$('.main').empty();
 }
 
 function getViewDetail() {
 	console.log("view detail");
+	$('.main').empty();
 }
 
 function getFuncDetail() {
 	console.log("func detail");
+	$('.main').empty();
 }
 
 
