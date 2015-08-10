@@ -78,19 +78,18 @@ function getDBTreeView (socket, connDB) {
 			backColor: '#f5f5f5',
 			data: treeViewData,
 			onNodeSelected: function(event, node) {
-
 				switch (node.text) {					
 					case 'SCHEMA' : 
-						getSchemaSummary(); 
+						getSchemaSummary(socket, connInfo); 
 						break;
 					case 'TABLE' : 
-						getTableSummary();
+						getTableSummary(socket, connInfo, $(this).treeview('getParent', node).text);
 						break;
 					case 'VIEW' : 
-						getViewSummary();
+						getViewSummary(socket, connInfo);
 						break;
 					case 'FUNCTION' : 
-						getFuncSummary();
+						getFuncSummary(socket, connInfo);
 						break;
 					default : 
 						break;
@@ -98,21 +97,20 @@ function getDBTreeView (socket, connDB) {
 
 				switch ($(this).treeview('getParent', node).text) {
 					case 'SCHEMA' :
-						getSchemaDetail();
+						getSchemaDetail(socket, connInfo, node.text);
 						break;
 					case 'TABLE' :
-						getTableDetail();
+						getTableDetail(socket, connInfo);
 						break;
 					case 'VIEW' :
-						getViewDetail();
+						getViewDetail(socket, connInfo);
 						break;
 					case 'FUNCTION' :
-						getFuncDetail();
+						getFuncDetail(socket, connInfo);
 						break;
 					default :
 						break;
 				}
-
 			},
 			onNodeUnselected: function(event, node) {
 
@@ -121,45 +119,247 @@ function getDBTreeView (socket, connDB) {
 	});
 }
 
-function getSchemaSummary() {
+function getSchemaSummary(socket, connInfo) {
 	//TO-DO 뭘 표시해야 할까 pg_namespace에 별게 없다...
-	console.log("schema summary");
 	$('.main').empty();
 }
 
-function getTableSummary() {
-	console.log("table summary");
+function getTableSummary(socket, connInfo, schemaName) {
 	$('.main').empty();
+
+	var navFormat = '<ul class="nav nav-tabs">' +
+  						'<li role="presentation" class="active"><a href="#">Table</a></li>' +
+  						'<li role="presentation"><a href="#">View</a></li>' +
+  						'<li role="presentation"><a href="#">Function</a></li>' +
+					'</ul>'
+
+	$('.main').append(navFormat);
+
+	var tblFormat = '<table class="table table-striped table-hover">' +
+						'<thead>' +
+							'<tr>' +
+								'<th>#</th>' +
+								'<th>Table Name</th>' +
+								'<th>Owner</th>' +
+								'<th>Tablespace</th>' +
+								'<th>Estimated Row Count</th>' +
+								'<th>Comment</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>' +
+						/*
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+						*/
+						'</tbody>' +
+					'</table>';
+	$('.main').append(tblFormat);
+
+	var socketData = connInfo;
+
+	socketData.type = 'TS';
+	socketData.schemaName = schemaName;
+	jSocketData = JSON.stringify(socketData);
+
+	socket.emit('tvaction_req', jSocketData);
+	socket.on('tvaction_res', function (data) {
+		var result = JSON.parse(data);
+		$('table > tbody').empty();
+		$.each(result, function (index, obj) {
+			var list_data = Templete.format(append_getSchemaDetail_Tag,
+				index + 1,
+				obj['tablename'],
+				obj['tableowner'],
+				obj['tablespace'],
+				obj['rowcounts'],
+				obj['comment']
+				);
+			$('table > tbody').append(list_data);
+		});
+	});
 }
 
-function getViewSummary() {
-	console.log("view summary");
+function getViewSummary(socket, connInfo) {
 	$('.main').empty();
+
+	var navFormat = '<ul class="nav nav-tabs">' +
+  						'<li role="presentation"><a href="#">Table</a></li>' +
+  						'<li role="presentation" class="active"><a href="#">View</a></li>' +
+  						'<li role="presentation"><a href="#">Function</a></li>' +
+					'</ul>'
+
+	$('.main').append(navFormat);
 }
 
-function getFuncSummary() {
-	console.log("func summary");
+function getFuncSummary(socket, connInfo) {
 	$('.main').empty();
+
+	var navFormat = '<ul class="nav nav-tabs">' +
+  						'<li role="presentation"><a href="#">Table</a></li>' +
+  						'<li role="presentation"><a href="#">View</a></li>' +
+  						'<li role="presentation" class="active"><a href="#">Function</a></li>' +
+					'</ul>'
+
+	$('.main').append(navFormat);
 }
 
-function getSchemaDetail() {
-	console.log("schema detail");
+append_getSchemaDetail_Tag = '<tr>' + 
+								'<th scope="row">{0}</th>' +
+								'<td>{1}</td>' +
+								'<td>{2}</td>' +
+								'<td>{3}</td>' +
+								'<td>{4}</td>' +
+								'<td>{5}</td>' +
+							 '</tr>';
+
+function getSchemaDetail(socket, connInfo, schemaName) {
+	//TO-DO getTableSummary와 로직 동일. 추후 무언가 추가하기 위해 함수 분리
 	$('.main').empty();
+
+	var navFormat = '<ul class="nav nav-tabs">' +
+  						'<li role="presentation" class="active"><a href="#">Table</a></li>' +
+  						'<li role="presentation"><a href="#">View</a></li>' +
+  						'<li role="presentation"><a href="#">Function</a></li>' +
+					'</ul>';
+
+	$('.main').append(navFormat);
+
+	var tblFormat = '<table class="table table-striped table-hover">' +
+						'<thead>' +
+							'<tr>' +
+								'<th>#</th>' +
+								'<th>Table Name</th>' +
+								'<th>Owner</th>' +
+								'<th>Tablespace</th>' +
+								'<th>Estimated Row Count</th>' +
+								'<th>Comment</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>' +
+						/*
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+						*/
+						'</tbody>' +
+					'</table>';
+	$('.main').append(tblFormat);
+
+	var socketData = connInfo;
+
+	socketData.type = 'SD';
+	socketData.schemaName = schemaName;
+	jSocketData = JSON.stringify(socketData);
+
+	socket.emit('tvaction_req', jSocketData);
+	socket.on('tvaction_res', function (data) {
+		var result = JSON.parse(data);
+		$('table > tbody').empty();
+		$.each(result, function (index, obj) {
+			var list_data = Templete.format(append_getSchemaDetail_Tag,
+				index + 1,
+				obj['tablename'],
+				obj['tableowner'],
+				obj['tablespace'],
+				obj['rowcounts'],
+				obj['comment']
+				);
+			$('table > tbody').append(list_data);
+		});
+	});
 }
 
-function getTableDetail() {
-	console.log("table detail");
+function getTableDetail(socket, connInfo) {
 	$('.main').empty();
+
+	
 }
 
-function getViewDetail() {
-	console.log("view detail");
+function getViewDetail(socket, connInfo) {
 	$('.main').empty();
+
+	
 }
 
-function getFuncDetail() {
-	console.log("func detail");
+function getFuncDetail(socket, connInfo) {
 	$('.main').empty();
+
+	
 }
 
 

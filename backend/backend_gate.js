@@ -37,42 +37,7 @@ exports.backend_events = function(socket) {
 	});
 
 	// Tree View에서 SCHEMA를 클릭하였을시 처리
-	socket.on('tvactionSchemaSummary_req', function (data) {
-		tvactionJS.descSchemaSummary(socket, data);
-	});
-
-	// Tree View에서 TABLE을 클릭하였을시 처리
-	socket.on('tvactionTableSummary_req', function (data) {
-		tvactionJS.descTableSummary(socket, data);
-	});
-
-	// Tree View에서 VIEW를 클릭하였을시 처리
-	socket.on('tvactionViewSummary_req', function (data) {
-		tvactionJS.descViewSummary(socket, data);
-	});
-
-	// Tree View에서 FUNCTION을 클릭하였을시 처리
-	socket.on('tvactionFuncSummary_req', function (data) {
-		tvactionJS.descFuncSummary(socket, data);
-	});
-
-	// Tree View에서 Schema 명을 클릭하였을시 처리
-	socket.on('tvactionSchemaDetail_req', function (data) {
-		tvactionJS.descSchemaDetail(socket, data);
-	});
-
-	// Tree View에서 Table 명을 클릭하였을시 처리
-	socket.on('tvactionTableDetail_req', function (data) {
-		tvactionJS.descTableDetail(socket, data);
-	});
-
-	// Tree View에서 View 명을 클릭하였을시 처리
-	socket.on('tvactionViewDetail_req', function (data) {
-		tvactionJS.descViewDetail(socket, data);
-	});
-
-	// Tree View에서 Function 명을 클릭하였을시 처리
-	socket.on('tvactionFuncDetail_req', function (data) {
-		tvactionJS.descFuncDetail(socket, data);
+	socket.on('tvaction_req', function (data) {
+		tvactionJS.tvaction(socket, data);
 	});
 }

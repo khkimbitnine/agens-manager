@@ -15,34 +15,155 @@
 #
 ###############################################################################################*/
 
-exports.descSchemaSummary = function (socket, data) {
+var pg = require('pg');
+var util = require('util');
+var eq = require('./executeQuery');
+
+exports.tvaction = function (socket, data) {
+
+	var socketData = JSON.parse(data);
+	var schemaName = socketData.schemaName;
+
+	var username = socketData.uid;
+	var password = socketData.upw;
+	var hostname = socketData.connHost;
+	var dbname = socketData.connDB;
+	var dbURL = util.format("postgres://%s:%s@%s/%s", username, password, hostname, dbname);
+
+	switch (socketData.type) {
+		case 'SS' :
+			getSchemaSummary(socket, socketData);
+			break;
+		case 'TS' :
+			getTableSummary(dbURL, socket, schemaName, username);
+			break;
+		case 'VS' :
+			getViewSummary(socket, socketData);
+			break;
+		case 'FS' :
+			getFuncSummary(socket, socketData);
+			break;
+		case 'SD' :
+			getSchemaDetail(dbURL, socket, schemaName, username);
+			break;
+		case 'TD' :
+			getTableDetail(socket, socketData);
+			break;
+		case 'VD' :
+			getViewDetail(socket, socketData);
+			break;
+		case 'FD' :
+			getFuncDetail(socket, socketData);
+			break;
+		default :
+			console.log("no types for tvaction!");
+			break;
+	}
 
 }
 
-exports.descTableSummary = function (socket, data) {
+function getSchemaSummary(socket, data) {
 
 }
 
-exports.descViewSummary = function (socket, data) {
+function getTableSummary(dbURL, socket, schemaName, username) {
+	//getSchemaDetail과 로직 동일
+
+	var queryString = 'SELECT oid AS schema ' + 
+					    'FROM pg_namespace ' +
+					   'WHERE nspname = \'' + schemaName + '\'';
+	var schema;
+	eq.executeQuery(dbURL, queryString, function (err, result) {
+		if (err) {
+			stderr(err);
+			return;
+		}
+		
+		schema = result.rows[0].schema;
+//TO-DO 쿼리 검증 필요
+		queryString = 'SELECT T1.tablename AS tablename, T1.tableowner AS tableowner, T1.tablespace AS tablespace, T2.rowcounts AS rowcounts, T2.description AS comment ' +
+						'FROM pg_tables T1, (SELECT C.relname AS tablename, C.reltuples AS rowcounts, D.description AS description ' +
+                   							  'FROM pg_class C LEFT OUTER JOIN pg_description D ' +
+                   								'ON (C.oid = D.objoid AND D.objsubid = 0) ' +
+                   							 'WHERE C.relkind = \'r\' ' +
+                   							   'AND C.relnamespace = \'' + schema + '\' ' +
+                   							   'AND C.relname NOT LIKE \'pg_%\' ' +
+                   							   'AND C.relname NOT LIKE \'sql_%\') T2 ' +
+					   'WHERE T1.tablename = T2.tablename ' +
+						 'AND T1.tableowner = \'' + username + '\' ' +
+						 'AND T1.schemaname = \'' + schemaName + '\'';
+
+		eq.executeQuery(dbURL, queryString, function (err, result) {
+			if (err) {
+				stderr(err);
+				return;
+			}
+
+			var jTvactionData = JSON.stringify(result.rows);
+			
+			socket.emit('tvaction_res', jTvactionData);
+		
+		});
+	});
+}
+
+function getViewSummary(socket, data) {
 
 }
 
-exports.descFuncSummary = function (socket, data) {
+function getFuncSummary(socket, data) {
 
 }
 
-exports.descSchemaDetail = function (socket, data) {
+function getSchemaDetail(dbURL, socket, schemaName, username) {
+	//TO-DO getTableSummary와 로직 동일. 추후 무언가 추가하기 위해 일단 함수 분리함
+
+	var queryString = 'SELECT oid AS schema ' + 
+					    'FROM pg_namespace ' +
+					   'WHERE nspname = \'' + schemaName + '\'';
+	var schema;
+	eq.executeQuery(dbURL, queryString, function (err, result) {
+		if (err) {
+			stderr(err);
+			return;
+		}
+		
+		schema = result.rows[0].schema;
+//TO-DO 쿼리 검증 필요
+		queryString = 'SELECT T1.tablename AS tablename, T1.tableowner AS tableowner, T1.tablespace AS tablespace, T2.rowcounts AS rowcounts, T2.description AS comment ' +
+						'FROM pg_tables T1, (SELECT C.relname AS tablename, C.reltuples AS rowcounts, D.description AS description ' +
+                   							  'FROM pg_class C LEFT OUTER JOIN pg_description D ' +
+                   								'ON (C.oid = D.objoid AND D.objsubid = 0) ' +
+                   							 'WHERE C.relkind = \'r\' ' +
+                   							   'AND C.relnamespace = \'' + schema + '\' ' +
+                   							   'AND C.relname NOT LIKE \'pg_%\' ' +
+                   							   'AND C.relname NOT LIKE \'sql_%\') T2 ' +
+					   'WHERE T1.tablename = T2.tablename ' +
+						 'AND T1.tableowner = \'' + username + '\' ' +
+						 'AND T1.schemaname = \'' + schemaName + '\'';
+
+		eq.executeQuery(dbURL, queryString, function (err, result) {
+			if (err) {
+				stderr(err);
+				return;
+			}
+
+			var jTvactionData = JSON.stringify(result.rows);
+			
+			socket.emit('tvaction_res', jTvactionData);
+		
+		});
+	});
+}
+
+function getTableDetail(socket, data) {
 
 }
 
-exports.descTableDetail = function (socket, data) {
+function getViewDetail(socket, data) {
 
 }
 
-exports.descViewDetail = function (socket, data) {
-
-}
-
-exports.descFuncDetail = function (socket, data) {
+function getFuncDetail(socket, data) {
 
 }
