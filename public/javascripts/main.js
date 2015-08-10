@@ -86,10 +86,10 @@ function getDBTreeView (socket, connDB) {
 						getTableSummary(socket, connInfo, $(this).treeview('getParent', node).text);
 						break;
 					case 'VIEW' : 
-						getViewSummary(socket, connInfo);
+						getViewSummary(socket, connInfo, $(this).treeview('getParent', node).text);
 						break;
 					case 'FUNCTION' : 
-						getFuncSummary(socket, connInfo);
+						getFuncSummary(socket, connInfo, $(this).treeview('getParent', node).text);
 						break;
 					default : 
 						break;
@@ -127,10 +127,10 @@ function getSchemaSummary(socket, connInfo) {
 function getTableSummary(socket, connInfo, schemaName) {
 	$('.main').empty();
 
-	var navFormat = '<ul class="nav nav-tabs">' +
-  						'<li role="presentation" class="active"><a href="#">Table</a></li>' +
-  						'<li role="presentation"><a href="#">View</a></li>' +
-  						'<li role="presentation"><a href="#">Function</a></li>' +
+	var navFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text()); return false;">Table</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;">View</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;">Function</a></li>' +
 					'</ul>'
 
 	$('.main').append(navFormat);
@@ -217,47 +217,138 @@ function getTableSummary(socket, connInfo, schemaName) {
 	});
 }
 
-function getViewSummary(socket, connInfo) {
+var append_getViewSummary_Tag = '<tr>' +
+									'<th scope="row">{0}</th>' +
+									'<td>{1}</td>' + 
+									'<td>{2}</td>' +
+									'<td>{3}</td>' +
+								'</tr>';
+
+function getViewSummary(socket, connInfo, schemaName) {
 	$('.main').empty();
 
-	var navFormat = '<ul class="nav nav-tabs">' +
-  						'<li role="presentation"><a href="#">Table</a></li>' +
-  						'<li role="presentation" class="active"><a href="#">View</a></li>' +
-  						'<li role="presentation"><a href="#">Function</a></li>' +
+	var navFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;")">Table</a></li>' +
+  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text()); return false;">View</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;">Function</a></li>' +
 					'</ul>'
 
 	$('.main').append(navFormat);
+
+	var tblFormat = '<table class="table table-striped table-hover">' +
+						'<thead>' +
+							'<tr>' +
+								'<th>#</th>' +
+								'<th>View Name</th>' +
+								'<th>Owner</th>' +
+								'<th>Comment</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>' +
+						'</tbody>' +
+					'</table>';
+	$('.main').append(tblFormat);
+
+	var socketData = connInfo;
+
+	socketData.type = 'VS';
+	socketData.schemaName = schemaName;
+	jSocketData = JSON.stringify(socketData);
+
+	socket.emit('tvaction_req', jSocketData);
+	socket.on('tvaction_res', function (data) {
+		var result = JSON.parse(data);
+		$('table > tbody').empty();
+		$.each(result, function (index, obj) {
+			var list_data = Templete.format(append_getViewSummary_Tag,
+				index + 1,
+				obj['viewname'],
+				obj['viewowner'],
+				obj['comment']
+				);
+			$('table > tbody').append(list_data);
+		});
+	});
 }
 
-function getFuncSummary(socket, connInfo) {
+var append_getFuncSummary_Tag = '<tr>' +
+									'<th scope="row">{0}</th>' +
+									'<td>{1}</td>' + 
+									'<td>{2}</td>' +
+									'<td>{3}</td>' +
+									'<td>{4}</td>' +
+									'<td>{5}</td>' +
+								'</tr>';
+
+function getFuncSummary(socket, connInfo, schemaName) {
 	$('.main').empty();
 
-	var navFormat = '<ul class="nav nav-tabs">' +
-  						'<li role="presentation"><a href="#">Table</a></li>' +
-  						'<li role="presentation"><a href="#">View</a></li>' +
-  						'<li role="presentation" class="active"><a href="#">Function</a></li>' +
+	var navFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;">Table</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;">View</a></li>' +
+  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text()); return false;">Function</a></li>' +
 					'</ul>'
 
 	$('.main').append(navFormat);
+
+	var tblFormat = '<table class="table table-striped table-hover">' +
+						'<thead>' +
+							'<tr>' +
+								'<th>#</th>' +
+								'<th>Function Name</th>' +
+								'<th>Returns</th>' +
+								'<th>Owner</th>' +
+								'<th>Programming Language</th>' +
+								'<th>Comment</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>' +
+						'</tbody>' +
+					'</table>';
+	$('.main').append(tblFormat);
+
+	var socketData = connInfo;
+
+	socketData.type = 'FS';
+	socketData.schemaName = schemaName;
+	jSocketData = JSON.stringify(socketData);
+
+	socket.emit('tvaction_req', jSocketData);
+	socket.on('tvaction_res', function (data) {
+		var result = JSON.parse(data);
+		$('table > tbody').empty();
+		$.each(result, function (index, obj) {
+			var list_data = Templete.format(append_getFuncSummary_Tag,
+				index + 1,
+				obj['functionname'],
+				obj['returntype'],
+				obj['ownername'],
+				obj['language'],
+				obj['comment']
+				);
+			$('table > tbody').append(list_data);
+		});
+	});
+
 }
 
-append_getSchemaDetail_Tag = '<tr>' + 
-								'<th scope="row">{0}</th>' +
-								'<td>{1}</td>' +
-								'<td>{2}</td>' +
-								'<td>{3}</td>' +
-								'<td>{4}</td>' +
-								'<td>{5}</td>' +
-							 '</tr>';
+var append_getSchemaDetail_Tag = '<tr>' + 
+									'<th scope="row">{0}</th>' +
+									'<td>{1}</td>' +
+									'<td>{2}</td>' +
+									'<td>{3}</td>' +
+									'<td>{4}</td>' +
+									'<td>{5}</td>' +
+							 	 '</tr>';
 
 function getSchemaDetail(socket, connInfo, schemaName) {
 	//TO-DO getTableSummary와 로직 동일. 추후 무언가 추가하기 위해 함수 분리
 	$('.main').empty();
 
-	var navFormat = '<ul class="nav nav-tabs">' +
-  						'<li role="presentation" class="active"><a href="#">Table</a></li>' +
-  						'<li role="presentation"><a href="#">View</a></li>' +
-  						'<li role="presentation"><a href="#">Function</a></li>' +
+	var navFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text()); return false;">Table</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;">View</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;">Function</a></li>' +
 					'</ul>';
 
 	$('.main').append(navFormat);
@@ -362,7 +453,22 @@ function getFuncDetail(socket, connInfo) {
 	
 }
 
-
+function navControl(text) {
+	switch (text) {
+		case 'Table':
+			
+			break;
+		case 'View':
+			
+			break;
+		case 'Function':
+			
+			break;
+		default:
+			console.log("navControl error!");
+			break;
+	}
+}
 
 
 

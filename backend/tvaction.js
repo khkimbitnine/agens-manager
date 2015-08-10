@@ -38,10 +38,10 @@ exports.tvaction = function (socket, data) {
 			getTableSummary(dbURL, socket, schemaName, username);
 			break;
 		case 'VS' :
-			getViewSummary(socket, socketData);
+			getViewSummary(dbURL, socket, schemaName, username);
 			break;
 		case 'FS' :
-			getFuncSummary(socket, socketData);
+			getFuncSummary(dbURL, socket, schemaName, username);
 			break;
 		case 'SD' :
 			getSchemaDetail(dbURL, socket, schemaName, username);
@@ -107,11 +107,69 @@ function getTableSummary(dbURL, socket, schemaName, username) {
 	});
 }
 
-function getViewSummary(socket, data) {
+function getViewSummary(dbURL, socket, schemaName, username) {
+	var queryString = 'SELECT oid AS schema ' +
+						'FROM pg_namespace ' +
+					   'WHERE nspname = \'' + schemaName + '\'';
+	var schema;
+	eq.executeQuery(dbURL, queryString, function (err, result) {
+		if(err) {
+			stderr(err);
+			return;
+		}
+
+		schema = result.rows[0].schema;
+
+		queryString = 'SELECT T1.viewname AS viewname, T1.viewowner AS viewowner, T2.description AS comment ' +
+						'FROM pg_views T1, (SELECT C.relname AS viewname, D.description AS description ' +
+					 						 'FROM pg_class C LEFT OUTER JOIN pg_description D ' +
+					 						   'ON C.oid = D.objoid AND D.objsubid = 0 ' +
+											'WHERE C.relnamespace = \'' + schema + '\' ' +
+					  						  'AND C.relkind IN (\'v\', \'m\')) T2 ' +
+					   'WHERE T1.viewname = T2.viewname ' +
+  						 'AND T1.viewowner = \'' + username +'\'' +
+  						 'AND T1.schemaname = \'' + schemaName + '\'';
+  		eq.executeQuery(dbURL, queryString, function (err, result) {
+  			if (err) {
+  				stderr(err);
+  				return;
+  			}
+
+  			var jTvactionData = JSON.stringify(result.rows);
+
+  			socket.emit('tvaction_res', jTvactionData);
+
+  		});
+
+	});
 
 }
 
-function getFuncSummary(socket, data) {
+function getFuncSummary(dbURL, socket, schemaName, username) {
+	//TO-DO 쿼리 검증 필요
+	var queryString = 'SELECT T1.proname AS functionname, T.typname AS returntype, U.usename AS ownername, L.lanname AS language, T1.description AS comment ' +
+						'FROM (SELECT * ' +
+								'FROM pg_proc P LEFT JOIN pg_description D ' +
+								   'ON P.oid = D.objoid) T1, ' +
+							  'pg_namespace N, pg_user U, pg_language L, pg_type T ' +
+					   'WHERE T1.pronamespace = N.oid ' +
+  						 'AND T1.proowner = U.usesysid ' +
+  						 'AND T1.prolang = L.oid ' +
+  						 'AND T1.prorettype = T.oid ' +
+  						 'AND N.nspname not like \'pg_%\' ' +
+  						 'AND N.nspname <> \'information_schema\' ' +
+  						 'AND N.nspname = \'' + schemaName + '\' ' +
+  						 'AND U.usename = \'' + username + '\' ';
+  	eq.executeQuery(dbURL, queryString, function (err, result) {
+  		if (err) {
+  			stderr(err);
+  			return;
+  		}
+
+  		var jTvactionData = JSON.stringify(result.rows);
+
+  		socket.emit('tvaction_res', jTvactionData);
+  	});
 
 }
 
