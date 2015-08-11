@@ -438,6 +438,21 @@ function getSchemaDetail(socket, connInfo, schemaName) {
 function getTableDetail(socket, connInfo) {
 	$('.main').empty();
 
+	var tblFormat = '<table class="table table-striped table-hover">' +
+						'<thead>' +
+							'<tr>' +
+								'<th>#</th>' +
+								'<th>Column Name</th>' +
+								'<th></th>' +
+								'<th>Tablespace</th>' +
+								'<th>Estimated Row Count</th>' +
+								'<th>Comment</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>' +
+						'</tbody>' +
+					'</table>';
+	$('.main').append(tblFormat);
 	
 }
 
