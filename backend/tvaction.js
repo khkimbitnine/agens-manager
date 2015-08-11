@@ -149,8 +149,8 @@ function getFuncSummary(dbURL, socket, schemaName, username) {
 	//TO-DO 쿼리 검증 필요
 	var queryString = 'SELECT T1.proname AS functionname, T.typname AS returntype, U.usename AS ownername, L.lanname AS language, T1.description AS comment ' +
 						'FROM (SELECT * ' +
-								'FROM pg_proc P LEFT JOIN pg_description D ' +
-								   'ON P.oid = D.objoid) T1, ' +
+								'FROM pg_proc P LEFT OUTER JOIN pg_description D ' +
+								  'ON P.oid = D.objoid) T1, ' +
 							  'pg_namespace N, pg_user U, pg_language L, pg_type T ' +
 					   'WHERE T1.pronamespace = N.oid ' +
   						 'AND T1.proowner = U.usesysid ' +

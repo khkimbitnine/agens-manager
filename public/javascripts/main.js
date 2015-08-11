@@ -36,7 +36,7 @@ $(function(){
 });
 
 //로그인한 유저의 DB 목록을 가져오서 Dropdown 메뉴를 구성한다.
-append_dropdown_tag = '<li><a style=\'cursor:pointer\' onclick="getDBTreeView(socket, $(this).text())">{0}</a></li>';
+append_dropdown_tag = '<li><a style=\'cursor:pointer\' onclick="getDBTreeView(socket, $(this).text()); $(\'.sidebar .btn-group .dropdown-menu > li > .active\').removeAttr(\'class\'); $(this).addClass(\'active\');">{0}</a></li>';
 function appendDropdownList (socket) {
 
 	//TO-DO 사용자 DB 아이디 보내기, cookie의 uid 값 읽어야함. 정책에 따라 decryption, hex 시켜야 함. 현재는 하드코딩
@@ -61,7 +61,7 @@ function appendDropdownList (socket) {
 }
 
 function getDBTreeView (socket, connDB) {
-	
+	$('.main').empty();
 	//TO-DO 사용자 DB 아이디 보내기, cookie의 uid 값 읽어야함. 정책에 따라 decryption, hex 시켜야 함. 현재는 하드코딩
 	var connInfo = { uid : 'postgres', upw : 'postgres', connHost: 'localhost', connDB : connDB};
 	//object -> JSON
@@ -128,9 +128,9 @@ function getTableSummary(socket, connInfo, schemaName) {
 	$('.main').empty();
 
 	var navFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
-  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text()); return false;">Table</a></li>' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;">View</a></li>' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;">Function</a></li>' +
+  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text(), socket); return false;">Table</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;">View</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;">Function</a></li>' +
 					'</ul>'
 
 	$('.main').append(navFormat);
@@ -228,9 +228,9 @@ function getViewSummary(socket, connInfo, schemaName) {
 	$('.main').empty();
 
 	var navFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;")">Table</a></li>' +
-  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text()); return false;">View</a></li>' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;">Function</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;")">Table</a></li>' +
+  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text(), socket); return false;">View</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;">Function</a></li>' +
 					'</ul>'
 
 	$('.main').append(navFormat);
@@ -284,9 +284,9 @@ function getFuncSummary(socket, connInfo, schemaName) {
 	$('.main').empty();
 
 	var navFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;">Table</a></li>' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;">View</a></li>' +
-  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text()); return false;">Function</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;">Table</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;">View</a></li>' +
+  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text(), socket); return false;">Function</a></li>' +
 					'</ul>'
 
 	$('.main').append(navFormat);
@@ -346,9 +346,9 @@ function getSchemaDetail(socket, connInfo, schemaName) {
 	$('.main').empty();
 
 	var navFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
-  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text()); return false;">Table</a></li>' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;">View</a></li>' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text()); return false;">Function</a></li>' +
+  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text(), socket); return false;">Table</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;">View</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;">Function</a></li>' +
 					'</ul>';
 
 	$('.main').append(navFormat);
@@ -453,16 +453,22 @@ function getFuncDetail(socket, connInfo) {
 	
 }
 
-function navControl(text) {
+function navControl(text, socket) {
+	//TO-DO 사용자 DB 아이디 보내기, cookie의 uid 값 읽어야함. 정책에 따라 decryption, hex 시켜야 함. 현재는 하드코딩
+	var connDB = $('.sidebar .btn-group .dropdown-menu > li > .active').text();
+	var connInfo = { uid : 'postgres', upw : 'postgres', connHost: 'localhost', connDB : connDB};
+
+//이거 로직 오류 var schemaName = $('.obtreeview > ul > li.node-selected').text();
+
 	switch (text) {
 		case 'Table':
-			
+			getTableSummary(socket, connInfo, schemaName);
 			break;
 		case 'View':
-			
+			getViewSummary(socket, connInfo, schemaName);
 			break;
 		case 'Function':
-			
+			getFuncSummary(socket, connInfo, schemaName);
 			break;
 		default:
 			console.log("navControl error!");
