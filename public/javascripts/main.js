@@ -83,13 +83,16 @@ function getDBTreeView (socket, connDB) {
 						getSchemaSummary(socket, connInfo); 
 						break;
 					case 'TABLE' : 
-						getTableSummary(socket, connInfo, $(this).treeview('getParent', node).text);
+						$('.current_selected_schema').text($(this).treeview('getParent', node).text); 
+						getTableSummary(socket, connInfo, $('.current_selected_schema').text());
 						break;
 					case 'VIEW' : 
-						getViewSummary(socket, connInfo, $(this).treeview('getParent', node).text);
+						$('.current_selected_schema').text($(this).treeview('getParent', node).text);
+						getViewSummary(socket, connInfo, $('.current_selected_schema').text());
 						break;
 					case 'FUNCTION' : 
-						getFuncSummary(socket, connInfo, $(this).treeview('getParent', node).text);
+						$('.current_selected_schema').text($(this).treeview('getParent', node).text);
+						getFuncSummary(socket, connInfo, $('.current_selected_schema').text());
 						break;
 					default : 
 						break;
@@ -97,16 +100,20 @@ function getDBTreeView (socket, connDB) {
 
 				switch ($(this).treeview('getParent', node).text) {
 					case 'SCHEMA' :
-						getSchemaDetail(socket, connInfo, node.text);
+						$('.current_selected_schema').text(node.text);
+						getSchemaDetail(socket, connInfo, $('.current_selected_schema').text());
 						break;
 					case 'TABLE' :
-						getTableDetail(socket, connInfo);
+						$('.current_selected_schema').text($(this).treeview('getParent', $(this).treeview('getParent', node)).text);
+						getTableDetail(socket, connInfo, $('.current_selected_schema').text());
 						break;
 					case 'VIEW' :
-						getViewDetail(socket, connInfo);
+						$('.current_selected_schema').text($(this).treeview('getParent', $(this).treeview('getParent', node)).text);
+						getViewDetail(socket, connInfo, $('.current_selected_schema').text());
 						break;
 					case 'FUNCTION' :
-						getFuncDetail(socket, connInfo);
+						$('.current_selected_schema').text($(this).treeview('getParent', $(this).treeview('getParent', node)).text);
+						getFuncDetail(socket, connInfo, $('.current_selected_schema').text());
 						break;
 					default :
 						break;
@@ -127,13 +134,13 @@ function getSchemaSummary(socket, connInfo) {
 function getTableSummary(socket, connInfo, schemaName) {
 	$('.main').empty();
 
-	var navFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
-  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text(), socket); return false;">Table</a></li>' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;">View</a></li>' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;">Function</a></li>' +
-					'</ul>'
+	var navSummaryFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  						'<li role="presentation" class="active"><a href="#" onclick="navSummaryControl($(this).text(), socket); return false;">Table</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navSummaryControl($(this).text(), socket); return false;">View</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navSummaryControl($(this).text(), socket); return false;">Function</a></li>' +
+					'</ul>';
 
-	$('.main').append(navFormat);
+	$('.main').append(navSummaryFormat);
 
 	var tblFormat = '<table class="table table-striped table-hover">' +
 						'<thead>' +
@@ -147,48 +154,6 @@ function getTableSummary(socket, connInfo, schemaName) {
 							'</tr>' +
 						'</thead>' +
 						'<tbody>' +
-						/*
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-						*/
 						'</tbody>' +
 					'</table>';
 	$('.main').append(tblFormat);
@@ -227,13 +192,13 @@ var append_getViewSummary_Tag = '<tr>' +
 function getViewSummary(socket, connInfo, schemaName) {
 	$('.main').empty();
 
-	var navFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;")">Table</a></li>' +
-  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text(), socket); return false;">View</a></li>' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;">Function</a></li>' +
-					'</ul>'
+	var navSummaryFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  						'<li role="presentation"><a href="#" onclick="navSummaryControl($(this).text(), socket); return false;")">Table</a></li>' +
+  						'<li role="presentation" class="active"><a href="#" onclick="navSummaryControl($(this).text(), socket); return false;">View</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navSummaryControl($(this).text(), socket); return false;">Function</a></li>' +
+					'</ul>';
 
-	$('.main').append(navFormat);
+	$('.main').append(navSummaryFormat);
 
 	var tblFormat = '<table class="table table-striped table-hover">' +
 						'<thead>' +
@@ -283,13 +248,13 @@ var append_getFuncSummary_Tag = '<tr>' +
 function getFuncSummary(socket, connInfo, schemaName) {
 	$('.main').empty();
 
-	var navFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;">Table</a></li>' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;">View</a></li>' +
-  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text(), socket); return false;">Function</a></li>' +
-					'</ul>'
+	var navSummaryFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  						'<li role="presentation"><a href="#" onclick="navSummaryControl($(this).text(), socket); return false;">Table</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navSummaryControl($(this).text(), socket); return false;">View</a></li>' +
+  						'<li role="presentation" class="active"><a href="#" onclick="navSummaryControl($(this).text(), socket); return false;">Function</a></li>' +
+					'</ul>';
 
-	$('.main').append(navFormat);
+	$('.main').append(navSummaryFormat);
 
 	var tblFormat = '<table class="table table-striped table-hover">' +
 						'<thead>' +
@@ -345,13 +310,13 @@ function getSchemaDetail(socket, connInfo, schemaName) {
 	//TO-DO getTableSummary와 로직 동일. 추후 무언가 추가하기 위해 함수 분리
 	$('.main').empty();
 
-	var navFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
-  						'<li role="presentation" class="active"><a href="#" onclick="navControl($(this).text(), socket); return false;">Table</a></li>' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;">View</a></li>' +
-  						'<li role="presentation"><a href="#" onclick="navControl($(this).text(), socket); return false;">Function</a></li>' +
+	var navSummaryFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  						'<li role="presentation" class="active"><a href="#" onclick="navSummaryControl($(this).text(), socket); return false;">Table</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navSummaryControl($(this).text(), socket); return false;">View</a></li>' +
+  						'<li role="presentation"><a href="#" onclick="navSummaryControl($(this).text(), socket); return false;">Function</a></li>' +
 					'</ul>';
 
-	$('.main').append(navFormat);
+	$('.main').append(navSummaryFormat);
 
 	var tblFormat = '<table class="table table-striped table-hover">' +
 						'<thead>' +
@@ -435,18 +400,26 @@ function getSchemaDetail(socket, connInfo, schemaName) {
 	});
 }
 
-function getTableDetail(socket, connInfo) {
+function getTableDetail(socket, connInfo, schemaName) {
 	$('.main').empty();
+
+	var navTableDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  									'<li role="presentation" class="active"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Columns</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Indexes</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Constraints</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Data</a></li>' +
+								'</ul>';
+	$('.main').append(navTableDetailFormat);
 
 	var tblFormat = '<table class="table table-striped table-hover">' +
 						'<thead>' +
 							'<tr>' +
 								'<th>#</th>' +
 								'<th>Column Name</th>' +
-								'<th></th>' +
-								'<th>Tablespace</th>' +
-								'<th>Estimated Row Count</th>' +
-								'<th>Comment</th>' +
+								'<th>Type</th>' +
+								'<th>PK</th>' +
+								'<th>NOT NULL</th>' +
+								'<th>Default Value</th>' +
 							'</tr>' +
 						'</thead>' +
 						'<tbody>' +
@@ -456,48 +429,241 @@ function getTableDetail(socket, connInfo) {
 	
 }
 
-function getViewDetail(socket, connInfo) {
+function getTableDetailIndexes(socket, connInfo, schemaName) {
+	$('.main').empty();
+
+	var navTableDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Columns</a></li>' +
+  									'<li role="presentation" class="active"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Indexes</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Constraints</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Data</a></li>' +
+								'</ul>';
+	$('.main').append(navTableDetailFormat);
+
+	var tblFormat = '<table class="table table-striped table-hover">' +
+						'<thead>' +
+							'<tr>' +
+								'<th>#</th>' +
+								'<th>Index Name</th>' +
+								'<th>Access Method</th>' +
+								'<th>PK</th>' +
+								'<th>Unique</th>' +
+								'<th>Partial</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>' +
+						'</tbody>' +
+					'</table>';
+	$('.main').append(tblFormat);
+
+}
+
+function getTableDetailConstraints(socket, connInfo, schemaName) {
+	$('.main').empty();
+
+	var navTableDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Columns</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Indexes</a></li>' +
+  									'<li role="presentation" class="active"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Constraints</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Data</a></li>' +
+								'</ul>';
+	$('.main').append(navTableDetailFormat);
+
+	var tblFormat = '<table class="table table-striped table-hover">' +
+						'<thead>' +
+							'<tr>' +
+								'<th>#</th>' +
+								'<th>Constraint Name</th>' +
+								'<th>Type</th>' +
+								'<th>Deferrable</th>' +
+								'<th>Deferred</th>' +
+								'<th>Update Action</th>' +
+								'<th>Delete Action</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>' +
+						'</tbody>' +
+					'</table>';
+	$('.main').append(tblFormat);
+}
+
+function getTableDetailData(socket, connInfo, schemaName) {
+	$('.main').empty();
+
+	var navTableDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Columns</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Indexes</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Constraints</a></li>' +
+  									'<li role="presentation" class="active"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Data</a></li>' +
+								'</ul>';
+	$('.main').append(navTableDetailFormat);
+
+	var tblFormat = '<table class="table table-striped table-hover">' +
+						'<thead>' +
+							'<tr>' +
+								'<th>#</th>' +
+								'<th>구</th>' +
+								'<th>현</th>' +
+								'<th>할</th>' +
+								'<th>거</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>' +
+						'</tbody>' +
+					'</table>';
+	$('.main').append(tblFormat);
+}
+
+function getViewDetail(socket, connInfo, schemaName) {
+	$('.main').empty();
+
+	var navViewDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  									'<li role="presentation" class="active"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Columns</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Rules</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Data</a></li>' +
+								'</ul>';
+	$('.main').append(navViewDetailFormat);
+
+	var viewFormat = '<table class="table table-striped table-hover">' +
+						'<thead>' +
+							'<tr>' +
+								'<th>#</th>' +
+								'<th>Column Name</th>' +
+								'<th>Type</th>' +
+								'<th>PK</th>' +
+								'<th>NOT NULL</th>' +
+								'<th>Default Value</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>' +
+						'</tbody>' +
+					'</table>';
+	$('.main').append(viewFormat);	
+}
+
+function getViewDetailRules(socket, connInfo, schemaName) {
+	$('.main').empty();
+
+	var navViewDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Columns</a></li>' +
+  									'<li role="presentation" class="active"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Rules</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Data</a></li>' +
+								'</ul>';
+	$('.main').append(navViewDetailFormat);
+
+	var viewFormat = '<table class="table table-striped table-hover">' +
+						'<thead>' +
+							'<tr>' +
+								'<th>#</th>' +
+								'<th>Rule Name</th>' +
+								'<th>Type</th>' +
+								'<th>Enabled</th>' +
+								'<th>Instead</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>' +
+						'</tbody>' +
+					'</table>';
+	$('.main').append(viewFormat);
+}
+
+function getViewDetailData(socket, connInfo, schemaName) {
+	$('.main').empty();
+
+	var navViewDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Columns</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Rules</a></li>' +
+  									'<li role="presentation" class="active"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Data</a></li>' +
+								'</ul>';
+	$('.main').append(navViewDetailFormat);
+
+	var viewFormat = '<table class="table table-striped table-hover">' +
+						'<thead>' +
+							'<tr>' +
+								'<th>#</th>' +
+								'<th>구</th>' +
+								'<th>현</th>' +
+								'<th>할</th>' +
+								'<th>거</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>' +
+						'</tbody>' +
+					'</table>';
+	$('.main').append(viewFormat);
+}
+
+function getFuncDetail(socket, connInfo, schemaName) {
 	$('.main').empty();
 
 	
 }
 
-function getFuncDetail(socket, connInfo) {
-	$('.main').empty();
-
-	
-}
-
-function navControl(text, socket) {
+function navSummaryControl(type, socket) {
 	//TO-DO 사용자 DB 아이디 보내기, cookie의 uid 값 읽어야함. 정책에 따라 decryption, hex 시켜야 함. 현재는 하드코딩
 	var connDB = $('.sidebar .btn-group .dropdown-menu > li > .active').text();
 	var connInfo = { uid : 'postgres', upw : 'postgres', connHost: 'localhost', connDB : connDB};
 
-//이거 로직 오류 var schemaName = $('.obtreeview > ul > li.node-selected').text();
-
-	switch (text) {
+	switch (type) {
 		case 'Table':
-			getTableSummary(socket, connInfo, schemaName);
+			getTableSummary(socket, connInfo, $('.current_selected_schema').text());
 			break;
 		case 'View':
-			getViewSummary(socket, connInfo, schemaName);
+			getViewSummary(socket, connInfo, $('.current_selected_schema').text());
 			break;
 		case 'Function':
-			getFuncSummary(socket, connInfo, schemaName);
+			getFuncSummary(socket, connInfo, $('.current_selected_schema').text());
 			break;
 		default:
-			console.log("navControl error!");
+			console.log("navSummaryControl error!");
 			break;
 	}
 }
 
+function navTableDetailControl(type, socket) {
+	//TO-DO 사용자 DB 아이디 보내기, cookie의 uid 값 읽어야함. 정책에 따라 decryption, hex 시켜야 함. 현재는 하드코딩
+	var connDB = $('.sidebar .btn-group .dropdown-menu > li > .active').text();
+	var connInfo = { uid : 'postgres', upw : 'postgres', connHost: 'localhost', connDB : connDB};
 
+	switch (type) {
+		case 'Columns':
+			getTableDetail(socket, connInfo, $('.current_selected_schema').text());
+			break;
+		case 'Indexes':
+			getTableDetailIndexes(socket, connInfo, $('.current_selected_schema').text());
+			break;
+		case 'Constraints':
+			getTableDetailConstraints(socket, connInfo, $('.current_selected_schema').text());
+			break;
+		case 'Data':
+			getTableDetailData(socket, connInfo, $('.current_selected_schema').text());
+			break;
+		default:
+			console.log("navTableDetailControl error!");
+			break;
+	}
+}
 
+function navViewDetailControl(type, socket) {
+	//TO-DO 사용자 DB 아이디 보내기, cookie의 uid 값 읽어야함. 정책에 따라 decryption, hex 시켜야 함. 현재는 하드코딩
+	var connDB = $('.sidebar .btn-group .dropdown-menu > li > .active').text();
+	var connInfo = { uid : 'postgres', upw : 'postgres', connHost: 'localhost', connDB : connDB};
 
-
-
-
-
+	switch (type) {
+		case 'Columns':
+			getViewDetail(socket, connInfo, $('.current_selected_schema').text());
+			break;
+		case 'Rules':
+			getViewDetailRules(socket, connInfo, $('.current_selected_schema').text());
+			break;
+		case 'Data':
+			getViewDetailData(socket, connInfo, $('.current_selected_schema').text());
+			break;
+		default:
+			console.log("navTableDetailControl error!");
+			break;
+	}
+}
 
 
 
