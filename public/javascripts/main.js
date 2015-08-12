@@ -154,6 +154,48 @@ function getTableSummary(socket, connInfo, schemaName) {
 							'</tr>' +
 						'</thead>' +
 						'<tbody>' +
+						/*
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+							'<tr>' +
+								'<th scope="row">1</th>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+								'<td>ttt</td>' +
+							'</tr>' +
+						*/
 						'</tbody>' +
 					'</table>';
 	$('.main').append(tblFormat);
