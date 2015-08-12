@@ -47,7 +47,8 @@ exports.tvaction = function (socket, data) {
 			getSchemaDetail(dbURL, socket, schemaName, username);
 			break;
 		case 'TD' :
-			getTableDetail(socket, socketData);
+			var tableName = socketData.tableName;
+			getTableDetail(dbURL, socket, schemaName, tableName);
 			break;
 		case 'VD' :
 			getViewDetail(socket, socketData);
@@ -214,7 +215,38 @@ function getSchemaDetail(dbURL, socket, schemaName, username) {
 	});
 }
 
-function getTableDetail(socket, data) {
+function getTableDetail(dbURL, socket, schemaName, tableName) {
+	var queryString = 'SELECT A.attname AS columnname, ' +
+	   						 'pg_catalog.format_type(A.atttypid, A.atttypmod) AS type, ' +
+	   						 'A.attlen AS length, ' +
+	   						 'EXISTS (SELECT 1 ' +
+	   	         					   'FROM (SELECT unnest(conkey) AS attnum ' +
+	   	         	     					   'FROM pg_constraint ' +
+	   	         	    					  'WHERE conrelid = A.attrelid AND contype = \'p\') C ' +
+	   	        					  'WHERE C.attnum = A.attnum) AS pk, ' +
+	   						 'A.attnotnull AS notnull, ' +
+	   						 'AD.adsrc AS defaultvalue ' +
+						'FROM pg_attribute A LEFT OUTER JOIN pg_attrdef AD ' +
+						  'ON A.attnum = AD.adnum ' +
+					   'WHERE A.attrelid = (SELECT C.oid AS tableid ' +
+	                  						 'FROM pg_class C, pg_namespace N ' +
+	                 						'WHERE C.relnamespace = N.oid ' +
+	                   						  'AND N.nspname = \'' + schemaName +'\' ' +
+	                   						  'AND C.relname = \'' + tableName + '\') ' +
+						 'AND A.attnum > 0 ' +
+						 'AND NOT A.attisdropped ' +
+					'ORDER BY A.attnum';
+	eq.executeQuery(dbURL, queryString, function (err, result) {
+		if(err) {
+			stderr(err);
+			return;
+		}
+
+		var jTvactionData = JSON.stringify(result.rows);
+
+		socket.emit('tvaction_res', jTvactionData);
+
+	});
 
 }
 

@@ -105,7 +105,8 @@ function getDBTreeView (socket, connDB) {
 						break;
 					case 'TABLE' :
 						$('.current_selected_schema').text($(this).treeview('getParent', $(this).treeview('getParent', node)).text);
-						getTableDetail(socket, connInfo, $('.current_selected_schema').text());
+						$('.current_selected_table').text(node.text);
+						getTableDetail(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_table').text());
 						break;
 					case 'VIEW' :
 						$('.current_selected_schema').text($(this).treeview('getParent', $(this).treeview('getParent', node)).text);
@@ -442,7 +443,16 @@ function getSchemaDetail(socket, connInfo, schemaName) {
 	});
 }
 
-function getTableDetail(socket, connInfo, schemaName) {
+var append_getTableDetail_Tag = '<tr>' +
+									'<th scope="row">{0}</th>' +
+									'<td>{1}</td>' +
+									'<td>{2}</td>' +
+									'<td>{3}</td>' +
+									'<td>{4}</td>' + 
+									'<td>{5}</td>' +
+									'<td>{6}</td>' +
+								'</tr>';
+function getTableDetail(socket, connInfo, schemaName, tableName) {
 	$('.main').empty();
 
 	var navTableDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
@@ -459,6 +469,7 @@ function getTableDetail(socket, connInfo, schemaName) {
 								'<th>#</th>' +
 								'<th>Column Name</th>' +
 								'<th>Type</th>' +
+								'<th>Length</th>' +
 								'<th>PK</th>' +
 								'<th>NOT NULL</th>' +
 								'<th>Default Value</th>' +
@@ -469,6 +480,30 @@ function getTableDetail(socket, connInfo, schemaName) {
 					'</table>';
 	$('.main').append(tblFormat);
 	
+	var socketData = connInfo;
+
+	socketData.type = 'TD';
+	socketData.schemaName = schemaName;
+	socketData.tableName = tableName;
+	jSocketData = JSON.stringify(socketData);
+
+	socket.emit('tvaction_req', jSocketData);
+	socket.on('tvaction_res', function (data) {
+		var result = JSON.parse(data);
+		$('table > tbody').empty();
+		$.each(result, function (index, obj) {
+			var list_data = Templete.format(append_getTableDetail_Tag,
+				index + 1,
+				obj['columnname'],
+				obj['type'],
+				obj['length'],
+				obj['pk'],
+				obj['notnull'],
+				obj['defaultvalue']
+				);
+			$('table > tbody').append(list_data);
+		});
+	});
 }
 
 function getTableDetailIndexes(socket, connInfo, schemaName) {
@@ -669,7 +704,7 @@ function navTableDetailControl(type, socket) {
 
 	switch (type) {
 		case 'Columns':
-			getTableDetail(socket, connInfo, $('.current_selected_schema').text());
+			getTableDetail(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_table').text());
 			break;
 		case 'Indexes':
 			getTableDetailIndexes(socket, connInfo, $('.current_selected_schema').text());
