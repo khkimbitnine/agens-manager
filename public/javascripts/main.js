@@ -506,7 +506,16 @@ function getTableDetail(socket, connInfo, schemaName, tableName) {
 	});
 }
 
-function getTableDetailIndexes(socket, connInfo, schemaName) {
+var append_getTableDetailIndexes_Tag = '<tr>' +
+								       		'<th scope="row">{0}</th>' +
+								       		'<td>{1}</td>' +
+								       		'<td>{2}</td>' +
+								       		'<td>{3}</td>' +
+								       		'<td>{4}</td>' + 
+								       		'<td>{5}</td>' +
+									   '</tr>';
+
+function getTableDetailIndexes(socket, connInfo, schemaName, tableName) {
 	$('.main').empty();
 
 	var navTableDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
@@ -533,6 +542,29 @@ function getTableDetailIndexes(socket, connInfo, schemaName) {
 					'</table>';
 	$('.main').append(tblFormat);
 
+	var socketData = connInfo;
+
+	socketData.type = 'TDI';
+	socketData.schemaName = schemaName;
+	socketData.tableName = tableName;
+	jSocketData = JSON.stringify(socketData);
+
+	socket.emit('tvaction_req', jSocketData);
+	socket.on('tvaction_res', function (data) {
+		var result = JSON.parse(data);
+		$('table > tbody').empty();
+		$.each(result, function (index, obj) {
+			var list_data = Templete.format(append_getTableDetailIndexes_Tag,
+				index + 1,
+				obj['indexname'],
+				obj['accessmethod'],
+				obj['pk'],
+				obj['unique'],
+				obj['partial']
+				);
+			$('table > tbody').append(list_data);
+		});
+	});
 }
 
 function getTableDetailConstraints(socket, connInfo, schemaName) {
@@ -707,7 +739,7 @@ function navTableDetailControl(type, socket) {
 			getTableDetail(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_table').text());
 			break;
 		case 'Indexes':
-			getTableDetailIndexes(socket, connInfo, $('.current_selected_schema').text());
+			getTableDetailIndexes(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_table').text());
 			break;
 		case 'Constraints':
 			getTableDetailConstraints(socket, connInfo, $('.current_selected_schema').text());

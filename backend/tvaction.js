@@ -50,6 +50,9 @@ exports.tvaction = function (socket, data) {
 			var tableName = socketData.tableName;
 			getTableDetail(dbURL, socket, schemaName, tableName);
 			break;
+		case 'TDI' :
+			var tableName = socketData.tableName;
+			getTableDetailIndexes(dbURL, socket, schemaName, tableName);
 		case 'VD' :
 			getViewDetail(socket, socketData);
 			break;
@@ -236,6 +239,38 @@ function getTableDetail(dbURL, socket, schemaName, tableName) {
 						 'AND A.attnum > 0 ' +
 						 'AND NOT A.attisdropped ' +
 					'ORDER BY A.attnum';
+	eq.executeQuery(dbURL, queryString, function (err, result) {
+		if(err) {
+			stderr(err);
+			return;
+		}
+
+		var jTvactionData = JSON.stringify(result.rows);
+
+		socket.emit('tvaction_res', jTvactionData);
+
+	});
+
+}
+
+function getTableDetailIndexes(dbURL, socket, schemaName, tableName) {
+	var queryString = 'SELECT CI.relname AS indexname, ' +
+       						 'AM.amname AS accessmethod, ' +
+       						 'I.indisprimary AS pk, ' +
+       						 'I.indisunique AS unique, ' +
+       						 '(I.indpred IS NOT NULL) AS partial ' +
+						'FROM pg_index I, pg_class CT, pg_roles RI, pg_class CI, pg_am AM ' +
+					   'WHERE I.indexrelid = CI.oid ' +
+  						 'AND I.indrelid = CT.oid ' +
+  						 'AND CI.relowner = RI.oid ' +
+  						 'AND CI.relam = AM.oid ' +
+  						 'AND CT.oid = (SELECT C.oid ' +
+  	              						 'FROM pg_class C, pg_namespace N ' +
+  	             						'WHERE C.relnamespace = N.oid ' +
+  	               						  'AND C.relkind = \'r\' ' +
+  	               						  'AND C.relname = \'' + tableName + '\' ' +
+  	               						  'AND N.nspname = \'' + schemaName + '\')';
+	
 	eq.executeQuery(dbURL, queryString, function (err, result) {
 		if(err) {
 			stderr(err);
