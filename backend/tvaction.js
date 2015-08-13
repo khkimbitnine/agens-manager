@@ -53,6 +53,11 @@ exports.tvaction = function (socket, data) {
 		case 'TDI' :
 			var tableName = socketData.tableName;
 			getTableDetailIndexes(dbURL, socket, schemaName, tableName);
+			break;
+		case 'TDC' :
+			var tableName = socketData.tableName;
+			getTableDetailConstraints(dbURL, socket, schemaName, tableName);
+			break;
 		case 'VD' :
 			getViewDetail(socket, socketData);
 			break;
@@ -234,8 +239,8 @@ function getTableDetail(dbURL, socket, schemaName, tableName) {
 					   'WHERE A.attrelid = (SELECT C.oid AS tableid ' +
 	                  						 'FROM pg_class C, pg_namespace N ' +
 	                 						'WHERE C.relnamespace = N.oid ' +
-	                   						  'AND N.nspname = \'' + schemaName +'\' ' +
-	                   						  'AND C.relname = \'' + tableName + '\') ' +
+	                   						  'AND C.relname = \'' + tableName + '\' ' +
+	                   						  'AND N.nspname = \'' + schemaName +'\') ' +
 						 'AND A.attnum > 0 ' +
 						 'AND NOT A.attisdropped ' +
 					'ORDER BY A.attnum';
@@ -283,6 +288,38 @@ function getTableDetailIndexes(dbURL, socket, schemaName, tableName) {
 
 	});
 
+}
+
+function getTableDetailConstraints(dbURL, socket, schemaName, tableName) {
+	var queryString = 'SELECT DISTINCT CN.conname AS constraintname, ' +
+									  'CN.contype AS type, ' +
+									  'CI.relname as indexname, ' +
+									  'CN.condeferrable AS deferrable, ' +
+									  'CN.condeferred AS deferred, ' +
+									  'CN.confupdtype AS updateaction, ' +
+									  'CN.confdeltype AS deleteaction ' +
+						'FROM pg_class CT, pg_constraint CN ' +
+ 						 'LEFT OUTER JOIN pg_depend D ON (CN.oid = D.refobjid) ' +
+ 						 'LEFT OUTER JOIN pg_class CI ON (D.objid = CI.oid) ' +
+ 						 'LEFT OUTER JOIN pg_roles RI ON (CI.relowner = RI.oid) ' +
+					   'WHERE CT.oid = CN.conrelid AND CT.oid = (SELECT C.oid ' +
+										   						  'FROM pg_class C, pg_namespace N ' +
+										  						 'WHERE C.relnamespace = N.oid ' +
+										    					   'AND C.relkind = \'r\' ' +
+										    					   'AND C.relname = \'' + tableName + '\' ' +
+										    					   'AND N.nspname = \'' + schemaName + '\')';
+
+	eq.executeQuery(dbURL, queryString, function (err, result) {
+		if(err) {
+			stderr(err);
+			return;
+		}
+		
+		var jTvactionData = JSON.stringify(result.rows);
+
+		socket.emit('tvaction_res', jTvactionData);
+
+	});
 }
 
 function getViewDetail(socket, data) {

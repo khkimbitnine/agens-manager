@@ -567,7 +567,18 @@ function getTableDetailIndexes(socket, connInfo, schemaName, tableName) {
 	});
 }
 
-function getTableDetailConstraints(socket, connInfo, schemaName) {
+var append_getTableDetailConstraints_Tag = '<tr>' +
+										   		'<th scope="row">{0}</th>' +
+												'<td>{1}</td>' +
+												'<td>{2}</td>' +
+												'<td>{3}</td>' +
+												'<td>{4}</td>' + 
+												'<td>{5}</td>' +
+												'<td>{6}</td>' +
+												'<td>{7}</td>' +
+										   '</tr>';
+
+function getTableDetailConstraints(socket, connInfo, schemaName, tableName) {
 	$('.main').empty();
 
 	var navTableDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
@@ -584,6 +595,7 @@ function getTableDetailConstraints(socket, connInfo, schemaName) {
 								'<th>#</th>' +
 								'<th>Constraint Name</th>' +
 								'<th>Type</th>' +
+								'<th>Index Name</th>' +
 								'<th>Deferrable</th>' +
 								'<th>Deferred</th>' +
 								'<th>Update Action</th>' +
@@ -594,6 +606,32 @@ function getTableDetailConstraints(socket, connInfo, schemaName) {
 						'</tbody>' +
 					'</table>';
 	$('.main').append(tblFormat);
+
+	var socketData = connInfo;
+
+	socketData.type = 'TDC';
+	socketData.schemaName = schemaName;
+	socketData.tableName = tableName;
+	jSocketData = JSON.stringify(socketData);
+
+	socket.emit('tvaction_req', jSocketData);
+	socket.on('tvaction_res', function (data) {
+		var result = JSON.parse(data);
+		$('table > tbody').empty();
+		$.each(result, function (index, obj) {
+			var list_data = Templete.format(append_getTableDetailConstraints_Tag,
+				index + 1,
+				obj['constraintname'],
+				obj['type'],
+				obj['indexname'],
+				obj['deferrable'],
+				obj['deferred'],
+				obj['updateaction'],
+				obj['deleteaction']
+				);
+			$('table > tbody').append(list_data);
+		});
+	});
 }
 
 function getTableDetailData(socket, connInfo, schemaName) {
@@ -742,7 +780,7 @@ function navTableDetailControl(type, socket) {
 			getTableDetailIndexes(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_table').text());
 			break;
 		case 'Constraints':
-			getTableDetailConstraints(socket, connInfo, $('.current_selected_schema').text());
+			getTableDetailConstraints(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_table').text());
 			break;
 		case 'Data':
 			getTableDetailData(socket, connInfo, $('.current_selected_schema').text());
