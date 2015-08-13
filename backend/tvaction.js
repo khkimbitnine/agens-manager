@@ -59,7 +59,8 @@ exports.tvaction = function (socket, data) {
 			getTableDetailConstraints(dbURL, socket, schemaName, tableName);
 			break;
 		case 'VD' :
-			getViewDetail(socket, socketData);
+			var viewName = socketData.viewName;
+			getViewDetail(dbURL, socket, schemaName, viewName);
 			break;
 		case 'FD' :
 			getFuncDetail(socket, socketData);
@@ -90,10 +91,16 @@ function getTableSummary(dbURL, socket, schemaName, username) {
 		
 		schema = result.rows[0].schema;
 //TO-DO 쿼리 검증 필요
-		queryString = 'SELECT T1.tablename AS tablename, T1.tableowner AS tableowner, T1.tablespace AS tablespace, T2.rowcounts AS rowcounts, T2.description AS comment ' +
-						'FROM pg_tables T1, (SELECT C.relname AS tablename, C.reltuples AS rowcounts, D.description AS description ' +
-                   							  'FROM pg_class C LEFT OUTER JOIN pg_description D ' +
-                   								'ON (C.oid = D.objoid AND D.objsubid = 0) ' +
+		queryString = 'SELECT T1.tablename AS tablename, ' +
+							 'T1.tableowner AS tableowner, ' +
+							 'T1.tablespace AS tablespace, ' +
+							 'T2.rowcounts AS rowcounts, ' +
+							 'T2.description AS comment ' +
+						'FROM pg_tables T1, (SELECT C.relname AS tablename, ' + 
+												   'C.reltuples AS rowcounts, ' +
+												   'D.description AS description ' +
+                   							  'FROM pg_class C ' +
+                   							   'LEFT OUTER JOIN pg_description D ON (C.oid = D.objoid AND D.objsubid = 0) ' +
                    							 'WHERE C.relkind = \'r\' ' +
                    							   'AND C.relnamespace = \'' + schema + '\' ' +
                    							   'AND C.relname NOT LIKE \'pg_%\' ' +
@@ -129,10 +136,13 @@ function getViewSummary(dbURL, socket, schemaName, username) {
 
 		schema = result.rows[0].schema;
 
-		queryString = 'SELECT T1.viewname AS viewname, T1.viewowner AS viewowner, T2.description AS comment ' +
-						'FROM pg_views T1, (SELECT C.relname AS viewname, D.description AS description ' +
-					 						 'FROM pg_class C LEFT OUTER JOIN pg_description D ' +
-					 						   'ON C.oid = D.objoid AND D.objsubid = 0 ' +
+		queryString = 'SELECT T1.viewname AS viewname, ' +
+							 'T1.viewowner AS viewowner, ' + 
+							 'T2.description AS comment ' +
+						'FROM pg_views T1, (SELECT C.relname AS viewname, ' +
+												  'D.description AS description ' +
+					 						 'FROM pg_class C ' + 
+					 						  'LEFT OUTER JOIN pg_description D ON C.oid = D.objoid AND D.objsubid = 0 ' +
 											'WHERE C.relnamespace = \'' + schema + '\' ' +
 					  						  'AND C.relkind IN (\'v\', \'m\')) T2 ' +
 					   'WHERE T1.viewname = T2.viewname ' +
@@ -156,11 +166,15 @@ function getViewSummary(dbURL, socket, schemaName, username) {
 
 function getFuncSummary(dbURL, socket, schemaName, username) {
 	//TO-DO 쿼리 검증 필요
-	var queryString = 'SELECT T1.proname AS functionname, T.typname AS returntype, U.usename AS ownername, L.lanname AS language, T1.description AS comment ' +
+	var queryString = 'SELECT T1.proname AS functionname, ' +
+							 'T.typname AS returntype, ' +
+							 'U.usename AS ownername, ' + 
+							 'L.lanname AS language, ' + 
+							 'T1.description AS comment ' +
 						'FROM (SELECT * ' +
-								'FROM pg_proc P LEFT OUTER JOIN pg_description D ' +
-								  'ON P.oid = D.objoid) T1, ' +
-							  'pg_namespace N, pg_user U, pg_language L, pg_type T ' +
+								'FROM pg_proc P ' + 
+								 'LEFT OUTER JOIN pg_description D ON P.oid = D.objoid) T1, ' +
+	    							 'pg_namespace N, pg_user U, pg_language L, pg_type T ' +
 					   'WHERE T1.pronamespace = N.oid ' +
   						 'AND T1.proowner = U.usesysid ' +
   						 'AND T1.prolang = L.oid ' +
@@ -197,10 +211,15 @@ function getSchemaDetail(dbURL, socket, schemaName, username) {
 		
 		schema = result.rows[0].schema;
 //TO-DO 쿼리 검증 필요
-		queryString = 'SELECT T1.tablename AS tablename, T1.tableowner AS tableowner, T1.tablespace AS tablespace, T2.rowcounts AS rowcounts, T2.description AS comment ' +
-						'FROM pg_tables T1, (SELECT C.relname AS tablename, C.reltuples AS rowcounts, D.description AS description ' +
-                   							  'FROM pg_class C LEFT OUTER JOIN pg_description D ' +
-                   								'ON (C.oid = D.objoid AND D.objsubid = 0) ' +
+		queryString = 'SELECT T1.tablename AS tablename, ' +
+							 'T1.tableowner AS tableowner, ' + 
+							 'T1.tablespace AS tablespace, ' + 
+							 'T2.rowcounts AS rowcounts, ' + 
+							 'T2.description AS comment ' +
+						'FROM pg_tables T1, (SELECT C.relname AS tablename, ' + 
+												   'C.reltuples AS rowcounts, ' + 
+												   'D.description AS description ' +
+                   							  'FROM pg_class C LEFT OUTER JOIN pg_description D ON (C.oid = D.objoid AND D.objsubid = 0) ' +
                    							 'WHERE C.relkind = \'r\' ' +
                    							   'AND C.relnamespace = \'' + schema + '\' ' +
                    							   'AND C.relname NOT LIKE \'pg_%\' ' +
@@ -234,8 +253,8 @@ function getTableDetail(dbURL, socket, schemaName, tableName) {
 	   	        					  'WHERE C.attnum = A.attnum) AS pk, ' +
 	   						 'A.attnotnull AS notnull, ' +
 	   						 'AD.adsrc AS defaultvalue ' +
-						'FROM pg_attribute A LEFT OUTER JOIN pg_attrdef AD ' +
-						  'ON A.attnum = AD.adnum ' +
+						'FROM pg_attribute A ' + 
+						 'LEFT OUTER JOIN pg_attrdef AD ON A.attnum = AD.adnum ' +
 					   'WHERE A.attrelid = (SELECT C.oid AS tableid ' +
 	                  						 'FROM pg_class C, pg_namespace N ' +
 	                 						'WHERE C.relnamespace = N.oid ' +
@@ -322,8 +341,31 @@ function getTableDetailConstraints(dbURL, socket, schemaName, tableName) {
 	});
 }
 
-function getViewDetail(socket, data) {
+function getViewDetail(dbURL, socket, schemaName, viewName) {
+	var queryString = 'SELECT A.attname AS columnname, ' +
+	 						 'pg_catalog.format_type(A.atttypid, A.atttypmod) AS type, ' +
+	 						 'A.attlen AS length ' +
+						'FROM pg_attribute A ' +
+						 'LEFT OUTER JOIN pg_attrdef AD ON A.attnum = AD.adnum ' +
+					   'WHERE A.attrelid = (SELECT C.oid AS viewid ' +
+											 'FROM pg_class C, pg_namespace N ' +
+											'WHERE C.relnamespace = N.oid ' +
+					 						  'AND C.relname = \'' + viewName + '\' ' +
+					 						  'AND N.nspname = \'' + schemaName + '\') ' +
+						 'AND A.attnum > 0 ' +
+						 'AND NOT A.attisdropped ' +
+					'ORDER BY A.attnum';
+	eq.executeQuery(dbURL, queryString, function (err, result) {
+		if(err) {
+			stderr(err);
+			return;
+		}
 
+		var jTvactionData = JSON.stringify(result.rows);
+
+		socket.emit('tvaction_res', jTvactionData);
+
+	});
 }
 
 function getFuncDetail(socket, data) {

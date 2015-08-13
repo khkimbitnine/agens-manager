@@ -105,12 +105,13 @@ function getDBTreeView (socket, connDB) {
 						break;
 					case 'TABLE' :
 						$('.current_selected_schema').text($(this).treeview('getParent', $(this).treeview('getParent', node)).text);
-						$('.current_selected_table').text(node.text);
-						getTableDetail(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_table').text());
+						$('.current_selected_relation').text(node.text);
+						getTableDetail(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_relation').text());
 						break;
 					case 'VIEW' :
 						$('.current_selected_schema').text($(this).treeview('getParent', $(this).treeview('getParent', node)).text);
-						getViewDetail(socket, connInfo, $('.current_selected_schema').text());
+						$('.current_selected_relation').text(node.text);
+						getViewDetail(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_relation').text());
 						break;
 					case 'FUNCTION' :
 						$('.current_selected_schema').text($(this).treeview('getParent', $(this).treeview('getParent', node)).text);
@@ -661,12 +662,45 @@ function getTableDetailData(socket, connInfo, schemaName) {
 	$('.main').append(tblFormat);
 }
 
-function getViewDetail(socket, connInfo, schemaName) {
+function getTableDetailDefinition(socket, connInfo, schemaName) {
+	$('.main').empty();
+
+	var navTableDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Columns</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Indexes</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Constraints</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Data</a></li>' +
+								'</ul>';
+	$('.main').append(navTableDetailFormat);
+
+	var tblFormat = '<table class="table table-striped table-hover">' +
+						'<thead>' +
+							'<tr>' +
+								'<th>#</th>' +
+								'<th>구</th>' +
+								'<th>현</th>' +
+								'<th>할</th>' +
+								'<th>거</th>' +
+							'</tr>' +
+						'</thead>' +
+						'<tbody>' +
+						'</tbody>' +
+					'</table>';
+	$('.main').append(tblFormat);
+}
+
+var append_getViewDetail_Tag = '<tr>' +
+							   		'<th scope="row">{0}</th>' +
+									'<td>{1}</td>' +
+									'<td>{2}</td>' +
+									'<td>{3}</td>' +
+							   '</tr>';
+
+function getViewDetail(socket, connInfo, schemaName, viewName) {
 	$('.main').empty();
 
 	var navViewDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
   									'<li role="presentation" class="active"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Columns</a></li>' +
-  									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Rules</a></li>' +
   									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Data</a></li>' +
 								'</ul>';
 	$('.main').append(navViewDetailFormat);
@@ -677,24 +711,43 @@ function getViewDetail(socket, connInfo, schemaName) {
 								'<th>#</th>' +
 								'<th>Column Name</th>' +
 								'<th>Type</th>' +
-								'<th>PK</th>' +
-								'<th>NOT NULL</th>' +
-								'<th>Default Value</th>' +
+								'<th>Length</th>' +
 							'</tr>' +
 						'</thead>' +
 						'<tbody>' +
 						'</tbody>' +
 					'</table>';
-	$('.main').append(viewFormat);	
+	$('.main').append(viewFormat);
+
+	var socketData = connInfo;
+
+	socketData.type = 'VD';
+	socketData.schemaName = schemaName;
+	socketData.viewName = viewName;
+	jSocketData = JSON.stringify(socketData);
+
+	socket.emit('tvaction_req', jSocketData);
+	socket.on('tvaction_res', function (data) {
+		var result = JSON.parse(data);
+		$('table > tbody').empty();
+		$.each(result, function (index, obj) {
+			var list_data = Templete.format(append_getViewDetail_Tag,
+				index + 1,
+				obj['columnname'],
+				obj['type'],
+				obj['length']
+				);
+			$('table > tbody').append(list_data);
+		});
+	});
 }
 
-function getViewDetailRules(socket, connInfo, schemaName) {
+function getViewDetailData(socket, connInfo, schemaName) {
 	$('.main').empty();
 
 	var navViewDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
   									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Columns</a></li>' +
-  									'<li role="presentation" class="active"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Rules</a></li>' +
-  									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Data</a></li>' +
+  									'<li role="presentation" class="active"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Data</a></li>' +
 								'</ul>';
 	$('.main').append(navViewDetailFormat);
 
@@ -702,10 +755,10 @@ function getViewDetailRules(socket, connInfo, schemaName) {
 						'<thead>' +
 							'<tr>' +
 								'<th>#</th>' +
-								'<th>Rule Name</th>' +
-								'<th>Type</th>' +
-								'<th>Enabled</th>' +
-								'<th>Instead</th>' +
+								'<th>구</th>' +
+								'<th>현</th>' +
+								'<th>할</th>' +
+								'<th>거</th>' +
 							'</tr>' +
 						'</thead>' +
 						'<tbody>' +
@@ -714,13 +767,12 @@ function getViewDetailRules(socket, connInfo, schemaName) {
 	$('.main').append(viewFormat);
 }
 
-function getViewDetailData(socket, connInfo, schemaName) {
+function getViewDetailDefinition(socket, connInfo, schemaName) {
 	$('.main').empty();
 
 	var navViewDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
   									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Columns</a></li>' +
-  									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Rules</a></li>' +
-  									'<li role="presentation" class="active"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Data</a></li>' +
+  									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Data</a></li>' +
 								'</ul>';
 	$('.main').append(navViewDetailFormat);
 
@@ -774,13 +826,13 @@ function navTableDetailControl(type, socket) {
 
 	switch (type) {
 		case 'Columns':
-			getTableDetail(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_table').text());
+			getTableDetail(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_relation').text());
 			break;
 		case 'Indexes':
-			getTableDetailIndexes(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_table').text());
+			getTableDetailIndexes(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_relation').text());
 			break;
 		case 'Constraints':
-			getTableDetailConstraints(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_table').text());
+			getTableDetailConstraints(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_relation').text());
 			break;
 		case 'Data':
 			getTableDetailData(socket, connInfo, $('.current_selected_schema').text());
@@ -798,10 +850,7 @@ function navViewDetailControl(type, socket) {
 
 	switch (type) {
 		case 'Columns':
-			getViewDetail(socket, connInfo, $('.current_selected_schema').text());
-			break;
-		case 'Rules':
-			getViewDetailRules(socket, connInfo, $('.current_selected_schema').text());
+			getViewDetail(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_relation').text());
 			break;
 		case 'Data':
 			getViewDetailData(socket, connInfo, $('.current_selected_schema').text());
