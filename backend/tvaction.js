@@ -71,7 +71,8 @@ exports.tvaction = function (socket, data) {
 			getViewDetailData(dbURL, socket, schemaName, viewName);
 			break;
 		case 'FD' :
-			getFuncDetail(socket, socketData);
+			var funcName = socketData.funcName;
+			getFuncDetail(dbURL, socket, schemaName, funcName);
 			break;
 		default :
 			console.log("no types for tvaction!");
@@ -406,6 +407,20 @@ function getViewDetailData(dbURL, socket, schemaName, viewName) {
 	});
 }
 
-function getFuncDetail(socket, data) {
+function getFuncDetail(dbURL, socket, schemaName, funcName) {
+	var queryString = 'SELECT prosrc AS sourcecode ' + 
+						'FROM pg_proc ' +
+					   'WHERE proname = \'' + funcName + '\' ' +
+						 'AND pronamespace = (SELECT oid ' +
+						 					   'FROM pg_namespace ' +
+						 					  'WHERE nspname = \'' + schemaName + '\')';
 
+	eq.executeQuery(dbURL, queryString, function (err, result) {
+		if(err) {
+			stderr(err);
+			return;
+		}
+		var jTvactionData = JSON.stringify(result.rows);
+		socket.emit('tvaction_res', jTvactionData);
+	});
 }

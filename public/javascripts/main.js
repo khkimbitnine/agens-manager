@@ -46,7 +46,7 @@ function appendDropdownList (socket) {
 
 	socket.emit('ddload_req', jConnInfo);
 	
-	socket.on('ddload_res', function (data) {
+	socket.once('ddload_res', function (data) {
 		//JSON -> object
 		var result = JSON.parse(data);
 		
@@ -69,7 +69,7 @@ function getDBTreeView (socket) {
 
 	socket.emit('tvload_req', jConnInfo);
 
-	socket.on('tvload_res', function (data) {
+	socket.once('tvload_res', function (data) {
 		var treeViewData = JSON.parse(data);
 		$('.obtreeview').treeview({
 			color: "#428bca",
@@ -115,7 +115,8 @@ function getDBTreeView (socket) {
 						break;
 					case 'FUNCTION' :
 						$('.current_selected_schema').text($(this).treeview('getParent', $(this).treeview('getParent', node)).text);
-						getFuncDetail(socket, connInfo, $('.current_selected_schema').text());
+						$('.current_selected_function').text(node.text);
+						getFuncDetail(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_function').text());
 						break;
 					default :
 						break;
@@ -132,6 +133,15 @@ function getSchemaSummary(socket, connInfo) {
 	//TO-DO 뭘 표시해야 할까 pg_namespace에 별게 없다...
 	$('.main').empty();
 }
+
+var append_getTableSummary_Tag = '<tr>' + 
+									'<th scope="row">{0}</th>' +
+									'<td>{1}</td>' +
+									'<td>{2}</td>' +
+									'<td>{3}</td>' +
+									'<td>{4}</td>' +
+									'<td>{5}</td>' +
+							 	 '</tr>';
 
 function getTableSummary(socket, connInfo, schemaName) {
 	$('.main').empty();
@@ -156,48 +166,6 @@ function getTableSummary(socket, connInfo, schemaName) {
 							'</tr>' +
 						'</thead>' +
 						'<tbody>' +
-						/*
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-						*/
 						'</tbody>' +
 					'</table>';
 	$('.main').append(tblFormat);
@@ -209,11 +177,11 @@ function getTableSummary(socket, connInfo, schemaName) {
 	jSocketData = JSON.stringify(socketData);
 
 	socket.emit('tvaction_req', jSocketData);
-	socket.on('tvaction_res', function (data) {
+	socket.once('tvaction_res', function (data) {
 		var result = JSON.parse(data);
 		$('table > tbody').empty();
 		$.each(result, function (index, obj) {
-			var list_data = Templete.format(append_getSchemaDetail_Tag,
+			var list_data = Templete.format(append_getTableSummary_Tag,
 				index + 1,
 				obj['tablename'],
 				obj['tableowner'],
@@ -265,7 +233,7 @@ function getViewSummary(socket, connInfo, schemaName) {
 	jSocketData = JSON.stringify(socketData);
 
 	socket.emit('tvaction_req', jSocketData);
-	socket.on('tvaction_res', function (data) {
+	socket.once('tvaction_res', function (data) {
 		var result = JSON.parse(data);
 		$('table > tbody').empty();
 		$.each(result, function (index, obj) {
@@ -323,7 +291,7 @@ function getFuncSummary(socket, connInfo, schemaName) {
 	jSocketData = JSON.stringify(socketData);
 
 	socket.emit('tvaction_req', jSocketData);
-	socket.on('tvaction_res', function (data) {
+	socket.once('tvaction_res', function (data) {
 		var result = JSON.parse(data);
 		$('table > tbody').empty();
 		$.each(result, function (index, obj) {
@@ -374,48 +342,6 @@ function getSchemaDetail(socket, connInfo, schemaName) {
 							'</tr>' +
 						'</thead>' +
 						'<tbody>' +
-						/*
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-							'<tr>' +
-								'<th scope="row">1</th>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-								'<td>ttt</td>' +
-							'</tr>' +
-						*/
 						'</tbody>' +
 					'</table>';
 	$('.main').append(tblFormat);
@@ -427,7 +353,7 @@ function getSchemaDetail(socket, connInfo, schemaName) {
 	jSocketData = JSON.stringify(socketData);
 
 	socket.emit('tvaction_req', jSocketData);
-	socket.on('tvaction_res', function (data) {
+	socket.once('tvaction_res', function (data) {
 		var result = JSON.parse(data);
 		$('table > tbody').empty();
 		$.each(result, function (index, obj) {
@@ -489,7 +415,7 @@ function getTableDetail(socket, connInfo, schemaName, tableName) {
 	jSocketData = JSON.stringify(socketData);
 
 	socket.emit('tvaction_req', jSocketData);
-	socket.on('tvaction_res', function (data) {
+	socket.once('tvaction_res', function (data) {
 		var result = JSON.parse(data);
 		$('table > tbody').empty();
 		$.each(result, function (index, obj) {
@@ -551,7 +477,7 @@ function getTableDetailIndexes(socket, connInfo, schemaName, tableName) {
 	jSocketData = JSON.stringify(socketData);
 
 	socket.emit('tvaction_req', jSocketData);
-	socket.on('tvaction_res', function (data) {
+	socket.once('tvaction_res', function (data) {
 		var result = JSON.parse(data);
 		$('table > tbody').empty();
 		$.each(result, function (index, obj) {
@@ -616,7 +542,7 @@ function getTableDetailConstraints(socket, connInfo, schemaName, tableName) {
 	jSocketData = JSON.stringify(socketData);
 
 	socket.emit('tvaction_req', jSocketData);
-	socket.on('tvaction_res', function (data) {
+	socket.once('tvaction_res', function (data) {
 		var result = JSON.parse(data);
 		$('table > tbody').empty();
 		$.each(result, function (index, obj) {
@@ -668,25 +594,30 @@ function getTableDetailData(socket, connInfo, schemaName, tableName) {
 
 	socket.emit('tvaction_req', jSocketData);
 
-	socket.on('tvaction_res', function (data) {
+	socket.once('tvaction_res', function (data) {
 
 		var result = JSON.parse(data);
 
 		$('table > thead > tr').empty();
 
-		$('table > thead > tr').append('<th>#</th>');
+		if(result.length > 0) {
+			
+			$('table > thead > tr').append('<th>#</th>');
 
-		for(var i = 0; i < Object.keys(result[0]).length; i++) {
-			$('table > thead > tr').append('<th>' + Object.keys(result[0])[i] + '</th>');
-		}
+			for(var i = 0; i < Object.keys(result[0]).length; i++) {
+				$('table > thead > tr').append('<th>' + Object.keys(result[0])[i] + '</th>');
+			}
 
-		$('table > tbody').empty();
+			$('table > tbody').empty();
 
-		for(var i = 0; i < result.length; i++) {
-			$('table > tbody').append('<tr><th scope="row">'+ (i+1) + '</th></tr>');
-			$.each(result[i], function(index, value) {
-				$('table > tbody > tr:eq('+ i +')').append('<td>' + value + '</td>');
-			});
+			for(var i = 0; i < result.length; i++) {
+				$('table > tbody').append('<tr><th scope="row">'+ (i+1) + '</th></tr>');
+				$.each(result[i], function(index, value) {
+					$('table > tbody > tr:eq('+ i +')').append('<td>' + value + '</td>');
+				});
+			}
+		} else {
+			$('table > thead > tr').append('<h4>No rows selected</h4>');
 		}
 		
 	});
@@ -729,7 +660,7 @@ function getViewDetail(socket, connInfo, schemaName, viewName) {
 	jSocketData = JSON.stringify(socketData);
 
 	socket.emit('tvaction_req', jSocketData);
-	socket.on('tvaction_res', function (data) {
+	socket.once('tvaction_res', function (data) {
 		var result = JSON.parse(data);
 		$('table > tbody').empty();
 		$.each(result, function (index, obj) {
@@ -775,34 +706,59 @@ function getViewDetailData(socket, connInfo, schemaName, viewName) {
 
 	socket.emit('tvaction_req', jSocketData);
 
-	socket.on('tvaction_res', function (data) {
+	socket.once('tvaction_res', function (data) {
 
 		var result = JSON.parse(data);
 
 		$('table > thead > tr').empty();
 
-		$('table > thead > tr').append('<th>#</th>');
+		if (result.length > 0) {
+			$('table > thead > tr').append('<th>#</th>');
 
-		for(var i = 0; i < Object.keys(result[0]).length; i++) {
-			$('table > thead > tr').append('<th>' + Object.keys(result[0])[i] + '</th>');
-		}
+			for(var i = 0; i < Object.keys(result[0]).length; i++) {
+				$('table > thead > tr').append('<th>' + Object.keys(result[0])[i] + '</th>');
+			}
 
-		$('table > tbody').empty();
+			$('table > tbody').empty();
 
-		for(var i = 0; i < result.length; i++) {
-			$('table > tbody').append('<tr><th scope="row">'+ (i+1) + '</th></tr>');
-			$.each(result[i], function(index, value) {
-				$('table > tbody > tr:eq('+ i +')').append('<td>' + value + '</td>');
-			});
+			for(var i = 0; i < result.length; i++) {
+				$('table > tbody').append('<tr><th scope="row">'+ (i+1) + '</th></tr>');
+				$.each(result[i], function(index, value) {
+					$('table > tbody > tr:eq('+ i +')').append('<td>' + value + '</td>');
+				});
+			}
+		} else {
+			$('table > thead > tr').append('<h4>No rows selected</h4>');
 		}
 		
 	});
 }
 
-function getFuncDetail(socket, connInfo, schemaName) {
+function getFuncDetail(socket, connInfo, schemaName, funcName) {
 	$('.main').empty();
 
-	
+	var navFuncDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
+  									'<li role="presentation"><a href="#" onclick="navFuncDetailControl($(this).text(), socket); return false;">Definition</a></li>' +
+								'</ul>';
+	$('.main').append(navFuncDetailFormat);
+
+	var socketData = connInfo;
+
+	socketData.type = 'FD';
+	socketData.schemaName = schemaName;
+	socketData.funcName = funcName;
+	jSocketData = JSON.stringify(socketData);
+
+	socket.emit('tvaction_req', jSocketData);
+	socket.once('tvaction_res', function (data) {
+		var result = JSON.parse(data);
+		console.log(result);
+		$('.main').append('<h4>' + result[0].sourcecode + '</h4>');
+	});
+}
+
+function getFuncDetailDefinition(socket, connInfo, schemaName, funcName) {
+
 }
 
 function navSummaryControl(type, socket) {
@@ -867,6 +823,22 @@ function navViewDetailControl(type, socket) {
 			break;
 	}
 }
+
+function navFuncDetailControl(type, socket) {
+	//TO-DO 사용자 DB 아이디 보내기, cookie의 uid 값 읽어야함. 정책에 따라 decryption, hex 시켜야 함. 현재는 하드코딩
+	var connDB = $('.sidebar .btn-group .dropdown-menu > li > .active').text();
+	var connInfo = { uid : 'postgres', upw : 'postgres', connHost: 'localhost', connDB : connDB};
+
+	switch (type) {
+		case 'Definition':
+			getFuncDetailDefinition(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_function').text());
+			break;
+		default:
+			console.log("navFuncDetailControl error!");
+			break;
+	}
+}
+
 
 
 

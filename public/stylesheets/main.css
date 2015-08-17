@@ -29,6 +29,9 @@ body {
   display: none;
 }
 
+.current_selected_function {
+  display: none;
+}
 /*
  * Top navigation
  * Hide default border to remove 1px line.
