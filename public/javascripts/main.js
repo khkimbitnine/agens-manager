@@ -649,12 +649,12 @@ function getTableDetailData(socket, connInfo, schemaName, tableName) {
 	var tblFormat = '<table class="table table-striped table-hover">' +
 						'<thead>' +
 							'<tr>' +
-								'<th>#</th>' +
+					/*			'<th>#</th>' +
 								'<th>구</th>' +
 								'<th>현</th>' +
 								'<th>할</th>' +
 								'<th>거</th>' +
-							'</tr>' +
+					*/		'</tr>' +
 						'</thead>' +
 						'<tbody>' +
 						'</tbody>' +
@@ -673,9 +673,24 @@ function getTableDetailData(socket, connInfo, schemaName, tableName) {
 	socket.on('tvaction_res', function (data) {
 
 		var result = JSON.parse(data);
+
+		$('table > thead > tr').empty();
+
+		$('table > thead > tr').append('<th>#</th>');
+
+		for(var i = 0; i < Object.keys(result[0]).length; i++) {
+			$('table > thead > tr').append('<th>' + Object.keys(result[0])[i] + '</th>');
+		}
+
 		$('table > tbody').empty();
-		console.log(result);
-		//console.log(Object.keys(result[0])[0]);
+
+		for(var i = 0; i < result.length; i++) {
+			$('table > tbody').append('<tr><th scope="row">'+ (i+1) + '</th></tr>');
+			$.each(result[i], function(index, value) {
+				$('table > tbody > tr:eq('+ i +')').append('<td>' + value + '</td>');
+			});
+		}
+		
 	});
 }
 
@@ -685,7 +700,6 @@ var append_getViewDetail_Tag = '<tr>' +
 									'<td>{2}</td>' +
 									'<td>{3}</td>' +
 							   '</tr>';
-
 function getViewDetail(socket, connInfo, schemaName, viewName) {
 	$('.main').empty();
 

@@ -354,8 +354,7 @@ function getTableDetailData(dbURL, socket, schemaName, tableName) {
 			return;
 		}
 
-		//var jTvactionData = JSON.stringify(result.rows);
-		var jTvactionData = JSON.stringify(result);
+		var jTvactionData = JSON.stringify(result.rows);
 		socket.emit('tvaction_res', jTvactionData);
 
 	});

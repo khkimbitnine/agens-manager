@@ -17,6 +17,18 @@ body {
   border-bottom: 1px solid #eee;
 }
 
+.current_selected_database {
+  display: none;
+}
+
+.current_selected_schema {
+  display: none;
+}
+
+.current_selected_relation {
+  display: none;
+}
+
 /*
  * Top navigation
  * Hide default border to remove 1px line.
