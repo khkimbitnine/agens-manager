@@ -66,6 +66,10 @@ exports.tvaction = function (socket, data) {
 			var viewName = socketData.viewName;
 			getViewDetail(dbURL, socket, schemaName, viewName);
 			break;
+		case 'VDD' :
+			var viewName = socketData.viewName;
+			getViewDetailData(dbURL, socket, schemaName, viewName);
+			break;
 		case 'FD' :
 			getFuncDetail(socket, socketData);
 			break;
@@ -385,6 +389,20 @@ function getViewDetail(dbURL, socket, schemaName, viewName) {
 
 		socket.emit('tvaction_res', jTvactionData);
 
+	});
+}
+
+function getViewDetailData(dbURL, socket, schemaName, viewName) {
+	var queryString = 'SELECT * FROM ' + schemaName + '.' + viewName;
+
+	eq.executeQuery(dbURL, queryString, function (err, result) {
+		if(err) {
+			stderr(err);
+			return;
+		}
+
+		var jTvactionData = JSON.stringify(result.rows);
+		socket.emit('tvaction_res', jTvactionData);
 	});
 }
 

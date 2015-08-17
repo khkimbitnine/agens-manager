@@ -646,19 +646,17 @@ function getTableDetailData(socket, connInfo, schemaName, tableName) {
 								'</ul>';
 	$('.main').append(navTableDetailFormat);
 
-	var tblFormat = '<table class="table table-striped table-hover">' +
-						'<thead>' +
-							'<tr>' +
-					/*			'<th>#</th>' +
-								'<th>구</th>' +
-								'<th>현</th>' +
-								'<th>할</th>' +
-								'<th>거</th>' +
-					*/		'</tr>' +
-						'</thead>' +
-						'<tbody>' +
-						'</tbody>' +
-					'</table>';
+	var tblFormat = '<div class = table-responsive>' +
+						'<table class="table table-striped table-hover table-condensed">' +
+							'<thead>' +
+								'<tr>' +
+								'</tr>' +
+							'</thead>' +
+							'<tbody>' +
+							'</tbody>' +
+						'</table>' +
+					'</div>';
+
 	$('.main').append(tblFormat);
 
 	var socketData = connInfo;
@@ -746,7 +744,7 @@ function getViewDetail(socket, connInfo, schemaName, viewName) {
 	});
 }
 
-function getViewDetailData(socket, connInfo, schemaName) {
+function getViewDetailData(socket, connInfo, schemaName, viewName) {
 	$('.main').empty();
 
 	var navViewDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
@@ -755,20 +753,50 @@ function getViewDetailData(socket, connInfo, schemaName) {
 								'</ul>';
 	$('.main').append(navViewDetailFormat);
 
-	var viewFormat = '<table class="table table-striped table-hover">' +
-						'<thead>' +
-							'<tr>' +
-								'<th>#</th>' +
-								'<th>구</th>' +
-								'<th>현</th>' +
-								'<th>할</th>' +
-								'<th>거</th>' +
-							'</tr>' +
-						'</thead>' +
-						'<tbody>' +
-						'</tbody>' +
-					'</table>';
+	var viewFormat = '<div class = table-responsive>' +
+						'<table class="table table-striped table-hover table-condensed">' +
+							'<thead>' +
+								'<tr>' +
+								'</tr>' +
+							'</thead>' +
+							'<tbody>' +
+							'</tbody>' +
+						'</table>' +
+					'</div>';
+					
 	$('.main').append(viewFormat);
+
+	var socketData = connInfo;
+
+	socketData.type = 'VDD';
+	socketData.schemaName = schemaName;
+	socketData.viewName = viewName;
+	jSocketData = JSON.stringify(socketData);
+
+	socket.emit('tvaction_req', jSocketData);
+
+	socket.on('tvaction_res', function (data) {
+
+		var result = JSON.parse(data);
+
+		$('table > thead > tr').empty();
+
+		$('table > thead > tr').append('<th>#</th>');
+
+		for(var i = 0; i < Object.keys(result[0]).length; i++) {
+			$('table > thead > tr').append('<th>' + Object.keys(result[0])[i] + '</th>');
+		}
+
+		$('table > tbody').empty();
+
+		for(var i = 0; i < result.length; i++) {
+			$('table > tbody').append('<tr><th scope="row">'+ (i+1) + '</th></tr>');
+			$.each(result[i], function(index, value) {
+				$('table > tbody > tr:eq('+ i +')').append('<td>' + value + '</td>');
+			});
+		}
+		
+	});
 }
 
 function getFuncDetail(socket, connInfo, schemaName) {
@@ -832,7 +860,7 @@ function navViewDetailControl(type, socket) {
 			getViewDetail(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_relation').text());
 			break;
 		case 'Data':
-			getViewDetailData(socket, connInfo, $('.current_selected_schema').text());
+			getViewDetailData(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_relation').text());
 			break;
 		default:
 			console.log("navTableDetailControl error!");
