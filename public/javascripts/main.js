@@ -36,7 +36,7 @@ $(function(){
 });
 
 //로그인한 유저의 DB 목록을 가져오서 Dropdown 메뉴를 구성한다.
-append_dropdown_tag = '<li><a style=\'cursor:pointer\' onclick="getDBTreeView(socket, $(this).text()); $(\'.sidebar .btn-group .dropdown-menu > li > .active\').removeAttr(\'class\'); $(this).addClass(\'active\');">{0}</a></li>';
+append_dropdown_tag = '<li><a style=\'cursor:pointer\' onclick="$(\'.current_selected_database\').text($(this).text()); getDBTreeView(socket); $(\'.sidebar .btn-group .dropdown-menu > li > .active\').removeAttr(\'class\'); $(this).addClass(\'active\');">{0}</a></li>';
 function appendDropdownList (socket) {
 
 	//TO-DO 사용자 DB 아이디 보내기, cookie의 uid 값 읽어야함. 정책에 따라 decryption, hex 시켜야 함. 현재는 하드코딩
@@ -60,10 +60,10 @@ function appendDropdownList (socket) {
 	});
 }
 
-function getDBTreeView (socket, connDB) {
+function getDBTreeView (socket) {
 	$('.main').empty();
 	//TO-DO 사용자 DB 아이디 보내기, cookie의 uid 값 읽어야함. 정책에 따라 decryption, hex 시켜야 함. 현재는 하드코딩
-	var connInfo = { uid : 'postgres', upw : 'postgres', connHost: 'localhost', connDB : connDB};
+	var connInfo = { uid : 'postgres', upw : 'postgres', connHost: 'localhost', connDB : $('.current_selected_database').text()};
 	//object -> JSON
 	var jConnInfo = JSON.stringify(connInfo);
 
@@ -635,7 +635,7 @@ function getTableDetailConstraints(socket, connInfo, schemaName, tableName) {
 	});
 }
 
-function getTableDetailData(socket, connInfo, schemaName) {
+function getTableDetailData(socket, connInfo, schemaName, tableName) {
 	$('.main').empty();
 
 	var navTableDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
@@ -660,33 +660,23 @@ function getTableDetailData(socket, connInfo, schemaName) {
 						'</tbody>' +
 					'</table>';
 	$('.main').append(tblFormat);
-}
 
-function getTableDetailDefinition(socket, connInfo, schemaName) {
-	$('.main').empty();
+	var socketData = connInfo;
 
-	var navTableDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
-  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Columns</a></li>' +
-  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Indexes</a></li>' +
-  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Constraints</a></li>' +
-  									'<li role="presentation"><a href="#" onclick="navTableDetailControl($(this).text(), socket); return false;">Data</a></li>' +
-								'</ul>';
-	$('.main').append(navTableDetailFormat);
+	socketData.type = 'TDD';
+	socketData.schemaName = schemaName;
+	socketData.tableName = tableName;
+	jSocketData = JSON.stringify(socketData);
 
-	var tblFormat = '<table class="table table-striped table-hover">' +
-						'<thead>' +
-							'<tr>' +
-								'<th>#</th>' +
-								'<th>구</th>' +
-								'<th>현</th>' +
-								'<th>할</th>' +
-								'<th>거</th>' +
-							'</tr>' +
-						'</thead>' +
-						'<tbody>' +
-						'</tbody>' +
-					'</table>';
-	$('.main').append(tblFormat);
+	socket.emit('tvaction_req', jSocketData);
+
+	socket.on('tvaction_res', function (data) {
+
+		var result = JSON.parse(data);
+		$('table > tbody').empty();
+		console.log(result);
+		//console.log(Object.keys(result[0])[0]);
+	});
 }
 
 var append_getViewDetail_Tag = '<tr>' +
@@ -767,31 +757,6 @@ function getViewDetailData(socket, connInfo, schemaName) {
 	$('.main').append(viewFormat);
 }
 
-function getViewDetailDefinition(socket, connInfo, schemaName) {
-	$('.main').empty();
-
-	var navViewDetailFormat = '<ul id = "summaryNav" class="nav nav-tabs">' +
-  									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Columns</a></li>' +
-  									'<li role="presentation"><a href="#" onclick="navViewDetailControl($(this).text(), socket); return false;">Data</a></li>' +
-								'</ul>';
-	$('.main').append(navViewDetailFormat);
-
-	var viewFormat = '<table class="table table-striped table-hover">' +
-						'<thead>' +
-							'<tr>' +
-								'<th>#</th>' +
-								'<th>구</th>' +
-								'<th>현</th>' +
-								'<th>할</th>' +
-								'<th>거</th>' +
-							'</tr>' +
-						'</thead>' +
-						'<tbody>' +
-						'</tbody>' +
-					'</table>';
-	$('.main').append(viewFormat);
-}
-
 function getFuncDetail(socket, connInfo, schemaName) {
 	$('.main').empty();
 
@@ -835,7 +800,7 @@ function navTableDetailControl(type, socket) {
 			getTableDetailConstraints(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_relation').text());
 			break;
 		case 'Data':
-			getTableDetailData(socket, connInfo, $('.current_selected_schema').text());
+			getTableDetailData(socket, connInfo, $('.current_selected_schema').text(), $('.current_selected_relation').text());
 			break;
 		default:
 			console.log("navTableDetailControl error!");

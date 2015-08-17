@@ -58,6 +58,10 @@ exports.tvaction = function (socket, data) {
 			var tableName = socketData.tableName;
 			getTableDetailConstraints(dbURL, socket, schemaName, tableName);
 			break;
+		case 'TDD' :
+			var tableName = socketData.tableName;
+			getTableDetailData(dbURL, socket, schemaName, tableName);
+			break;
 		case 'VD' :
 			var viewName = socketData.viewName;
 			getViewDetail(dbURL, socket, schemaName, viewName);
@@ -340,6 +344,23 @@ function getTableDetailConstraints(dbURL, socket, schemaName, tableName) {
 
 	});
 }
+
+function getTableDetailData(dbURL, socket, schemaName, tableName) {
+	var queryString = 'SELECT * FROM ' + schemaName + '.' + tableName;
+
+	eq.executeQuery(dbURL, queryString, function (err, result) {
+		if(err) {
+			stderr(err);
+			return;
+		}
+
+		//var jTvactionData = JSON.stringify(result.rows);
+		var jTvactionData = JSON.stringify(result);
+		socket.emit('tvaction_res', jTvactionData);
+
+	});
+}
+
 
 function getViewDetail(dbURL, socket, schemaName, viewName) {
 	var queryString = 'SELECT A.attname AS columnname, ' +
