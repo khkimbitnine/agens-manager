@@ -86,21 +86,7 @@ function getSchemaSummary(socket, data) {
 }
 
 function getTableSummary(dbURL, socket, schemaName, username) {
-	//getSchemaDetail과 로직 동일
-
-	var queryString = 'SELECT oid AS schema ' + 
-					    'FROM pg_namespace ' +
-					   'WHERE nspname = \'' + schemaName + '\'';
-	var schema;
-	eq.executeQuery(dbURL, queryString, function (err, result) {
-		if (err) {
-			stderr(err);
-			return;
-		}
-		
-		schema = result.rows[0].schema;
-//TO-DO 쿼리 검증 필요
-		queryString = 'SELECT T1.tablename AS tablename, ' +
+	var queryString = 'SELECT T1.tablename AS tablename, ' +
 							 'T1.tableowner AS tableowner, ' +
 							 'T1.tablespace AS tablespace, ' +
 							 'T2.rowcounts AS rowcounts, ' +
@@ -111,66 +97,50 @@ function getTableSummary(dbURL, socket, schemaName, username) {
                    							  'FROM pg_class C ' +
                    							   'LEFT OUTER JOIN pg_description D ON (C.oid = D.objoid AND D.objsubid = 0) ' +
                    							 'WHERE C.relkind = \'r\' ' +
-                   							   'AND C.relnamespace = \'' + schema + '\' ' +
+                   							   'AND C.relnamespace =  (SELECT oid AS schemaoid ' +
+                   							   							'FROM pg_namespace ' +
+                   							   						   'WHERE nspname = \'' + schemaName + '\')' +
                    							   'AND C.relname NOT LIKE \'pg_%\' ' +
                    							   'AND C.relname NOT LIKE \'sql_%\') T2 ' +
 					   'WHERE T1.tablename = T2.tablename ' +
 						 'AND T1.tableowner = \'' + username + '\' ' +
 						 'AND T1.schemaname = \'' + schemaName + '\'';
 
-		eq.executeQuery(dbURL, queryString, function (err, result) {
-			if (err) {
-				stderr(err);
-				return;
-			}
-
-			var jTvactionData = JSON.stringify(result.rows);
-			
-			socket.emit('tvaction_res', jTvactionData);
-		
-		});
-	});
-}
-
-function getViewSummary(dbURL, socket, schemaName, username) {
-	var queryString = 'SELECT oid AS schema ' +
-						'FROM pg_namespace ' +
-					   'WHERE nspname = \'' + schemaName + '\'';
-	var schema;
 	eq.executeQuery(dbURL, queryString, function (err, result) {
-		if(err) {
+		if (err) {
 			stderr(err);
 			return;
 		}
 
-		schema = result.rows[0].schema;
+		var jTvactionData = JSON.stringify(result.rows);
 
-		queryString = 'SELECT T1.viewname AS viewname, ' +
+		socket.emit('tvaction_res', jTvactionData);
+	});
+}
+
+function getViewSummary(dbURL, socket, schemaName, username) {
+	var queryString = 'SELECT T1.viewname AS viewname, ' +
 							 'T1.viewowner AS viewowner, ' + 
 							 'T2.description AS comment ' +
 						'FROM pg_views T1, (SELECT C.relname AS viewname, ' +
 												  'D.description AS description ' +
 					 						 'FROM pg_class C ' + 
 					 						  'LEFT OUTER JOIN pg_description D ON C.oid = D.objoid AND D.objsubid = 0 ' +
-											'WHERE C.relnamespace = \'' + schema + '\' ' +
+											'WHERE C.relnamespace =  (SELECT oid AS schemaoid ' +
+		                 							   				   'FROM pg_namespace ' +
+		                 							   				  'WHERE nspname = \'' + schemaName + '\')' +
 					  						  'AND C.relkind IN (\'v\', \'m\')) T2 ' +
 					   'WHERE T1.viewname = T2.viewname ' +
-  						 'AND T1.viewowner = \'' + username +'\'' +
-  						 'AND T1.schemaname = \'' + schemaName + '\'';
-  		eq.executeQuery(dbURL, queryString, function (err, result) {
-  			if (err) {
-  				stderr(err);
-  				return;
-  			}
-
-  			var jTvactionData = JSON.stringify(result.rows);
-
-  			socket.emit('tvaction_res', jTvactionData);
-
-  		});
-
-	});
-
+		  				 'AND T1.viewowner = \'' + username +'\'' +
+		  				 'AND T1.schemaname = \'' + schemaName + '\'';
+  	eq.executeQuery(dbURL, queryString, function (err, result) {
+  		if (err) {
+  			stderr(err);
+  			return;
+  		}
+  		var jTvactionData = JSON.stringify(result.rows);
+  		socket.emit('tvaction_res', jTvactionData);
+  	});
 }
 
 function getFuncSummary(dbURL, socket, schemaName, username) {
@@ -206,48 +176,35 @@ function getFuncSummary(dbURL, socket, schemaName, username) {
 }
 
 function getSchemaDetail(dbURL, socket, schemaName, username) {
-	//TO-DO getTableSummary와 로직 동일. 추후 무언가 추가하기 위해 일단 함수 분리함
-
-	var queryString = 'SELECT oid AS schema ' + 
-					    'FROM pg_namespace ' +
-					   'WHERE nspname = \'' + schemaName + '\'';
-	var schema;
-	eq.executeQuery(dbURL, queryString, function (err, result) {
-		if (err) {
-			stderr(err);
-			return;
-		}
-		
-		schema = result.rows[0].schema;
-//TO-DO 쿼리 검증 필요
-		queryString = 'SELECT T1.tablename AS tablename, ' +
-							 'T1.tableowner AS tableowner, ' + 
-							 'T1.tablespace AS tablespace, ' + 
-							 'T2.rowcounts AS rowcounts, ' + 
+	var queryString = 'SELECT T1.tablename AS tablename, ' +
+							 'T1.tableowner AS tableowner, ' +
+							 'T1.tablespace AS tablespace, ' +
+							 'T2.rowcounts AS rowcounts, ' +
 							 'T2.description AS comment ' +
 						'FROM pg_tables T1, (SELECT C.relname AS tablename, ' + 
-												   'C.reltuples AS rowcounts, ' + 
+												   'C.reltuples AS rowcounts, ' +
 												   'D.description AS description ' +
-                   							  'FROM pg_class C LEFT OUTER JOIN pg_description D ON (C.oid = D.objoid AND D.objsubid = 0) ' +
+                   							  'FROM pg_class C ' +
+                   							   'LEFT OUTER JOIN pg_description D ON (C.oid = D.objoid AND D.objsubid = 0) ' +
                    							 'WHERE C.relkind = \'r\' ' +
-                   							   'AND C.relnamespace = \'' + schema + '\' ' +
+                   							   'AND C.relnamespace =  (SELECT oid AS schemaoid ' +
+                   							   							'FROM pg_namespace ' +
+                   							   						   'WHERE nspname = \'' + schemaName + '\')' +
                    							   'AND C.relname NOT LIKE \'pg_%\' ' +
                    							   'AND C.relname NOT LIKE \'sql_%\') T2 ' +
 					   'WHERE T1.tablename = T2.tablename ' +
 						 'AND T1.tableowner = \'' + username + '\' ' +
 						 'AND T1.schemaname = \'' + schemaName + '\'';
 
-		eq.executeQuery(dbURL, queryString, function (err, result) {
-			if (err) {
-				stderr(err);
-				return;
-			}
+	eq.executeQuery(dbURL, queryString, function (err, result) {
+		if (err) {
+			stderr(err);
+			return;
+		}
 
-			var jTvactionData = JSON.stringify(result.rows);
-			
-			socket.emit('tvaction_res', jTvactionData);
-		
-		});
+		var jTvactionData = JSON.stringify(result.rows);
+
+		socket.emit('tvaction_res', jTvactionData);
 	});
 }
 
