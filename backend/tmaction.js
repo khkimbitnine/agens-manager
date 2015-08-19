@@ -31,21 +31,22 @@ exports.tmaction = function (socket, data) {
 	var dbURL = util.format("postgres://%s:%s@%s/%s", username, password, hostname, dbname);
 
 	switch (socketData.type) {
-		case 'TS' :
-			getTableSummary(dbURL, socket, schemaName, username);
+		case 'TB' :
+			getSchemaSummary(dbURL, socket, schemaName, username);
 			break;
 		default :
-			console.log("no types for tvaction!");
+			console.log("no types for tmaction!");
 			break;
 	}
 
 }
 
-function getTableSummary(dbURL, socket, schemaName, username) {
-	//getSchemaDetail과 로직 동일
+function getSchemaSummary(dbURL, socket, schemaName, username) {
 
-	var queryString = '';
-	var schema;
+	var queryString = 'SELECT nspname AS schema ' +
+    					'FROM pg_namespace ' +
+    				   'WHERE nspname NOT LIKE \'pg_%\' '  +
+    				     'AND nspname <> \'information_schema\';';
 
 	eq.executeQuery(dbURL, queryString, function (err, result) {
 		if (err) {
@@ -53,11 +54,8 @@ function getTableSummary(dbURL, socket, schemaName, username) {
 			return;
 		}
 		
-		schema = result.rows[0].schema;
-		
-		//TO-DO 쿼리 작성 필요
-		queryString = '';
-		console.log(queryString);
+		//schema = result.rows[0].schema;
+
 		eq.executeQuery(dbURL, queryString, function (err, result) {
 			if (err) {
 				stderr(err);
@@ -71,4 +69,7 @@ function getTableSummary(dbURL, socket, schemaName, username) {
 		});
 	});
 }
+
+
+
 

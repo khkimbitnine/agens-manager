@@ -119,7 +119,105 @@ body {
 }
 
 
+/*
+  click pointer
+*/
+.clck {
+    border: 0;
+    cursor: pointer;
+}
+.subclck {
+    cursor: pointer;
+}
+/*
+  toolmenu subMenu image
+*/
+.menuNm {
+  margin-left: 20px;
+}
 
+#tbImg {
+  background-image: url(/images/table.png);
+  background-repeat: no-repeat;
+  height: 18px;
+}
 
+#tbImg.on{
+  background-image: url(/images/tablename.png);
+  background-repeat: no-repeat;
+  height: 18px;
+  font-weight: bold;
+}
 
+#scImg {
+  background-image: url(/images/schema.png);
+  background-repeat: no-repeat;
+  height: 18px;
+}
 
+#scImg.on{
+  background-image: url(/images/schemaname.png);
+  background-repeat: no-repeat;
+  height: 18px;
+  font-weight: bold;
+}
+
+#idImg {
+  background-image: url(/images/index.png);
+  background-repeat: no-repeat;
+  height: 18px;
+}
+
+#idImg.on{
+  background-image: url(/images/indexname.png);
+  background-repeat: no-repeat;
+  height: 18px;
+  font-weight: bold;
+}
+
+#vwImg {
+  background-image: url(/images/view.png);
+  background-repeat: no-repeat;
+  height: 18px;
+}
+
+#vwImg.on{
+  background-image: url(/images/viewname.png);
+  background-repeat: no-repeat;
+  height: 18px;
+  font-weight: bold;
+}
+
+#ftImg {
+  background-image: url(/images/function.png);
+  background-repeat: no-repeat;
+  height: 18px;
+}
+
+#ftImg.on{
+  background-image: url(/images/functionname.png);
+  background-repeat: no-repeat;
+  height: 18px;
+  font-weight: bold;
+}
+
+#tgImg {
+  background-image: url(/images/trigger.png);
+  background-repeat: no-repeat;
+  height: 18px;
+}
+
+#tgImg.on{
+  background-image: url(/images/triggername.png);
+  background-repeat: no-repeat;
+  height: 18px;
+  font-weight: bold;
+} 
+
+select {
+  height:30px;
+}
+
+textarea.sizeX {
+  resize: none;
+}

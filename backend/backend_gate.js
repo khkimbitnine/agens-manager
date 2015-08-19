@@ -19,6 +19,7 @@ var signinJS = require('./signin');
 var ddloadJS = require('./ddload');
 var tvloadJS = require('./tvload');
 var tvactionJS = require('./tvaction');
+var tmactionJS = require('./tmaction');
 
 exports.backend_events = function(socket) {
 	// index.js에서 signin 요청시 처리
@@ -39,5 +40,10 @@ exports.backend_events = function(socket) {
 	// Tree View에서 SCHEMA를 클릭하였을시 처리
 	socket.on('tvaction_req', function (data) {
 		tvactionJS.tvaction(socket, data);
+	});
+
+	// toolmenu View에서 CREATE를 클릭하였을시 처리
+	socket.on('tmaction_req', function (data) {
+		tmactionJS.tmaction(socket, data);
 	});
 }

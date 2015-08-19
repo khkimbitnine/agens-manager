@@ -20,7 +20,7 @@
 // cookie write 필요
 // Server side에서 SQL injection 고려(black listing, white listing 예외처리)
 $(function(){
-	var socket = io.connect("http://10.211.55.14:3000");
+	var socket = io.connect("http://192.168.188.128:3000");
 
 	$("#signin_btn").click(function(){
 		var id = $("#inputID").val();
