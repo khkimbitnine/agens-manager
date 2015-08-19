@@ -19,6 +19,7 @@ var pg = require('pg');
 var util = require('util');
 var eq = require('./executeQuery');
 
+// tvaction 모듈 선언. 클라이언트로부터 오는 Tree View action 에 따라 호출할 함수를 바인딩한다.
 exports.tvaction = function (socket, data) {
 
 	var socketData = JSON.parse(data);
@@ -85,6 +86,7 @@ function getSchemaSummary(socket, data) {
 
 }
 
+// 트리뷰에서 TABLE 클릭시 요약 정보를 보여준다.
 function getTableSummary(dbURL, socket, schemaName, username) {
 	var queryString = 'SELECT T1.tablename AS tablename, ' +
 							 'T1.tableowner AS tableowner, ' +
@@ -118,6 +120,7 @@ function getTableSummary(dbURL, socket, schemaName, username) {
 	});
 }
 
+// 트리뷰에서 VIEW를 클릭시 요약정보를 보여준다.
 function getViewSummary(dbURL, socket, schemaName, username) {
 	var queryString = 'SELECT T1.viewname AS viewname, ' +
 							 'T1.viewowner AS viewowner, ' + 
@@ -143,6 +146,7 @@ function getViewSummary(dbURL, socket, schemaName, username) {
   	});
 }
 
+// 트리뷰에서 FUNCTION을 클릭시 요약정보를 보여준다.
 function getFuncSummary(dbURL, socket, schemaName, username) {
 	//TO-DO 쿼리 검증 필요
 	var queryString = 'SELECT T1.proname AS functionname, ' +
@@ -175,6 +179,7 @@ function getFuncSummary(dbURL, socket, schemaName, username) {
 
 }
 
+// 트리뷰에서 스키마를 클릭시 상세정보를 보여준다.
 function getSchemaDetail(dbURL, socket, schemaName, username) {
 	var queryString = 'SELECT T1.tablename AS tablename, ' +
 							 'T1.tableowner AS tableowner, ' +
@@ -208,6 +213,7 @@ function getSchemaDetail(dbURL, socket, schemaName, username) {
 	});
 }
 
+// 트리뷰에서 테이블명을 클릭시 상세 정보를 보여준다.
 function getTableDetail(dbURL, socket, schemaName, tableName) {
 	var queryString = 'SELECT A.attname AS columnname, ' +
 	   						 'pg_catalog.format_type(A.atttypid, A.atttypmod) AS type, ' +
@@ -243,6 +249,7 @@ function getTableDetail(dbURL, socket, schemaName, tableName) {
 
 }
 
+// 트리뷰에서 테이블명을 클릭하고 나오는 우측 네이게이션 바에서 인덱스를 클릭시 상세정보를 보여준다.
 function getTableDetailIndexes(dbURL, socket, schemaName, tableName) {
 	var queryString = 'SELECT CI.relname AS indexname, ' +
        						 'AM.amname AS accessmethod, ' +
@@ -275,6 +282,7 @@ function getTableDetailIndexes(dbURL, socket, schemaName, tableName) {
 
 }
 
+// 트리뷰에서 테이블명 클릭시 나오는 우측의 네이게이션 바에서 Constraint 클릭시 상세 정보를 보여준다.
 function getTableDetailConstraints(dbURL, socket, schemaName, tableName) {
 	var queryString = 'SELECT DISTINCT CN.conname AS constraintname, ' +
 									  'CN.contype AS type, ' +
@@ -307,6 +315,7 @@ function getTableDetailConstraints(dbURL, socket, schemaName, tableName) {
 	});
 }
 
+// 트리뷰에서 테이블명 클릭시 나오는 우측의 네이게이션 바에서 Data를 클릭시 상세 정보를 보여준다.
 function getTableDetailData(dbURL, socket, schemaName, tableName) {
 	var queryString = 'SELECT * FROM ' + schemaName + '.' + tableName;
 
@@ -322,7 +331,7 @@ function getTableDetailData(dbURL, socket, schemaName, tableName) {
 	});
 }
 
-
+// 트리뷰에서 뷰명 클릭시 나오는 상세 정보를 보여준다.
 function getViewDetail(dbURL, socket, schemaName, viewName) {
 	var queryString = 'SELECT A.attname AS columnname, ' +
 	 						 'pg_catalog.format_type(A.atttypid, A.atttypmod) AS type, ' +
@@ -350,6 +359,7 @@ function getViewDetail(dbURL, socket, schemaName, viewName) {
 	});
 }
 
+// 트리뷰에서 뷰명 클릭시 나오는 우측의 네이게이션 바에서 Data 클릭시 상세 정보를 보여준다.
 function getViewDetailData(dbURL, socket, schemaName, viewName) {
 	var queryString = 'SELECT * FROM ' + schemaName + '.' + viewName;
 
@@ -364,6 +374,7 @@ function getViewDetailData(dbURL, socket, schemaName, viewName) {
 	});
 }
 
+// 트리뷰에서 함수명 클릭시 상세 정보를 보여준다.
 function getFuncDetail(dbURL, socket, schemaName, funcName) {
 	var queryString = 'SELECT prosrc AS sourcecode ' + 
 						'FROM pg_proc ' +
