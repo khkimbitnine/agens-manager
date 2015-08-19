@@ -16,7 +16,7 @@
 ###############################################################################################*/
 
 var socket = io.connect("http://10.211.55.14:3000");
-
+//testing
 Templete = {}
 Templete.format = function(text) {
 	if (arguments.length <= 1) {
