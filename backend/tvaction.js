@@ -150,7 +150,7 @@ function getFuncSummary(dbURL, socket, schemaName, username) {
 							 'U.usename AS ownername, ' + 
 							 'L.lanname AS language, ' + 
 							 'T1.description AS comment ' +
-						'FROM (SELECT * ' +
+						'FROM (SELECT proname, pronamespace, proowner, prolang, prorettype, description ' +
 								'FROM pg_proc P ' + 
 								 'LEFT OUTER JOIN pg_description D ON P.oid = D.objoid) T1, ' +
 	    							 'pg_namespace N, pg_user U, pg_language L, pg_type T ' +
