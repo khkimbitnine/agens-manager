@@ -752,7 +752,6 @@ function getFuncDetail(socket, connInfo, schemaName, funcName) {
 	socket.emit('tvaction_req', jSocketData);
 	socket.once('tvaction_res', function (data) {
 		var result = JSON.parse(data);
-		console.log(result);
 		$('.main').append('<h4>' + result[0].sourcecode + '</h4>');
 	});
 }
