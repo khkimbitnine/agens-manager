@@ -17,5 +17,10 @@
 
 //TO-DO DB 조회
 exports.signin = function(socket){
+	hashMap.set("1", {uid : 1, token : 'aaaaa'});
+
+	console.log(hashMap.get("1").token);
+
+
 	socket.emit('auth_success', {msg:'welcome'});
 }

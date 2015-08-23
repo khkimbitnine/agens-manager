@@ -10,6 +10,9 @@ var socketIO = require('socket.io');
 var routes = require('./routes/index');
 var backend = require('./backend/backend_gate');
 
+//connection manager import
+var connMgr = require('./backend/connMgr');
+
 var app = express();
 
 // pass Socket.IO Server to "bin/www"
@@ -35,6 +38,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // file mount
 app.use('/', routes);
 app.use('/backend', backend.backend_events);
+
+// connection manager start
+connMgr.connMgr();
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
