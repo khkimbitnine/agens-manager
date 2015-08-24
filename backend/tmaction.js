@@ -29,10 +29,26 @@ exports.tmaction = function (socket, data) {
 	var hostname = socketData.connHost;
 	var dbname = socketData.connDB;
 	var dbURL = util.format("postgres://%s:%s@%s/%s", username, password, hostname, dbname);
-
+	var queryString = null;
 	switch (socketData.type) {
 		case 'TB' :
-			getSchemaSummary(dbURL, socket, schemaName, username);
+
+			queryString ='SELECT nspname AS schema ' +
+    					'FROM pg_namespace ' +
+    				   'WHERE nspname NOT LIKE \'pg_%\' '  +
+    				     'AND nspname <> \'information_schema\';';
+
+			getQuerySel(dbURL, socket, schemaName, username,queryString,'tmaction_tbres');
+			break;
+		case 'TP' :
+
+			queryString ='SELECT typname AS types' +
+						' FROM pg_type ' +
+						' WHERE  typrelid = 0 ' +
+						' AND typbasetype = 0 ' + 
+						' AND  typanalyze = 0 ;' ;
+
+			getQuerySel(dbURL, socket, schemaName, username,queryString,'tmaction_tpres');
 			break;
 		default :
 			console.log("no types for tmaction!");
@@ -41,6 +57,21 @@ exports.tmaction = function (socket, data) {
 
 }
 
+function getQuerySel(dbURL, socket, schemaName, username, queryString, resName){
+
+	eq.executeQuery(dbURL, queryString, function (err, result) {
+			if (err) {
+				stderr(err);
+				return;
+			}
+
+			var jTvactionData = JSON.stringify(result.rows);
+			socket.emit(resName, jTvactionData);
+		
+		});
+
+}
+/*
 function getSchemaSummary(dbURL, socket, schemaName, username) {
 
 	var queryString = 'SELECT nspname AS schema ' +
@@ -48,13 +79,6 @@ function getSchemaSummary(dbURL, socket, schemaName, username) {
     				   'WHERE nspname NOT LIKE \'pg_%\' '  +
     				     'AND nspname <> \'information_schema\';';
 
-	eq.executeQuery(dbURL, queryString, function (err, result) {
-		if (err) {
-			stderr(err);
-			return;
-		}
-		
-		//schema = result.rows[0].schema;
 
 		eq.executeQuery(dbURL, queryString, function (err, result) {
 			if (err) {
@@ -63,13 +87,32 @@ function getSchemaSummary(dbURL, socket, schemaName, username) {
 			}
 
 			var jTvactionData = JSON.stringify(result.rows);
-			
 			socket.emit('tmaction_res', jTvactionData);
 		
 		});
-	});
+
 }
 
 
+function getTypeInfo(dbURL, socket, schemaName, username) {
 
+	var queryString = 'SELECT typname AS types' +
+						' FROM pg_type ' +
+						' WHERE  typrelid = 0 ' +
+						' AND typbasetype = 0 ' + 
+						' AND  typanalyze = 0 ;' ;
+
+		eq.executeQuery(dbURL, queryString, function (err, result) {
+
+		if (err) {
+			stderr(err);
+			return;
+		}
+
+			var jTvactionData = JSON.stringify(result.rows);
+			socket.emit('tmaction_typeres', jTvactionData);
+		});
+
+}
+*/
 

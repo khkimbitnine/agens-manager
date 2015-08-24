@@ -1,0 +1,15 @@
+LOG:  database system was shut down at 2015-08-19 04:59:11 EDT
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  autovacuum launcher started
+LOG:  database system is ready to accept connections
+ERROR:  column "typename" does not exist at character 8
+STATEMENT:  select typename from pg_type;
+LOG:  received smart shutdown request
+LOG:  autovacuum launcher shutting down
+LOG:  shutting down
+LOG:  received SIGHUP, reloading configuration files
+LOG:  database system is shut down
+LOG:  database system was shut down at 2015-08-21 05:06:59 EDT
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  autovacuum launcher started
+LOG:  database system is ready to accept connections
