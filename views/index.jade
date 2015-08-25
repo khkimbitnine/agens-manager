@@ -8,8 +8,12 @@ block content
   .container
     form(class='form-signin')
       h2(class='form-signin-heading')= title
+      label(for='inputHost', class='sr-only') Host
+      input(type='text', id='inputHost' class='form-control', placeholder='Host', required, autofocus)
+      label(for='inputPort', class='sr-only') Port
+      input(type='text', id='inputPort' class='form-control', placeholder='Port', required)
       label(for='inputID', class='sr-only') ID
-      input(type='text', id='inputID' class='form-control', placeholder='ID', required, autofocus)
+      input(type='text', id='inputID' class='form-control', placeholder='ID', required)
       label(for='inputPassword', class='sr-only') PassWord
       input(type='password', id='inputPassword', class='form-control', placeholder='Password' required)
       .checkbox

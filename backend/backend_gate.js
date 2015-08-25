@@ -23,8 +23,8 @@ var tmactionJS = require('./tmaction');
 
 exports.backend_events = function(socket) {
 	// index.js에서 signin 요청시 처리
-	socket.on('signin', function () {
-		signinJS.signin(socket);
+	socket.on('signin', function (data) {
+		signinJS.signin(socket, data);
 	});
 
 	// main.js에서 dropdown_req 요청시 처리
