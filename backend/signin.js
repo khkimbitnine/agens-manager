@@ -15,12 +15,57 @@
 #
 ###############################################################################################*/
 
-//TO-DO DB 조회
-exports.signin = function(socket){
+exports.signin = function(socket, data){
+
+	var token = generateToken(data);
+
+	//hashMap에 token값이 있는지 검사하고 없으면 hashMap에 token을 key로 해서 binding, 있으면 다시한번 generateToken 수행
 	hashMap.set("1", {uid : 1, token : 'aaaaa'});
 
 	console.log(hashMap.get("1").token);
 
 
 	socket.emit('auth_success', {msg:'welcome'});
+}
+
+function generateToken (data) {
+	
+	// 배열에 data binding
+	var tempArr = [];
+	var i = 0;
+	for (var value in data) {
+		tempArr[i] = data[value];
+		i++;
+	}
+	tempArr[i] = new Date().getTime();
+
+	// array shuffle
+	shuffle(tempArr);
+
+	var tempToken = '';
+
+	for(i = 0; i < tempArr.length; i++) {
+		tempToken = tempToken + tempArr[i];
+	}
+
+
+}
+
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex ;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
 }

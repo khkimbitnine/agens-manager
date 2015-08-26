@@ -23,14 +23,20 @@ $(function(){
 	var socket = io.connect("http://10.211.55.14:3000");
 
 	$("#signin_btn").click(function(){
-		var id = $("#inputID").val();
-		var pw = $("#inputPassword").val();
+		var host = $("#inputHost").val();
+		var port = $("#inputPort").val();
+		var uid = $("#inputID").val();
+		var password = $("#inputPassword").val();
 
 		//TO-DO 인증 신청 로직포함해서 보내기
-		socket.emit('signin');
+		socket.emit('signin', {host: host, port: port, uid: uid, password: password});
     });
 	//TO-DO 쿼리스트링으로 GET으로 보내기
     socket.on('auth_success', function (data) {
        	window.location = '/main';
+	});
+
+	socket.on('auth_fail', function (data) {
+		alert("Authentication fail. Please type the correct inputs.");
 	});
 });
