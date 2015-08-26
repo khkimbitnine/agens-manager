@@ -212,7 +212,7 @@ function getTypeInfo(socket){
 function setTableField (obj) {
 
 	//TABLE화면 구성
-	var appendCont = '<form id="frm">'
+	var appendCont = '<form id="frm" name="frm"> '
 	+'<div class="well well-sm row">'
 		+'<label for="schemaNmSel" style="margin-right:10;" class="col-md-2 text-center mgTop6">'
 			+'<h5>SCHEMA NAME</h5>'
@@ -224,7 +224,7 @@ function setTableField (obj) {
 			+'<h5>TABLE NAME</h5>'
 		+'</label>'
 		+'<div class="col-md-3" >'
-			+'<input type="text" class="form-control mgTop6"id="tableTxt" placeholder="table name1">'
+			+'<input type="text" class="form-control mgTop6" id="tableTxt" name="tableTxt" placeholder="table name1">'
 		+'</div>'
 	+'</div>'
 	+'<table id="createTb" class="table table-striped">'
@@ -238,18 +238,18 @@ function setTableField (obj) {
 		+'<th>Default</th>'
 		+'<th>Foreign Key</th>'
 		+'<th>Check</th>'
-		+'<th><a href="#" onclick="plusTr();"><img src="/images/plus.png" class="pdTop6 csPointer"/></a></th>'
+		+'<th><a href="#" onclick="plusTr(this);"><img src="/images/plus.png" class="pdTop6 csPointer"/></a></th>'
 	+'</tr>'
 	+'<tr id="firstTr">'
-		+'<td><input type="text" class="form-control " id="tableTxt" placeholder="table name1"></td>'
-		+'<td><select id="tpSel" class="form-control"></select></td>'
-		+'<td><input type="text" class="form-control " id="tableTxt" placeholder="table name1"></td>'
-		+'<td><input type="checkbox" class="form-control"></td>'
-		+'<td><input type="checkbox" class="form-control"></td>'
-		+'<td><input type="checkbox" class="form-control"></td>'
-		+'<td><input type="text" class="form-control " id="tableTxt" placeholder="table name1"></td>'
-		+'<td><input type="text" class="form-control " id="tableTxt" placeholder="table name1"></td>'
-		+'<td><input type="text" class="form-control " id="tableTxt" placeholder="table name1"></td>'
+		+'<td><input type="text" class="form-control " id="columnTxt" name="columnTxt" placeholder="table name1"></td>'
+		+'<td><select class="form-control" id="tpSel" name="tpSel" ></select></td>'
+		+'<td><input type="text" class="form-control " id="lengthTxt" name="lengthTxt" placeholder="table name1"></td>'
+		+'<td><input type="checkbox" id="nnChk" name="nnChk" class="form-control"></td>'
+		+'<td><input type="checkbox" id="prmChk" name="prmChk" class="form-control"></td>'
+		+'<td><input type="checkbox" id="unChk" name="unChk" class="form-control"></td>'
+		+'<td><input type="text" class="form-control " id="defaultTxt" name="defaultTxt" placeholder="table name1"></td>'
+		+'<td><input type="text" class="form-control " id="fgnTxt" name="fgnTxt" placeholder="table name1"></td>'
+		+'<td><input type="text" class="form-control " id="chkTxt" name="chkTxt" placeholder="table name1"></td>'
 		+'<td></td>'
 	+'</tr>'
 	+'</table>'
@@ -259,22 +259,20 @@ function setTableField (obj) {
 		+'<th>Comment</th>'
 	+'</tr>'
 	+'<tr>'
-		+'<td><textarea class="form-control sizeX" rows="3" placeholder="enter the comment"></textarea></td>'
+		+'<td><textarea id="cmtTar" name="cmtTar" class="form-control sizeX" rows="3" placeholder="enter the comment"></textarea></td>'
 	+'</tr>'
 	+'</table>'
 	+'<div class="center-block">'
-		+'<button type="button" class="btn btn-success" style="margin-right:8px;">CREATE</button>'
-		+'<button type="button" class="btn btn-primary">CANCEL</button>'
+		+'<button type="button" class="btn btn-success mgRgt8" onclick="setCreateTable();">CREATE</button>'
+		+'<button type="button" class="btn btn-primary" onclick="setCancel();">CANCEL</button>'
 	+'</div>'
-	+'</form>'
+	+' </frm>'
 	;
 
 	$('.main').append(appendCont);
 
 	getSchemaInfo(socket);
 	getTypeInfo(socket);
-
-
 }
 
 function setSchemaField(obj){
@@ -314,8 +312,8 @@ function setSchemaField(obj){
 	+'</tr>'
 	+'</table>'
 	+'<div class="center-block">'
-		+'<button type="button" class="btn btn-success" style="margin-right:8px;">CREATE</button>'
-		+'<button type="button" class="btn btn-primary">CANCEL</button>'
+		+'<button type="button" class="btn btn-success mgRgt8" onclick="setCreateTable();">CREATE</button>'
+		+'<button type="button" class="btn btn-primary" onclick="setCancel();">CANCEL</button>'
 	+'</div>'
 	+'</form>'
 	;
@@ -327,7 +325,7 @@ function setSchemaField(obj){
 function setIndexField(obj){
 
 	//INDEX화면 구성
-	var appendCont = '<form id="form">'
+	var appendCont = '<form id="frm">'
 	+'<div class="well well-sm row">'
 		+'<label for="indexTxt" style="margin-right:10;" class="col-md-2 text-center mgTop6">'
 			+'<h5>INDEX NAME</h5>'
@@ -347,13 +345,13 @@ function setIndexField(obj){
 			+'<h5>Unique</h5>'
 		+'</label>'
 		+'<div class="col-md-1">'
-			+'<input id="uniqueCk" type="checkbox" class="form-control"/>'
+			+'<input id="uniqueCk" type="checkbox" class="chkBox"/>'
 		+'</div>'
 		+'<label for="ccrCk" class="col-md-1 text-center">'
 			+'<h5>Concurrency</h5>'
 		+'</label>'
 		+'<div class="col-md-1">'
-			+'<input id="ccrCk" type="checkbox" class="form-control"/>'
+			+'<input id="ccrCk" type="checkbox" class="chkBox"/>'
 		+'</div>'
 	+'</div>'
 	
@@ -383,14 +381,17 @@ function setIndexField(obj){
 		+'</div>'
 		+'<div class="col-md-1 text-center" style="width:10%">'
 				+'<label for="descCk" style="margin-top:10px;" class="text-center">'
-						+'DESC<input id="descCk" type="checkbox" style="margin-top:10px;display:inline;margin-left:5px;"/>'
+						+'DESC'	
 				+'</label>'
+					+'<input id="descCk" type="checkbox" class="chkBox" style="float:right;" />'
 				+'<p/><label for="firstCk" style="margin-top:5px;" class="text-center">'
-					+'FIRST<input id="firstCk" type="checkbox" style="margin-top:10px;display:inline;margin-left:5px;"/>'
+					+'FIRST'
 				+'</label>'
+					+'<input id="firstCk" type="checkbox" class="chkBox" style="float:right;" />'
 				+'<p/><label for="lastCk" style="margin-top:5px;" class="text-center">'
-					+'LAST<input id="lastCk" type="checkbox" style="margin-top:10px;display:inline;margin-left:5px;"/>'
+					+'LAST'
 				+'</label>'
+					+'<input id="lastCk" type="checkbox" class="chkBox" style="float:right;"/>'
 
 		+'</div>'
 		/*+'<div class="col-md-1">'
@@ -416,8 +417,8 @@ function setIndexField(obj){
 	+'</div>'
 
 	+'<div class="center-block">'
-		+'<button type="button" class="btn btn-success" style="margin-right:8px;">CREATE</button>'
-		+'<button type="button" class="btn btn-primary">CANCEL</button>'
+		+'<button type="button" class="btn btn-success mgRgt8" onclick="setCreateTable();">CREATE</button>'
+		+'<button type="button" class="btn btn-primary" onclick="setCancel();">CANCEL</button>'
 	+'</div>'
 	+'</form>'
 	;
@@ -469,8 +470,8 @@ function setViewField(obj){
 	+'</div>'
 
 	+'<div class="center-block">'
-		+'<button type="button" class="btn btn-success" style="margin-right:8px;">CREATE</button>'
-		+'<button type="button" class="btn btn-primary">CANCEL</button>'
+		+'<button type="button" class="btn btn-success mgRgt8" onclick="setCreateTable();">CREATE</button>'
+		+'<button type="button" class="btn btn-primary" onclick="setCancel();">CANCEL</button>'
 	+'</div>'
 	+'</form>'
 	;
@@ -489,21 +490,21 @@ function setFunctionField(obj){
 				+'<h5>SQL/PLSQL</h5>'
 			+'</label>'
 			+'<div class="col-md-1" style="width:3%;margin-top:8px;">'
-				+'<input type="radio" id="sqlpsRd" name="prLangRd" value="SQL/PLSQL"/>'
+				+'<input type="radio" id="sqlpsRd" name="prLangRd" value="SQL/PLSQL" class="rdoBox"/>'
 			+'</div>'
 
 			+'<label for="intnRd"  class="col-md-1 text-center">'
 				+'<h5>INTERNAL</h5>'
 			+'</label>'
 			+'<div class="col-md-1" style="width:3%;margin-top:8px;">'
-				+'<input type="radio" id="intnRd" name="prLangRd" value="INTERNAL"/>'
+				+'<input type="radio" id="intnRd" name="prLangRd" value="INTERNAL" class="rdoBox"/>'
 			+'</div>'
 
 			+'<label for="cRd"  class="col-md-1 text-center">'
 				+'<h5>C</h5>'
 			+'</label>'
 			+'<div class="col-md-1" style="width:3%;margin-top:8px;">'
-				+'<input type="radio" id="cRd" name="prLangRd" value="C"/>'
+				+'<input type="radio" id="cRd" name="prLangRd" value="C" class="rdoBox"/>'
 			+'</div>'
 		+'</div>'
 		+'<div class="row">'
@@ -517,10 +518,10 @@ function setFunctionField(obj){
 				+'<h5>RETURNS:</h5>'
 			+'</label>'
 			+'<div class="col-md-4 mgTop6" style="margin-right:10;;width:28%">'
-				+'<h6 style="display:inline;margin-right:5px;">Set of<input type="checkbox" style="display:inline;margin-left:5px"></h6>'
+				+'<h6 style="display:inline;margin-right:5px;">Set of<input type="checkbox" class="chkBox" style="display:inline;margin-left:5px"></h6>'
 				+'<select id="returnSel" class="form-control" style="display:inline;width:40%;"><option></option></select>'
 				+'<select id="returnSel" class="form-control" style="display:inline;width:20%;margin-right:5px"><option></option></select>'
-				+'<h6 style="display:inline;margin-right:5px;">Array<input type="checkbox" style="display:inline;margin-left:5px"></h6>'
+				+'<h6 style="display:inline;margin-right:5px;">Array<input type="checkbox" class="chkBox" style="display:inline;float: right;"></h6>'
 			+'</div>'
 			+'<label for="" style="margin-right:10;width:20%" class="col-md-3 text-center mgTop6">'
 				+'<h5>PROGRAMMING LANGUAGE:</h5>'
@@ -551,7 +552,7 @@ function setFunctionField(obj){
 					+'<td><input type="text" class="form-control"/></td>'
 					+'<td>'
 						+'<select class="form-control" style="display:inline;width:40%"><select><select class="form-control" style="display:inline;width:40%;margin-right:10px;"><select>'
-						+'<label tyle="display:inline;width:5%;">Array</label><input type="checkbox" style="margin-left:5px;display:inline;width:5%"/>'
+						+'<label tyle="display:inline;width:5%;">Array</label><input type="checkbox" class="chkBox" style="float:right"/>'
 					+'</td>'
 				+'</tr>'
 				+'<tr>'
@@ -559,7 +560,7 @@ function setFunctionField(obj){
 					+'<td><input type="text" class="form-control"/></td>'
 					+'<td>'
 						+'<select class="form-control" style="display:inline;width:40%"><select><select class="form-control" style="display:inline;width:40%;margin-right:10px;"><select>'
-						+'<label tyle="display:inline;width:5%">Array</label><input type="checkbox" style="margin-left:5px;display:inline;width:5%"/>'
+						+'<label tyle="display:inline;width:5%">Array</label><input type="checkbox" class="chkBox" style="float:right"/>'
 					+'</td>'
 				+'</tr>'
 				+'<tr>'
@@ -567,7 +568,7 @@ function setFunctionField(obj){
 					+'<td><input type="text" class="form-control"/></td>'
 					+'<td>'
 						+'<select class="form-control" style="display:inline;width:40%"><select><select class="form-control" style="display:inline;width:40%;margin-right:10px;"><select>'
-						+'<label tyle="display:inline;width:5%;">Array</label><input type="checkbox" style="margin-left:5px;display:inline;width:5%"/>'
+						+'<label tyle="display:inline;width:5%;">Array</label><input type="checkbox" class="chkBox" style="float:right"/>'
 					+'</td>'
 				+'</tr>'
 			+'</table>'
@@ -635,8 +636,8 @@ function setFunctionField(obj){
 	+'</div>'
 
 	+'<div class="center-block">'
-		+'<button type="button" class="btn btn-success" style="margin-right:8px;">CREATE</button>'
-		+'<button type="button" class="btn btn-primary">CANCEL</button>'
+		+'<button type="button" class="btn btn-success mgRgt8" onclick="setCreateTable();">CREATE</button>'
+		+'<button type="button" class="btn btn-primary" onclick="setCancel();">CANCEL</button>'
 	+'</div>'
 	+'</form>'
 	;
@@ -709,8 +710,8 @@ function setTriggerField(obj){
 	+'</div>'
 
 	+'<div class="center-block">'
-		+'<button type="button" class="btn btn-success" style="margin-right:8px;">CREATE</button>'
-		+'<button type="button" class="btn btn-primary">CANCEL</button>'
+		+'<button type="button" class="btn btn-success mgRgt8" onclick="setCreateTable();">CREATE</button>'
+		+'<button type="button" class="btn btn-primary" onclick="setCancel();">CANCEL</button>'
 	+'</div>'
 	+'</form>'
 	;
@@ -731,15 +732,25 @@ function setSqlTextField (obj) {
 	+ - 이벤트
 **/
 
-function plusTr() {
+function plusTr(obj) {
 
 	//PLUS 버튼 TR 추가
+	 var len =$("#createTb").find('tr').length -1;
 	 var appendCont = $("#firstTr").clone();
-	 appendCont.removeAttr('id');
+	 
+	 appendCont.attr('id','');
 	 appendCont.find('td:last').append('<a href="#" onclick="javascript:minusTr(this);"><img src="/images/minus.png" class="pdTop6 csPointer"/></a>');
+	 appendCont.find('#columnTxt').attr('id','columnTxt'+len);
+	 appendCont.find('#tpSel').attr('id','tpSel'+len);
+	 appendCont.find('#lengthTxt').attr('id','lengthTxt'+len);
+	 appendCont.find('#nnChk').attr('id','nnChk'+len);
+	 appendCont.find('#prmChk').attr('id','prmChk'+len);
+	 appendCont.find('#unChk').attr('id','unChk'+len);
+	 appendCont.find('#defaultTxt').attr('id','defaultTxt'+len);
+	 appendCont.find('#fgnTxt').attr('id','fgnTxt'+len);
+	 appendCont.find('#chkTxt').attr('id','chkTxt'+len);
 
 	$("#createTb").append(appendCont);
-
 }
 
 function minusTr(obj) {
@@ -755,4 +766,52 @@ function prLanChg(){
 		var selRd = $(':radio[name="prLangRd"]:checked').val();
 		$("#prLanH6").text(selRd);
 	});
+}
+
+function setCancel(){
+	$("#frm").clearForm();
+	/*$("#frm")..each(
+		function(){
+			this.reset();
+		}
+	);*/
+}
+
+function setCreateTable(){
+
+	/*var object1 = new Object;
+
+	 $('input[type=text]').each(function(i,obj){
+	 	object1[obj.name]=obj.value; 
+	 });
+
+	 $('input[type=checkbox]:checked').each(function(i,obj){
+	 	object1[obj.name]=obj.value; 
+	 });
+
+	 $('select').each(function(i,obj){
+	 	object1[obj.name]=obj.value; 
+	 });
+	object1['comment'] = $('textarea').val();*/
+
+	var frm = $("#frm").serialize();
+	var connInfo = { uid : 'postgres', upw : 'postgres', connHost: 'localhost', connDB : $('.current_selected_database').text(), type : 'CT' ,datas : frm};
+	//object -> JSON
+	var jConnInfo = JSON.stringify(connInfo);
+
+	console.log(frm);
+	socket.emit('tmaction_req', jConnInfo);
+	socket.once('tmaction_ctres', function (data) {
+
+		//JSON -> object
+		var result = JSON.parse(data);
+
+		/*$.each(result, function (index, obj) {
+			var list_data = Templete.format(schemaNames,
+				obj['schema']
+				);
+			$("#schemaNmSel").append(list_data);
+		});*/
+	});
+	
 }

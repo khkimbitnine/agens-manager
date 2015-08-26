@@ -16,6 +16,8 @@
 ###############################################################################################*/
 
 var pg = require('pg');
+var qs = require('querystring');
+var urls = require('url');
 var util = require('util');
 var eq = require('./executeQuery');
 
@@ -28,6 +30,9 @@ exports.tmaction = function (socket, data) {
 	var password = socketData.upw;
 	var hostname = socketData.connHost;
 	var dbname = socketData.connDB;
+
+	var datas = socketData.datas;
+
 	var dbURL = util.format("postgres://%s:%s@%s/%s", username, password, hostname, dbname);
 	var queryString = null;
 	switch (socketData.type) {
@@ -50,6 +55,26 @@ exports.tmaction = function (socket, data) {
 
 			getQuerySel(dbURL, socket, schemaName, username,queryString,'tmaction_tpres');
 			break;
+
+		case 'CT':
+			
+			var jsonData = qs.parse(datas);
+			console.log(jsonData);
+
+			for(var myKey in jsonData) {
+   				console.log("key:"+myKey+", value:"+jsonData[myKey]);
+			}
+
+			/*queryString ='CREATE TABLE '+jsonData.tableTxt +
+					+' ( '
+					for(var i=0;)
+					+	 jsonData.columnTxt +' '+ jsonData.tpSel +' ('+lengthTxt' )'
+					+' ) ; ';
+*/
+
+			break;
+			
+			getQuerySel(dbURL, socket, schemaName, username,queryString,'tmaction_ctres');
 		default :
 			console.log("no types for tmaction!");
 			break;
