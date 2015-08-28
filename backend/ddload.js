@@ -65,7 +65,7 @@ function getSessionInfo(cookieInfo) {
 	var uid = cookieInfo.uid;
 	var token = cookieInfo.token;
 
-	var tokenValue = hashMap.get(token);
+	var tokenValue = tokenHashMap.get(token);
 
 	if(tokenValue) {
 		return tokenValue;

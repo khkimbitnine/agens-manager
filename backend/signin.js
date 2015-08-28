@@ -39,8 +39,18 @@ function authUser (socket, data) {
 			stderr(err);
 			return;
 		}
-		var token = checkAndInsertToken(socketData);
-		if(token != -1) {
+
+		var token;
+		var inserted = false;
+		var retry = 5;
+		do {
+			token = generateToken(socketData);
+			inserted = insertToken(token, socketData);
+			if (inserted)
+				break;
+		} while (--retry > 0);
+
+		if(inserted) {
 			var JcookieData = JSON.stringify({uid: username, token: token});
 			socket.emit('auth_success', JcookieData);
 		} else {
@@ -50,22 +60,12 @@ function authUser (socket, data) {
 	});
 }
 
-function checkAndInsertToken (data) {
-	var token = generateToken(data);
-	for(var tryCount = 0; tryCount < 5; tryCount++) {
+function insertToken (token, data) {
+	if(tokenHashMap.has(token))
+		return false;
 
-		if(!hashMap.has(token)) {
-			hashMap.set(token, data);
-			return token;
-		} else {
-			if(tryCount == 4) {
-				return -1;
-			} else {
-				token = generateToken(data);
-			}
-		}
-		
-	}
+	tokenHashMap.set(token, data);
+	return true;
 }
 
 function generateToken (data) {
@@ -79,7 +79,7 @@ function generateToken (data) {
 	}
 	tempArr[i] = new Date().getTime();
 
-	// array shuffle
+	// array shuffling
 	shuffle(tempArr);
 
 	var tempToken = '';

@@ -19,6 +19,6 @@
 var HashMap = require('hashmap');
 
 exports.connMgr = function () {
-	// create hashmap
-	global.hashMap = new HashMap();
+	// create hashmap, 변수 이름 변경 다른사람 알게
+	global.tokenHashMap = new HashMap();
 }
