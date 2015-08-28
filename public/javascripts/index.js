@@ -15,28 +15,31 @@
 #
 ###############################################################################################*/
 
-// signin 버튼 클릭시 PostgreSQL의 ID와 Password 등의 로그인시 필요한 정보를 signin_S.js로 전달한다.
-// TO-DO 비밀번호 암호화(SHA256?)
-// cookie write 필요
 // Server side에서 SQL injection 고려(black listing, white listing 예외처리)
 $(function(){
 	var socket = io.connect("http://10.211.55.14:3000");
 
 	$("#signin_btn").click(function(){
-		var host = $("#inputHost").val();
-		var port = $("#inputPort").val();
 		var uid = $("#inputID").val();
-		var password = $("#inputPassword").val();
+		var upw = $("#inputPassword").val();
+		var connhost = $("#inputHost").val() + ':' + $("#inputPort").val();
 
-		//TO-DO 인증 신청 로직포함해서 보내기
-		socket.emit('signin', {host: host, port: port, uid: uid, password: password});
+		socket.emit('signin', JSON.stringify({uid: uid, upw: upw, connhost: connhost, connDB: 'postgres'}));
     });
-	//TO-DO 쿼리스트링으로 GET으로 보내기
+
     socket.on('auth_success', function (data) {
-       	window.location = '/main';
+    	var cookieData = JSON.parse(data);
+    	initializeCookie(cookieData);
+        window.location = '/main';
 	});
 
 	socket.on('auth_fail', function (data) {
-		alert("Authentication fail. Please type the correct inputs.");
+		var message = JSON.parse(data);
+		alert(data.msg);
 	});
 });
+
+function initializeCookie(data) {
+	Cookies.set('uid', data.uid);
+    Cookies.set('token', data.token);
+}

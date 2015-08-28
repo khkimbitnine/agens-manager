@@ -40,11 +40,14 @@ append_dropdown_tag = '<li><a style=\'cursor:pointer\' onclick="$(\'.current_sel
 function appendDropdownList (socket) {
 
 	//TO-DO 사용자 DB 아이디 보내기, cookie의 uid 값 읽어야함. 정책에 따라 decryption, hex 시켜야 함. 현재는 하드코딩
-	var connInfo = { uid : 'postgres', upw : 'postgres', connHost: 'localhost'};
-	//object -> JSON
-	var jConnInfo = JSON.stringify(connInfo);
+	//var connInfo = { uid : 'postgres', upw : 'postgres', connHost: 'localhost'};
 
-	socket.emit('ddload_req', jConnInfo);
+	var cookieInfo = {uid: Cookies.get('uid'), token: Cookies.get('token')};
+
+	//object -> JSON
+	var jCookieInfo = JSON.stringify(cookieInfo);
+
+	socket.emit('ddload_req', jCookieInfo);
 	
 	socket.once('ddload_res', function (data) {
 		//JSON -> object
@@ -56,7 +59,11 @@ function appendDropdownList (socket) {
 				);
 			$(".dropdown-menu").append(list_data);
 		});
+	});
 
+	socket.once('req_session_disconnected', function (data) {
+		alert('Session connection is disconnected, Please re-signin.');
+		window.location='/';
 	});
 }
 

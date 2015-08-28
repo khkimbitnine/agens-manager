@@ -23,15 +23,25 @@ exports.ddload = function (socket, data) {
 
 	//TO-DO data에 날아온 DB 유저 정보를 바탕으로 아래 연결정보를 설정한다. 정책에 다라 decryption, dehex 필요...
 	//JSON -> object
-	var connInfo = JSON.parse(data);
-	//연결정보 설정. dbname은 postgres로 하여 uid에 따른 모든 DB 목록을 가져온다.
-	var username = connInfo.uid;
-	var password = connInfo.upw;
-	var hostname = connInfo.connHost;
-	var dbname = 'postgres';
-	var dbURL = util.format("postgres://%s:%s@%s/%s", username, password, hostname, dbname);
+	var cookieInfo = JSON.parse(data);
 
-	makeDBList(dbURL, socket, username);
+	// Hash 뒤지기
+	var tokenValue = getSessionInfo(cookieInfo);
+
+	if(tokenValue != -1) {
+		var username = tokenValue.uid;
+		var password = tokenValue.upw;
+		var hostname = tokenValue.connhost;
+		var dbname = 'postgres';
+		var dbURL = util.format("postgres://%s:%s@%s/%s", username, password, hostname, dbname);
+
+		makeDBList(dbURL, socket, username);
+	} else {
+		// 세션끊긴거 통보
+		console.log('session disconnected');
+		socket.emit('req_session_disconnected');
+		return -1;
+	}
 }
 
 function makeDBList (dbURL, socket, username) {
@@ -49,4 +59,18 @@ function makeDBList (dbURL, socket, username) {
 		var jResult = JSON.stringify(result.rows);
 		socket.emit('ddload_res', jResult);
 	});
+}
+
+function getSessionInfo(cookieInfo) {
+	var uid = cookieInfo.uid;
+	var token = cookieInfo.token;
+
+	var tokenValue = hashMap.get(token);
+
+	if(tokenValue) {
+		return tokenValue;
+	} else {
+		console.log('token not found');
+		return -1;
+	}
 }
